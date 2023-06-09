@@ -1,21 +1,6 @@
 {
-  "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "es2022",
-    "outDir": "out",
-    "sourceMap": true,
-    "strict": true,
-    "experimentalDecorators": true,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "rootDir": "src"
-  },
-  "include": [
-    "src",
+  "references": [
+    { "path": "packages/twig-language-server" },
   ],
-  "exclude": [
-    "node_modules",
-    "out",
-  ],
+  "files": []
 }

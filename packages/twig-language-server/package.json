@@ -1,0 +1,29 @@
+{
+  "name": "twig-language-server",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "esbuild-base": "npm run build:copy-wasm && esbuild ./src/*.ts --outdir=out --format=cjs --platform=node",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+
+    "build": "npm run build:ts && npm run build:copy-wasm",
+    "build:ts": "tsc --build",
+    "build:copy-wasm": "cp vendor/tree-sitter-twig.wasm out/tree-sitter-twig.wasm"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@types/node": "^20.2.5",
+    "glob": "^10.2.7",
+    "typescript": "^5.1.3",
+    "vitest": "^0.31.4"
+  },
+  "dependencies": {
+    "vscode-languageserver": "^8.1.0",
+    "vscode-languageserver-textdocument": "^1.0.8",
+    "web-tree-sitter": "^0.20.8"
+  }
+}
