@@ -5,13 +5,12 @@
       "name": "Launch VSCode Extension",
       "type": "extensionHost",
       "request": "launch",
+      "preLaunchTask": "npm: build",
+      "autoAttachChildProcesses": true,
+      "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-twig"
       ],
-      "outFiles": [
-        "${workspaceFolder}/packages/vscode-twig/out/extension.js",
-      ],
-      "preLaunchTask": "VSCode Twig"
     },
   ]
 }

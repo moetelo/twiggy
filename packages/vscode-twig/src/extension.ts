@@ -1,113 +1,61 @@
-import { createRequire } from 'module';
-import { join, resolve } from 'path';
-import {
-  ExtensionContext,
-  FileSystemWatcher,
-  WorkspaceFolder,
-  window,
-  workspace,
-} from 'vscode';
-import { LanguageClient, ServerOptions } from 'vscode-languageclient/node.js';
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * ------------------------------------------------------------------------------------------ */
 
-const outputChannel = window.createOutputChannel('Twig Language Server');
-const clients = new Map<string, LanguageClient>();
-const extensions = ['.twig', '.html.twig'];
-const filePattern = `**/*{${extensions.join(',')}}`;
+import * as path from 'path';
+import { workspace, ExtensionContext } from 'vscode';
+
+import {
+	LanguageClient,
+	LanguageClientOptions,
+	ServerOptions,
+	TransportKind
+} from 'vscode-languageclient/node';
+
 let client: LanguageClient;
 
-export async function activate(context: ExtensionContext) {
-  // let fileWatcher = workspace.createFileSystemWatcher(filePattern);
-
-  const module = context.asAbsolutePath(
-		join('..', 'twig-language-server', 'out', 'index.js')
+export function activate(context: ExtensionContext) {
+	// The server is implemented in node
+	const serverModule = context.asAbsolutePath(
+		path.join('..', 'twig-language-server', 'out', 'server.js')
 	);
 
-  let serverOptions: ServerOptions = { module };
-  client = new LanguageClient(
-    'twig-language-server',
-    'Twig Language Server',
-    serverOptions,
-    {
-      outputChannel,
-      // initializationOptions: {},
-      documentSelector: [{ scheme: 'file', language: 'twig' }],
-      // synchronize: { fileEvents: watcher },
-    }
-  );
+	// If the extension is launched in debug mode then the debug server options are used
+	// Otherwise the run options are used
+	const serverOptions: ServerOptions = {
+		run: { module: serverModule, transport: TransportKind.ipc },
+		debug: {
+			module: serverModule,
+			transport: TransportKind.ipc,
+		}
+	};
 
-  // clients.set(folderPath, client);
+	// Options to control the language client
+	const clientOptions: LanguageClientOptions = {
+		// Register the server for plain text documents
+		documentSelector: [{ scheme: 'file', language: 'plaintext' }],
+		synchronize: {
+			// Notify the server about file changes to '.clientrc files contained in the workspace
+			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+		}
+	};
 
-  await client.start();
+	// Create the language client and start the client.
+	client = new LanguageClient(
+		'languageServerExample',
+		'Language Server Example',
+		serverOptions,
+		clientOptions
+	);
 
-  console.log('client started');
+	// Start the client. This will also launch the server
+	client.start();
 }
 
-export async function deactivate(): Promise<void> {
-  // await Promise.all([...clients.values()].map((client) => client.stop()));
-  if (!client) {
+export function deactivate(): Thenable<void> | undefined {
+	if (!client) {
 		return undefined;
 	}
 	return client.stop();
 }
-
-// function findLanguageServer(workspaceDir: string): string | null {
-//   // TODO: fix dynamic path from dev to prod
-//   try {
-//     return '../twig-language-server/out/index1.js';
-//   } catch {
-//     outputChannel.appendLine(`twig-language-server not found`);
-//     return null;
-//   }
-// }
-
-// async function addWorkspaceFolder(
-//   workspaceFolder: WorkspaceFolder,
-//   watcher: FileSystemWatcher,
-//   context: ExtensionContext
-// ): Promise<void> {
-//   let folderPath = workspaceFolder.uri.fsPath;
-
-//   if (clients.has(folderPath)) {
-//     return;
-//   }
-
-//   let module = context.asAbsolutePath(
-//     join('..', 'twig-language-server', 'out', 'index.js')
-//   );
-
-//   console.log(`${folderPath}/${filePattern}`);
-
-//   let serverOptions: ServerOptions = { module };
-//   let client = new LanguageClient(
-//     'twig-language-server',
-//     'Twig Language Server',
-//     serverOptions,
-//     {
-//       workspaceFolder,
-//       outputChannel,
-//       // initializationOptions: {},
-//       documentSelector: [
-//         { scheme: 'file', pattern: `${folderPath}/${filePattern}` },
-//       ],
-//       // synchronize: { fileEvents: watcher },
-//     }
-//   );
-
-//   clients.set(folderPath, client);
-
-//   await client.start();
-
-//   console.log('client started');
-// }
-
-// async function removeWorkspaceFolder(
-//   workspaceFolder: WorkspaceFolder
-// ): Promise<void> {
-//   let folderPath = workspaceFolder.uri.fsPath;
-//   let client = clients.get(folderPath);
-
-//   if (client) {
-//     clients.delete(folderPath);
-//     await client.stop();
-//   }
-// }

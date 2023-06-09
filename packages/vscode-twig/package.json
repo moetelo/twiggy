@@ -4,7 +4,13 @@
   "description": "A Twig extension for VS Code",
   "version": "0.0.0",
   "publisher": "stanislav",
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaermorchen/twig-language-server",
+    "directory": "packages/vscode-twig"
+  },
+  "type": "commonjs",
+  "main": "out/extension.js",
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "engines": {
     "vscode": "^1.74.0"
@@ -21,7 +27,6 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
   "contributes": {
     "languages": [
       {
@@ -44,6 +49,11 @@
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+
+    "build": "npm run compile",
+    "compile": "tsc --build",
+    "bundle": "esbuild out/extension.js --bundle --outfile=dist/extension.js --platform=node --external:vscode --minify",
+
     "release": "release-it"
   },
   "devDependencies": {

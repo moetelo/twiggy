@@ -1,17 +1,20 @@
 {
   "name": "twig-language-server",
   "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaermorchen/twig-language-server",
+    "directory": "packages/twig-language-server"
+  },
   "type": "module",
+  "main": "out/index.js",
+  "exports": {
+    ".": "./out/index.js"
+  },
   "scripts": {
-    "esbuild-base": "npm run build:copy-wasm && esbuild ./src/*.ts --outdir=out --format=cjs --platform=node",
-    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-    "esbuild": "npm run esbuild-base -- --sourcemap",
-
     "build": "npm run build:ts && npm run build:copy-wasm",
     "build:ts": "tsc --build",
-    "build:copy-wasm": "cp vendor/tree-sitter-twig.wasm out/tree-sitter-twig.wasm"
+    "build:copy-wasm": "mkdir -p out && cp vendor/tree-sitter-twig.wasm out/tree-sitter-twig.wasm"
   },
   "author": "",
   "license": "",
