@@ -9,7 +9,7 @@
       "autoAttachChildProcesses": true,
       "runtimeExecutable": "${execPath}",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode-twig"
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode"
       ],
     },
   ]

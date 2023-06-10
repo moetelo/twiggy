@@ -1,7 +1,4 @@
 {
-  "references": [
-    { "path": "packages/twig-language-server" },
-    { "path": "packages/vscode-twig" }
-  ],
+  "references": [{ "path": "packages/vscode" }],
   "files": []
 }
