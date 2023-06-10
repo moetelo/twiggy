@@ -2,14 +2,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch VSCode Extension",
+      "name": "Extension",
       "type": "extensionHost",
       "request": "launch",
-      "preLaunchTask": "npm: build",
-      "autoAttachChildProcesses": true,
-      "runtimeExecutable": "${execPath}",
+      "preLaunchTask": "${defaultBuildTask}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/packages/vscode/out/*.js"
       ],
     },
   ]

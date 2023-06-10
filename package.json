@@ -6,7 +6,8 @@
     "packages/vscode"
   ],
   "scripts": {
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "watch": "tsc --build --watch"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "Mozilla Public License 2.0"
