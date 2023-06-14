@@ -16,7 +16,11 @@ export function activate(context: ExtensionContext) {
 
   const serverOptions: ServerOptions = {
     run: { module, transport: TransportKind.ipc },
-    debug: { module, transport: TransportKind.ipc },
+    debug: {
+      module,
+      transport: TransportKind.ipc,
+      options: { execArgv: ['--nolazy', `--inspect=6009`] },
+    },
   };
 
   const clientOptions: LanguageClientOptions = {
