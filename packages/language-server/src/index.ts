@@ -2,9 +2,6 @@ import {
   createConnection,
   TextDocuments,
   ProposedFeatures,
-  CompletionItem,
-  CompletionItemKind,
-  TextDocumentPositionParams,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { validateTwigDocument } from './utils/validate-twig-document';
