@@ -3,11 +3,13 @@
   "repository": "https://github.com/kaermorchen/twig-language-server",
   "private": true,
   "workspaces": [
+    "packages/language-server",
     "packages/vscode"
   ],
   "scripts": {
-    "build": "tsc --build",
-    "watch": "tsc --build --watch"
+    "copy-wasm": "cp packages/language-server/vendor/tree-sitter-twig.wasm packages/language-server/out",
+    "build": "npm run copy-wasm && tsc --build",
+    "watch": "npm run build -- --watch"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "Mozilla Public License 2.0"
