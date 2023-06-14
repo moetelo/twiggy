@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "preLaunchTask": "${defaultBuildTask}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/packages/vscode/out/*.js"
+      ],
+    },
+    {
+      "name": "Server",
+      "type": "node",
+      "request": "attach",
+      "port": 6009,
+      "restart": true,
+      "sourceMaps":true,
+      "smartStep":true,
+      "outFiles": [
+        "${workspaceRoot}/packages/language-server/out/**/*.js"
+      ]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Extension + Server",
+      "configurations": [
+        "Extension",
+        "Server"
+      ],
+      "stopAll": true
+    }
+  ]
+}
