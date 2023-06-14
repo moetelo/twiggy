@@ -18,6 +18,7 @@ import {
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { parseTwig } from './utils/parse-twig';
 
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -40,6 +41,12 @@ documents.onDidChangeContent((change) => {
 async function validateTextDocument(textDocument: TextDocument): Promise<void> {
   const text = textDocument.getText();
   const diagnostics: Diagnostic[] = [];
+  const tree = await parseTwig(text);
+
+  if (tree.rootNode.hasError()) {
+
+  }
+
 
   // const diagnostic: Diagnostic = {
   //   severity: DiagnosticSeverity.Warning,
