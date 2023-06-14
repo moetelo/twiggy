@@ -1,7 +1,3 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 import {
   createConnection,
   TextDocuments,
@@ -15,10 +11,13 @@ import {
   TextDocumentPositionParams,
   TextDocumentSyncKind,
   InitializeResult,
+  Position,
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { parseTwig } from './utils/parse-twig';
+import { PreOrderCursorIterator } from './utils/pre-order-cursor-iterator';
+import { pointToPosition } from './utils/point-to-position';
 
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -38,29 +37,32 @@ documents.onDidChangeContent((change) => {
   validateTextDocument(change.document);
 });
 
-async function validateTextDocument(textDocument: TextDocument): Promise<void> {
-  const text = textDocument.getText();
+async function validateTextDocument(document: TextDocument): Promise<void> {
+  const text = document.getText();
   const diagnostics: Diagnostic[] = [];
-  const tree = await parseTwig(text);
+  const cst = await parseTwig(text);
 
-  if (tree.rootNode.hasError()) {
+  if (cst.rootNode.hasError()) {
+    const cursor = cst.walk();
+    const nodes = new PreOrderCursorIterator(cursor);
 
+    for (const node of nodes) {
+      if (node.nodeType === 'ERROR') {
+        const diagnostic: Diagnostic = {
+          severity: DiagnosticSeverity.Warning,
+          range: {
+            start: pointToPosition(node.startPosition),
+            end: pointToPosition(node.endPosition),
+          },
+          message: `Unexpected syntax`,
+        };
+
+        diagnostics.push(diagnostic);
+      }
+    }
   }
 
-
-  // const diagnostic: Diagnostic = {
-  //   severity: DiagnosticSeverity.Warning,
-  //   range: {
-  //     start: textDocument.positionAt(m.index),
-  //     end: textDocument.positionAt(m.index + m[0].length),
-  //   },
-  //   message: `${m[0]} is all uppercase.`,
-  //   source: 'ex',
-  // };
-
-  // diagnostics.push(diagnostic);
-
-  connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
+  connection.sendDiagnostics({ uri: document.uri, diagnostics });
 }
 
 connection.onCompletion(
