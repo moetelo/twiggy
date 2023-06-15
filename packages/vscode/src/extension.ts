@@ -1,5 +1,11 @@
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
+import {
+  workspace,
+  ExtensionContext,
+  window,
+  WorkspaceFolder,
+  FileSystemWatcher,
+} from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -7,9 +13,42 @@ import {
   TransportKind,
 } from 'vscode-languageclient/node';
 
-let client: LanguageClient;
+const outputChannel = window.createOutputChannel('Twig Language Server');
+const clients = new Map<string, LanguageClient>();
+const filePattern = `**/*.twig`;
 
 export function activate(context: ExtensionContext) {
+  const fileWatcher = workspace.createFileSystemWatcher(filePattern);
+
+  context.subscriptions.push(fileWatcher);
+
+  workspace.workspaceFolders?.forEach((folder) =>
+    addWorkspaceFolder(folder, fileWatcher, context)
+  );
+
+  workspace.onDidChangeWorkspaceFolders(({ added, removed }) => {
+    added.forEach((folder) => addWorkspaceFolder(folder, fileWatcher, context));
+    removed.forEach((folder) => removeWorkspaceFolder(folder));
+  });
+}
+
+export async function deactivate(): Promise<void> {
+  for (const client of clients.values()) {
+    await client.stop();
+  }
+}
+
+async function addWorkspaceFolder(
+  workspaceFolder: WorkspaceFolder,
+  watcher: FileSystemWatcher,
+  context: ExtensionContext
+): Promise<void> {
+  const folderPath = workspaceFolder.uri.fsPath;
+
+  if (clients.has(folderPath)) {
+    return;
+  }
+
   const module = context.asAbsolutePath(
     path.join('..', 'language-server', 'out', 'index.js')
   );
@@ -24,26 +63,41 @@ export function activate(context: ExtensionContext) {
   };
 
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: 'file', language: 'twig' }],
+    workspaceFolder,
+    outputChannel,
+    documentSelector: [
+      {
+        scheme: 'file',
+        language: 'twig',
+        pattern: `${folderPath}/**`,
+      },
+    ],
     synchronize: {
-      fileEvents: workspace.createFileSystemWatcher('**/.clientrc'),
+      fileEvents: watcher,
     },
   };
 
-  client = new LanguageClient(
+  const client = new LanguageClient(
     'twig-language-server',
     'Twig Language Server',
     serverOptions,
     clientOptions
   );
 
-  client.start();
+  clients.set(folderPath, client);
+
+  await client.start();
 }
 
-export function deactivate(): Thenable<void> | undefined {
-  if (!client) {
-    return undefined;
-  }
+async function removeWorkspaceFolder(
+  workspaceFolder: WorkspaceFolder
+): Promise<void> {
+  const folderPath = workspaceFolder.uri.fsPath;
+  const client = clients.get(folderPath);
 
-  return client.stop();
+  if (client) {
+    clients.delete(folderPath);
+
+    await client.stop();
+  }
 }
