@@ -5,6 +5,7 @@ import {
   window,
   WorkspaceFolder,
   FileSystemWatcher,
+  RelativePattern,
 } from 'vscode';
 import {
   LanguageClient,
@@ -15,19 +16,14 @@ import {
 
 const outputChannel = window.createOutputChannel('Twig Language Server');
 const clients = new Map<string, LanguageClient>();
-const filePattern = `**/*.twig`;
 
 export function activate(context: ExtensionContext) {
-  const fileWatcher = workspace.createFileSystemWatcher(filePattern);
-
-  context.subscriptions.push(fileWatcher);
-
   workspace.workspaceFolders?.forEach((folder) =>
-    addWorkspaceFolder(folder, fileWatcher, context)
+    addWorkspaceFolder(folder, context)
   );
 
   workspace.onDidChangeWorkspaceFolders(({ added, removed }) => {
-    added.forEach((folder) => addWorkspaceFolder(folder, fileWatcher, context));
+    added.forEach((folder) => addWorkspaceFolder(folder, context));
     removed.forEach((folder) => removeWorkspaceFolder(folder));
   });
 }
@@ -40,10 +36,14 @@ export async function deactivate(): Promise<void> {
 
 async function addWorkspaceFolder(
   workspaceFolder: WorkspaceFolder,
-  watcher: FileSystemWatcher,
   context: ExtensionContext
 ): Promise<void> {
   const folderPath = workspaceFolder.uri.fsPath;
+  const fileEvents = workspace.createFileSystemWatcher(
+    new RelativePattern(workspaceFolder, '*.twig')
+  );
+
+  context.subscriptions.push(fileEvents);
 
   if (clients.has(folderPath)) {
     return;
@@ -72,9 +72,7 @@ async function addWorkspaceFolder(
         pattern: `${folderPath}/**`,
       },
     ],
-    synchronize: {
-      fileEvents: watcher,
-    },
+    synchronize: { fileEvents },
   };
 
   const client = new LanguageClient(
