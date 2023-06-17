@@ -6,9 +6,11 @@ import {
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { validateTwigDocument } from './utils/validate-twig-document';
 import * as completions from './completions';
+import { DocumentCache } from './document-cache';
 
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+const documentCache = new DocumentCache(documents);
 
 connection.onInitialize(() => {
   return {
