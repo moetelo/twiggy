@@ -24,8 +24,4 @@ export class GlobalVariables extends BasicCompletion {
       },
     ];
   }
-
-  onCompletionResolve(item: CompletionItem): CompletionItem {
-    return item;
-  }
 }

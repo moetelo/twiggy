@@ -11,5 +11,8 @@ export abstract class BasicCompletion {
   }
 
   abstract onCompletion(): CompletionItem[];
-  abstract onCompletionResolve(item: CompletionItem): CompletionItem;
+
+  onCompletionResolve(item: CompletionItem): CompletionItem {
+    return item;
+  }
 }
