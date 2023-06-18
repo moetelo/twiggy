@@ -1,34 +1,8 @@
-import {
-  createConnection,
-  TextDocuments,
-  ProposedFeatures,
-} from 'vscode-languageserver/node';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { validateTwigDocument } from './utils/validate-twig-document';
-import * as completions from './completions';
-import { DocumentCache } from './document-cache';
+import { createConnection, ProposedFeatures } from 'vscode-languageserver/node';
+import { Server } from './server';
 
 const connection = createConnection(ProposedFeatures.all);
-const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
-const documentCache = new DocumentCache(documents);
 
-connection.onInitialize(() => {
-  return {
-    capabilities: {
-      completionProvider: {
-        resolveProvider: true,
-      },
-    },
-  };
-});
+new Server(connection);
 
-documents.onDidChangeContent((change) => {
-  validateTwigDocument(change.document, connection);
-});
-
-for (const Klass of Object.values(completions)) {
-  new Klass(connection);
-}
-
-documents.listen(connection);
 connection.listen();
