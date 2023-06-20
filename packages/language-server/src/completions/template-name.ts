@@ -25,11 +25,24 @@ export class TemplateName extends BasicCompletion {
       node = findNodeByPosition(rootNode, completionParams.position);
 
       if (node) {
-        // {% include 'template.html' %}
+        // This case for array or ajax wrapper
+        // ['template.html']
+        // ajax ? 'ajax.html' : 'not_ajax.html'
         if (
-          node.parent?.type === 'tag_statement' &&
-          node.previousSibling?.type === 'tag' &&
-          node.previousSibling?.text === 'include'
+          node.parent?.type === 'array' ||
+          node.parent?.type === 'ternary_expression'
+        ) {
+          node = node.parent;
+        }
+
+        if (
+          // {% include 'template.html' %}
+          (node.parent?.type === 'tag_statement' &&
+            node.previousSibling?.type === 'tag' &&
+            node.previousSibling?.text === 'include') ||
+          // {% include('template.html') %}
+          (node.parent?.parent?.parent?.parent?.type === 'function_call' &&
+            node.parent?.parent?.parent?.previousSibling?.text === 'include')
         ) {
           const twigPaths = this.server.documentCache.documents.keys();
           const currentPath = dirname(documentUriToFsPath(uri));
