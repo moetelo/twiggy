@@ -36,13 +36,32 @@ export class TemplateName extends BasicCompletion {
         }
 
         if (
+          // {% import "forms.html" as forms %}
+          // {% from "macros.twig" import hello %}
+          (node.parent &&
+            ['import_statement', 'from_statement'].includes(
+              node.parent?.type
+            )) ||
           // {% include 'template.html' %}
+          // {% extends 'template.html' %}
+          // {% use 'template.html' %}
           (node.parent?.type === 'tag_statement' &&
             node.previousSibling?.type === 'tag' &&
-            node.previousSibling?.text === 'include') ||
+            ['include', 'extends', 'use', 'import', 'from'].includes(
+              node.previousSibling?.text
+            )) ||
           // {% include('template.html') %}
+          // {% source('template.html') %}
           (node.parent?.parent?.parent?.parent?.type === 'function_call' &&
-            node.parent?.parent?.parent?.previousSibling?.text === 'include')
+            node.parent?.parent?.parent?.previousSibling &&
+            ['include', 'source'].includes(
+              node.parent?.parent?.parent?.previousSibling?.text
+            )) ||
+          // {{ block("title", "common_blocks.twig") }}
+          (node.parent?.parent?.parent?.parent?.type === 'function_call' &&
+            node.parent?.parent?.parent?.previousSibling?.text === 'block' &&
+            node.parent?.parent.id ===
+              node.parent?.parent?.parent?.children.at(-2)?.id)
         ) {
           const twigPaths = this.server.documentCache.documents.keys();
           const currentPath = dirname(documentUriToFsPath(uri));
