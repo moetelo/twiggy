@@ -2,8 +2,8 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { BasicCompletion } from './basic-completion';
 
 export class GlobalVariables extends BasicCompletion {
-  onCompletion(): CompletionItem[] {
-    return [
+  onCompletion() {
+    return Promise.resolve([
       {
         label: `_self`,
         kind: CompletionItemKind.Variable,
@@ -22,6 +22,6 @@ export class GlobalVariables extends BasicCompletion {
         detail: 'Global variable',
         documentation: 'References the current charset',
       },
-    ];
+    ]);
   }
 }

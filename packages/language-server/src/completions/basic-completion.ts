@@ -1,18 +1,27 @@
-import { CompletionItem, Connection } from 'vscode-languageserver/node';
+import {
+  CompletionItem,
+  CompletionParams,
+  Connection,
+} from 'vscode-languageserver/node';
+import { Server } from '../server';
 
 export abstract class BasicCompletion {
-  connection: Connection;
+  server: Server;
 
-  constructor(connection: Connection) {
-    this.connection = connection;
+  constructor(server: Server) {
+    this.server = server;
 
-    this.connection.onCompletion(this.onCompletion.bind(this));
-    this.connection.onCompletionResolve(this.onCompletionResolve.bind(this));
+    this.server.connection.onCompletion(this.onCompletion.bind(this));
+    this.server.connection.onCompletionResolve(
+      this.onCompletionResolve.bind(this)
+    );
   }
 
-  abstract onCompletion(): CompletionItem[];
+  abstract onCompletion(
+    completionParams: CompletionParams
+  ): Promise<CompletionItem[]>;
 
-  onCompletionResolve(item: CompletionItem): CompletionItem {
-    return item;
+  async onCompletionResolve(item: CompletionItem): Promise<CompletionItem> {
+    return Promise.resolve(item);
   }
 }
