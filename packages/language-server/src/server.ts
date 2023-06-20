@@ -7,8 +7,9 @@ import {
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { validateTwigDocument } from './utils/validate-twig-document';
-import { GlobalVariables } from './completions';
+import { GlobalVariables } from './completions/global-variables';
 import { DocumentCache } from './document-cache';
+import { TemplateName } from './completions/template-name';
 
 export class Server {
   connection: Connection;
@@ -20,7 +21,8 @@ export class Server {
     this.connection = connection;
     this.documents = new TextDocuments(TextDocument);
 
-    new GlobalVariables(this.connection);
+    new GlobalVariables(this);
+    new TemplateName(this);
 
     // Bindings
     connection.onInitialize((initializeParams: InitializeParams) => {
