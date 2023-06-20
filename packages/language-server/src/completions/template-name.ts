@@ -6,7 +6,8 @@ import {
 import { BasicCompletion } from './basic-completion';
 import { findNodeByPosition } from '../utils/find-element-by-position';
 import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
-import { relative } from 'path';
+import { dirname, relative } from 'path';
+import { trimTwigExtension } from '../utils/trim-twig-extension';
 
 export class TemplateName extends BasicCompletion {
   async onCompletion(
@@ -17,6 +18,7 @@ export class TemplateName extends BasicCompletion {
     const document = this.server.documentCache.getDocument(uri);
     const cst = await document?.cst();
     const rootNode = cst?.rootNode;
+
     let node;
 
     if (rootNode) {
@@ -30,13 +32,14 @@ export class TemplateName extends BasicCompletion {
           node.previousSibling?.text === 'include'
         ) {
           const twigPaths = this.server.documentCache.documents.keys();
-          const currentPath = documentUriToFsPath(
-            completionParams.textDocument.uri
-          );
+          const currentPath = dirname(documentUriToFsPath(uri));
 
           for (const twigPath of twigPaths) {
             completions.push({
-              label: relative(currentPath, documentUriToFsPath(twigPath)),
+              label: relative(
+                currentPath,
+                documentUriToFsPath(trimTwigExtension(twigPath))
+              ),
               kind: CompletionItemKind.File,
             });
           }
