@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
+import { CompletionItemKind } from 'vscode-languageserver/node';
 import { BasicCompletion } from './basic-completion';
 
 export class GlobalVariables extends BasicCompletion {

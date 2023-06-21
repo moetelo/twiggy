@@ -1,8 +1,4 @@
-import {
-  CompletionItem,
-  CompletionParams,
-  Connection,
-} from 'vscode-languageserver/node';
+import { CompletionItem, CompletionParams } from 'vscode-languageserver/node';
 import { Server } from '../server';
 
 export abstract class BasicCompletion {
