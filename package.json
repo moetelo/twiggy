@@ -7,8 +7,7 @@
     "packages/vscode"
   ],
   "scripts": {
-    "copy-wasm": "cp packages/language-server/vendor/tree-sitter-twig.wasm packages/language-server/out",
-    "build": "npm run copy-wasm && tsc --build",
+    "build": "tsc --build",
     "watch": "npm run build -- --watch"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
