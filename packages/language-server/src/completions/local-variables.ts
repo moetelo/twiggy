@@ -5,55 +5,41 @@ import {
 } from 'vscode-languageserver/node';
 import { BasicCompletion } from './basic-completion';
 import { findNodeByPosition } from '../utils/find-element-by-position';
-import { SyntaxNode } from 'web-tree-sitter';
+import { bottomTopCursorIterator } from '../utils/bottom-top-cursor-iterator';
 
-export class LocalVariables extends BasicCompletion {
-  async onCompletion(
-    completionParams: CompletionParams
-  ): Promise<CompletionItem[]> {
+export class Variables extends BasicCompletion {
+  async onCompletion(completionParams: CompletionParams) {
     const completions: CompletionItem[] = [];
     const uri = completionParams.textDocument.uri;
     const document = this.server.documentCache.getDocument(uri);
-    const cst = await document?.cst();
-    const rootNode = cst?.rootNode;
 
-    let node;
+    if (!document) {
+      return;
+    }
 
-    if (rootNode) {
-      node = findNodeByPosition(rootNode, completionParams.position);
+    const cst = await document.cst();
+    let cursorNode = findNodeByPosition(
+      cst.rootNode,
+      completionParams.position
+    );
 
-      if (node) {
-        // Travel previous siblings
-        let previousSibling: SyntaxNode | null = node.parent;
+    if (!cursorNode || cursorNode.type !== 'identifier') {
+      return;
+    }
 
-        while (previousSibling) {
-          if (
-            previousSibling.type === 'statement_directive' &&
-            previousSibling.firstNamedChild?.type === 'assignment_statement'
-          ) {
-            let label = previousSibling.firstNamedChild?.namedChild(1)?.text;
+    for (let node of bottomTopCursorIterator(cursorNode)) {
+      if (node.type === 'set') {
+        let cursor = node.walk();
 
-            if (label) {
-              completions.push({
-                label,
-                kind: CompletionItemKind.Variable,
-              });
-            }
-          } else if (
-            previousSibling.type === 'statement_directive' &&
-            previousSibling.firstNamedChild?.type === 'for_statement'
-          ) {
-            for (const item of previousSibling.firstNamedChild.children) {
-              if (item.type === 'variable') {
-                completions.push({
-                  label: item.text,
-                  kind: CompletionItemKind.Variable,
-                });
-              }
-            }
+        cursor.gotoFirstChild();
+
+        while (cursor.gotoNextSibling()) {
+          if (cursor.currentFieldName() === 'variable') {
+            completions.push({
+              label: cursor.nodeText,
+              kind: CompletionItemKind.Variable,
+            });
           }
-
-          previousSibling = previousSibling.previousSibling;
         }
       }
     }

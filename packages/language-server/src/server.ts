@@ -10,7 +10,7 @@ import { validateTwigDocument } from './utils/validate-twig-document';
 import { GlobalVariables } from './completions/global-variables';
 import { DocumentCache } from './document-cache';
 import { TemplateName } from './completions/template-name';
-import { LocalVariables } from './completions/local-variables';
+import { Variables } from './completions/local-variables';
 
 export class Server {
   connection: Connection;
@@ -24,7 +24,7 @@ export class Server {
 
     new GlobalVariables(this);
     new TemplateName(this);
-    // new LocalVariables(this);
+    new Variables(this);
 
     // Bindings
     connection.onInitialize((initializeParams: InitializeParams) => {
