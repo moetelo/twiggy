@@ -7,11 +7,9 @@ import {
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { validateTwigDocument } from './utils/validate-twig-document';
-import { GlobalVariables } from './completions/global-variables';
 import { DocumentCache } from './document-cache';
-import { TemplateName } from './completions/template-name';
-import { Variables } from './completions/local-variables';
 import { Hover } from './hovers';
+import { CompletionProvider } from './completions/completion-provider';
 
 export class Server {
   connection: Connection;
@@ -23,12 +21,8 @@ export class Server {
     this.connection = connection;
     this.documents = new TextDocuments(TextDocument);
 
-    // Completions
-    new GlobalVariables(this);
-    new TemplateName(this);
-    new Variables(this);
-
     new Hover(this);
+    new CompletionProvider(this);
 
     // Bindings
     connection.onInitialize((initializeParams: InitializeParams) => {

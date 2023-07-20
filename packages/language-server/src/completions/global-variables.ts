@@ -1,27 +1,25 @@
-import { CompletionItemKind } from 'vscode-languageserver/node';
-import { BasicCompletion } from './basic-completion';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
+import { SyntaxNode } from 'web-tree-sitter';
+import { globalVariables as gV } from '../common';
 
-export class GlobalVariables extends BasicCompletion {
-  onCompletion() {
-    return Promise.resolve([
-      {
-        label: `_self`,
-        kind: CompletionItemKind.Variable,
-        detail: 'Global variable',
-        documentation: 'References the current template name',
-      },
-      {
-        label: `_context`,
-        kind: CompletionItemKind.Variable,
-        detail: 'Global variable',
-        documentation: 'References the current context',
-      },
-      {
-        label: `_charset`,
-        kind: CompletionItemKind.Variable,
-        detail: 'Global variable',
-        documentation: 'References the current charset',
-      },
-    ]);
+export function globalVariables(cursorNode: SyntaxNode) {
+  let completions: CompletionItem[] = [];
+
+  if (cursorNode.type !== 'identifier') {
+    return;
   }
+
+  for (const item of gV) {
+    completions.push(
+      Object.assign(
+        {
+          kind: CompletionItemKind.Variable,
+          detail: 'Global variable',
+        },
+        item
+      )
+    );
+  }
+
+  return completions;
 }

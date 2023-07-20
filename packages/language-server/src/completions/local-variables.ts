@@ -1,49 +1,30 @@
-import {
-  CompletionItem,
-  CompletionItemKind,
-  CompletionParams,
-} from 'vscode-languageserver/node';
-import { BasicCompletion } from './basic-completion';
-import { findNodeByPosition } from '../utils/find-element-by-position';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
+import { SyntaxNode } from 'web-tree-sitter';
 import { bottomTopCursorIterator } from '../utils/bottom-top-cursor-iterator';
 
-export class Variables extends BasicCompletion {
-  async onCompletion(completionParams: CompletionParams) {
-    const completions: CompletionItem[] = [];
-    const uri = completionParams.textDocument.uri;
-    const document = this.server.documentCache.getDocument(uri);
+export function localVariables(cursorNode: SyntaxNode) {
+  let completions: CompletionItem[] = [];
 
-    if (!document) {
-      return;
-    }
+  if (cursorNode.type !== 'identifier') {
+    return;
+  }
 
-    const cst = await document.cst();
-    let cursorNode = findNodeByPosition(
-      cst.rootNode,
-      completionParams.position
-    );
+  for (let node of bottomTopCursorIterator(cursorNode)) {
+    if (node.type === 'set') {
+      let cursor = node.walk();
 
-    if (!cursorNode || cursorNode.type !== 'identifier') {
-      return;
-    }
+      cursor.gotoFirstChild();
 
-    for (let node of bottomTopCursorIterator(cursorNode)) {
-      if (node.type === 'set') {
-        let cursor = node.walk();
-
-        cursor.gotoFirstChild();
-
-        while (cursor.gotoNextSibling()) {
-          if (cursor.currentFieldName() === 'variable') {
-            completions.push({
-              label: cursor.nodeText,
-              kind: CompletionItemKind.Variable,
-            });
-          }
+      while (cursor.gotoNextSibling()) {
+        if (cursor.currentFieldName() === 'variable') {
+          completions.push({
+            label: cursor.nodeText,
+            kind: CompletionItemKind.Variable,
+          });
         }
       }
     }
-
-    return completions;
   }
+
+  return completions;
 }
