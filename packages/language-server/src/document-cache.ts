@@ -7,7 +7,7 @@ import { DocumentUri } from 'vscode-languageserver';
 import { fsPathToDocumentUri } from './utils/fs-path-to-document-uri';
 import Parser from 'web-tree-sitter';
 
-class Document {
+export class Document {
   filePath: string;
   text: string | null = null;
 
