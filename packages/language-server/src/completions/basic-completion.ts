@@ -1,5 +1,8 @@
 import { CompletionItem, CompletionParams } from 'vscode-languageserver/node';
 import { Server } from '../server';
+import type { Connection } from 'vscode-languageserver';
+
+type onCompletionHandler = Parameters<Connection['onCompletion']>[0];
 
 export abstract class BasicCompletion {
   server: Server;
@@ -14,8 +17,8 @@ export abstract class BasicCompletion {
   }
 
   abstract onCompletion(
-    completionParams: CompletionParams
-  ): Promise<CompletionItem[]>;
+    ...args: Parameters<onCompletionHandler>
+  ): ReturnType<onCompletionHandler>;
 
   async onCompletionResolve(item: CompletionItem): Promise<CompletionItem> {
     return Promise.resolve(item);

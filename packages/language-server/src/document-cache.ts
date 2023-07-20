@@ -5,19 +5,29 @@ import { parseTwig } from './utils/parse-twig';
 import { readFile } from 'fs/promises';
 import { DocumentUri } from 'vscode-languageserver';
 import { fsPathToDocumentUri } from './utils/fs-path-to-document-uri';
+import Parser from 'web-tree-sitter';
 
 class Document {
   filePath: string;
+  text: string | null = null;
 
   constructor(filePath: string) {
     this.filePath = filePath;
   }
 
+  async setText(text: string) {
+    this.text = text;
+  }
+
   async getText() {
+    if (this.text) {
+      return Promise.resolve(this.text);
+    }
+
     return await readFile(this.filePath, 'utf-8');
   }
 
-  async cst() {
+  async cst(): Promise<Parser.Tree> {
     const text = await this.getText();
 
     return await parseTwig(text);

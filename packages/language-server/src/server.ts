@@ -24,7 +24,7 @@ export class Server {
 
     new GlobalVariables(this);
     new TemplateName(this);
-    new LocalVariables(this);
+    // new LocalVariables(this);
 
     // Bindings
     connection.onInitialize((initializeParams: InitializeParams) => {
@@ -34,6 +34,7 @@ export class Server {
       const capabilities: ServerCapabilities = {
         completionProvider: {
           resolveProvider: true,
+          triggerCharacters: ['"', "'"],
         },
       };
 
@@ -42,6 +43,11 @@ export class Server {
 
     this.documents.onDidChangeContent((change) => {
       validateTwigDocument(change.document, connection);
+
+      // Update text in documentCache
+      this.documentCache
+        .getDocument(change.document.uri)
+        ?.setText(change.document.getText());
     });
 
     this.documents.listen(connection);
