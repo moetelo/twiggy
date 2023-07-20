@@ -11,7 +11,7 @@ import { GlobalVariables } from './completions/global-variables';
 import { DocumentCache } from './document-cache';
 import { TemplateName } from './completions/template-name';
 import { Variables } from './completions/local-variables';
-import { Hovers } from './hovers';
+import { Hover } from './hovers';
 
 export class Server {
   connection: Connection;
@@ -28,7 +28,7 @@ export class Server {
     new TemplateName(this);
     new Variables(this);
 
-    new Hovers(this);
+    new Hover(this);
 
     // Bindings
     connection.onInitialize((initializeParams: InitializeParams) => {
