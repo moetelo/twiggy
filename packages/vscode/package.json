@@ -10,6 +10,22 @@
   ],
   "main": "./out/extension.js",
   "scripts": {},
+  "contributes": {
+    "languages": [
+      {
+        "id": "twig",
+        "aliases": [
+          "HTML (Twig)",
+          "twig"
+        ],
+        "extensions": [
+          ".twig",
+          ".html.twig"
+        ],
+        "configuration": "./languages/twig.configuration.json"
+      }
+    ]
+  },
   "devDependencies": {
     "@types/node": "^20.2.6",
     "@types/vscode": "^1.79.0",
