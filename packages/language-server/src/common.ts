@@ -5,7 +5,7 @@ import {
   MarkupContent,
 } from 'vscode-languageserver';
 
-export const globalVariables = [
+export const twigGlobalVariables = [
   {
     label: `_self`,
     documentation: 'References the current template name',
@@ -17,6 +17,80 @@ export const globalVariables = [
   {
     label: `_charset`,
     documentation: 'References the current charset',
+  },
+];
+
+export const twigTests = [
+  {
+    label: 'constant',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        '`constant` checks if a variable has the exact same value as a constant. You can use either global constants or class constants:',
+        '```twig',
+        "{% if post.status is constant('Post::PUBLISHED') %}",
+        '  the status attribute is exactly the same as Post::PUBLISHED',
+        '{% endif %}',
+        '```',
+        'You can test constants from object instances as well:',
+        '```twig',
+        "{% if post.status is constant('PUBLISHED', post) %}",
+        '  the status attribute is exactly the same as Post::PUBLISHED',
+        '{% endif %}',
+        '```',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string ...$values',
+      },
+    ],
+    return: 'mixed',
+  },
+  {
+    label: 'divisible by',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        '`divisible by` checks if a variable is divisible by a number',
+      ].join('\n'),
+    },
+  },
+  {
+    label: 'same as',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        '`same as` checks if a variable is the same as another variable. This is equivalent to === in PHP',
+      ].join('\n'),
+    },
+  },
+  {
+    label: `defined`,
+    documentation:
+      '`defined` checks if a variable is defined in the current context',
+  },
+  {
+    label: `empty`,
+    documentation:
+      '`empty` checks if a variable is an empty string, an empty array, an empty hash, exactly false, or exactly null.',
+  },
+  {
+    label: `even`,
+    documentation: '`even` returns true if the given number is even',
+  },
+  {
+    label: `iterable`,
+    documentation:
+      '`iterable` checks if a variable is an array or a traversable object',
+  },
+  {
+    label: `null`,
+    documentation: '`null` returns true if the variable is null:',
+  },
+  {
+    label: `odd`,
+    documentation: '`odd` returns true if the given number is odd',
   },
 ];
 

@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { globalVariables as gV } from '../common';
+import { twigGlobalVariables } from '../common';
 
 export function globalVariables(cursorNode: SyntaxNode) {
   let completions: CompletionItem[] = [];
@@ -9,12 +9,11 @@ export function globalVariables(cursorNode: SyntaxNode) {
     return;
   }
 
-  for (const item of gV) {
+  for (const item of twigGlobalVariables) {
     completions.push(
       Object.assign(
         {
-          kind: CompletionItemKind.Variable,
-          detail: 'Global variable',
+          kind: CompletionItemKind.Constant,
         },
         item
       )
