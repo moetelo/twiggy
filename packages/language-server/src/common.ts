@@ -531,6 +531,190 @@ export const twigFunctions: twigFunction[] = [
       },
     ],
   },
+  {
+    label: 'render',
+    parameters: [
+      {
+        label: 'string|ControllerReference $uri',
+      },
+      {
+        label: 'array options = []',
+      },
+    ],
+  },
+  {
+    label: 'render_esi',
+    parameters: [
+      {
+        label: 'string|ControllerReference $uri',
+      },
+      {
+        label: 'array options = []',
+      },
+    ],
+  },
+  {
+    label: 'fragment_uri',
+    parameters: [
+      {
+        label: 'ControllerReference controller',
+      },
+      {
+        label: 'boolean absolute = false',
+      },
+      {
+        label: 'boolean strict = true',
+      },
+      {
+        label: 'boolean sign = true',
+      },
+    ],
+  },
+  {
+    label: 'controller',
+    parameters: [
+      {
+        label: 'string controller',
+      },
+      {
+        label: 'array attributes = []',
+      },
+      {
+        label: 'array query = []',
+      },
+    ],
+  },
+  {
+    label: 'asset',
+    parameters: [
+      {
+        label: 'string path',
+      },
+      {
+        label: 'string|null packageName = null',
+      },
+    ],
+  },
+  {
+    label: 'asset_version',
+    parameters: [
+      {
+        label: 'string|null packageName = null',
+      },
+    ],
+  },
+  {
+    label: 'csrf_token',
+    parameters: [
+      {
+        label: 'string intention',
+      },
+    ],
+  },
+  {
+    label: 'is_granted',
+    parameters: [
+      {
+        label: 'string role',
+      },
+      {
+        label: 'object object = null',
+      },
+      {
+        label: 'string field = null',
+      },
+    ],
+  },
+  {
+    label: 'logout_path',
+    parameters: [
+      {
+        label: 'string key = null',
+      },
+    ],
+  },
+  {
+    label: 'logout_url',
+    parameters: [
+      {
+        label: 'string key = null',
+      },
+    ],
+  },
+  {
+    label: 'path',
+    parameters: [
+      {
+        label: 'string route_name',
+      },
+      {
+        label: 'array route_parameters = []',
+      },
+      {
+        label: 'boolean relative = false',
+      },
+    ],
+  },
+  {
+    label: 'url',
+    parameters: [
+      {
+        label: 'string route_name',
+      },
+      {
+        label: 'array route_parameters = []',
+      },
+      {
+        label: 'boolean schemeRelative = false',
+      },
+    ],
+  },
+  {
+    label: 'absolute_url',
+    parameters: [
+      {
+        label: 'string path',
+      },
+    ],
+  },
+  {
+    label: 'relative_path',
+    parameters: [
+      {
+        label: 'string path',
+      },
+    ],
+  },
+  {
+    label: 'impersonation_exit_path',
+    parameters: [
+      {
+        label: 'string exitTo = null',
+      },
+    ],
+  },
+  {
+    label: 'impersonation_exit_url',
+    parameters: [
+      {
+        label: 'string exitTo = null',
+      },
+    ],
+  },
+  {
+    label: 't',
+    parameters: [
+      {
+        label: 'string message',
+      },
+      {
+        label: 'array parameters = []',
+      },
+      {
+        label: "string domain = 'messages'",
+      },
+    ],
+  },
 ];
 
 export const twigFunctionsSignatureInformation = new Map<
