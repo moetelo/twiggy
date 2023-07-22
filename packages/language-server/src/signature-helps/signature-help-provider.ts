@@ -6,6 +6,7 @@ import {
 } from 'vscode-languageserver';
 import { Server } from '../server';
 import { findNodeByPosition } from '../utils/find-element-by-position';
+import type { SyntaxNode } from 'web-tree-sitter';
 
 const twigFunctions = new Map<string, SignatureInformation>([
   [
@@ -52,11 +53,17 @@ export class SignatureHelpProvider {
     const cst = await document.cst();
     const cursorNode = findNodeByPosition(cst.rootNode, params.position);
 
-    if (cursorNode?.parent?.type !== 'arguments') {
+    if (!cursorNode) {
       return;
     }
 
-    const callExpression = cursorNode.parent.parent;
+    const argumentsNode = cursorNode.parent;
+
+    if (argumentsNode?.type !== 'arguments') {
+      return;
+    }
+
+    const callExpression = argumentsNode.parent;
 
     if (!callExpression || callExpression.type !== 'call_expression') {
       return;
@@ -74,8 +81,22 @@ export class SignatureHelpProvider {
       return;
     }
 
+    let activeParameter = 0;
+
+    if (signatureInformation.parameters?.length) {
+      let node: SyntaxNode | null = cursorNode;
+
+      while (node) {
+        if (node.isNamed()) {
+          activeParameter++;
+        }
+        node = node.previousNamedSibling;
+      }
+    }
+
     return <SignatureHelp>{
       signatures: [signatureInformation],
+      activeParameter,
     };
   }
 }

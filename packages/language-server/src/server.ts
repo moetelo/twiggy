@@ -38,7 +38,7 @@ export class Server {
           triggerCharacters: ['"', "'"],
         },
         signatureHelpProvider: {
-          triggerCharacters: ['('],
+          triggerCharacters: ['(', ','],
         },
       };
 
