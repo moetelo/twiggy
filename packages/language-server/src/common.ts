@@ -2,6 +2,7 @@ import {
   MarkupKind,
   SignatureInformation,
   ParameterInformation,
+  MarkupContent,
 } from 'vscode-languageserver';
 
 export const globalVariables = [
@@ -20,27 +21,30 @@ export const globalVariables = [
 ];
 
 type twigFunction = {
-  name: string;
-  documentation?: string[];
+  label: string;
+  documentation?: MarkupContent;
   parameters?: ParameterInformation[];
   return?: string;
 };
 
-const twigFunctions: twigFunction[] = [
+export const twigFunctions: twigFunction[] = [
   {
-    name: 'max',
-    documentation: [
-      'Returns the biggest value of a sequence or a set of values:',
-      '```twig',
-      '{{ max(1, 3, 2) }}',
-      '{{ max([1, 3, 2]) }}',
-      '```',
-      'When called with a mapping, max ignores keys and only compares values:',
-      '```twig',
-      '{{ max({2: "e", 1: "a", 3: "b", 5: "d", 4: "c"}) }}',
-      '{# returns "e" #}',
-      '```',
-    ],
+    label: 'max',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Returns the biggest value of a sequence or a set of values:',
+        '```twig',
+        '{{ max(1, 3, 2) }}',
+        '{{ max([1, 3, 2]) }}',
+        '```',
+        'When called with a mapping, max ignores keys and only compares values:',
+        '```twig',
+        '{{ max({2: "e", 1: "a", 3: "b", 5: "d", 4: "c"}) }}',
+        '{# returns "e" #}',
+        '```',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'mixed ...$values',
@@ -50,19 +54,22 @@ const twigFunctions: twigFunction[] = [
     return: 'mixed',
   },
   {
-    name: 'min',
-    documentation: [
-      'Returns the lowest value of a sequence or a set of values',
-      '```twig',
-      '{{ min(1, 3, 2) }}',
-      '{{ min([1, 3, 2]) }}',
-      '```',
-      'When called with a mapping, min ignores keys and only compares values:',
-      '```twig',
-      '{{ min({2: "e", 3: "a", 1: "b", 5: "d", 4: "c"}) }}',
-      '{# returns "a" #}',
-      '```',
-    ],
+    label: 'min',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Returns the lowest value of a sequence or a set of values',
+        '```twig',
+        '{{ min(1, 3, 2) }}',
+        '{{ min([1, 3, 2]) }}',
+        '```',
+        'When called with a mapping, min ignores keys and only compares values:',
+        '```twig',
+        '{{ min({2: "e", 3: "a", 1: "b", 5: "d", 4: "c"}) }}',
+        '{# returns "a" #}',
+        '```',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'mixed ...$values',
@@ -72,15 +79,18 @@ const twigFunctions: twigFunction[] = [
     return: 'mixed',
   },
   {
-    name: 'range',
-    documentation: [
-      'Returns a list containing an arithmetic progression of integers:',
-      '```twig',
-      '{% for i in range(0, 3) %}',
-      '    {{ i }},',
-      '{% endfor %}',
-      '```',
-    ],
+    label: 'range',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Returns a list containing an arithmetic progression of integers:',
+        '```twig',
+        '{% for i in range(0, 3) %}',
+        '    {{ i }},',
+        '{% endfor %}',
+        '```',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'int $low',
@@ -98,10 +108,13 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'constant',
-    documentation: [
-      'Provides the ability to get constants from instances as well as class/global constants.',
-    ],
+    label: 'constant',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Provides the ability to get constants from instances as well as class/global constants.',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $constant',
@@ -115,8 +128,11 @@ const twigFunctions: twigFunction[] = [
     return: 'string',
   },
   {
-    name: 'cycle',
-    documentation: ['Cycles over a value.'],
+    label: 'cycle',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Cycles over a value.'].join('\n'),
+    },
     parameters: [
       {
         label: '\\ArrayAccess|array $values',
@@ -129,13 +145,16 @@ const twigFunctions: twigFunction[] = [
     return: 'string',
   },
   {
-    name: 'random',
-    documentation: [
-      'Returns a random value depending on the supplied parameter type:',
-      '- a random item from a \\Traversable or array',
-      '- a random character from a string',
-      '- a random integer between 0 and the integer parameter.',
-    ],
+    label: 'random',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Returns a random value depending on the supplied parameter type:',
+        '- a random item from a \\Traversable or array',
+        '- a random character from a string',
+        '- a random integer between 0 and the integer parameter.',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: '\\Traversable|array|int|float|string $values = null',
@@ -149,15 +168,18 @@ const twigFunctions: twigFunction[] = [
     return: 'mixed',
   },
   {
-    name: 'date',
-    documentation: [
-      'Converts an input to a DateTime instance.',
-      '```twig',
-      "{% if date(user.created_at) < date('+2days') %}",
-      '  {# do something #}',
-      '{% endif %}',
-      '```',
-    ],
+    label: 'date',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Converts an input to a DateTime instance.',
+        '```twig',
+        "{% if date(user.created_at) < date('+2days') %}",
+        '  {# do something #}',
+        '{% endif %}',
+        '```',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: '\\DateTimeInterface|string|null $date = null',
@@ -172,13 +194,16 @@ const twigFunctions: twigFunction[] = [
     return: '\\DateTimeInterface',
   },
   {
-    name: 'dump',
-    documentation: [
-      'The dump function dumps information about a template variable. This is mostly useful to debug a template that does not behave as expected by introspecting its variables:',
-      '```twig',
-      '{{ dump(user) }}',
-      '```',
-    ],
+    label: 'dump',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The dump function dumps information about a template variable. This is mostly useful to debug a template that does not behave as expected by introspecting its variables:',
+        '```twig',
+        '{{ dump(user) }}',
+        '```',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'mixed $context',
@@ -187,8 +212,11 @@ const twigFunctions: twigFunction[] = [
     ],
   },
   {
-    name: 'include',
-    documentation: ['Renders a template.'],
+    label: 'include',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Renders a template.'].join('\n'),
+    },
     parameters: [
       {
         label: 'array $context',
@@ -217,8 +245,11 @@ const twigFunctions: twigFunction[] = [
     return: 'string',
   },
   {
-    name: 'source',
-    documentation: ['Returns a template content without rendering it.'],
+    label: 'source',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns a template content without rendering it.'].join('\n'),
+    },
     parameters: [
       {
         label: 'string $name',
@@ -232,8 +263,13 @@ const twigFunctions: twigFunction[] = [
     return: 'string',
   },
   {
-    name: 'attribute',
-    documentation: ['Returns the attribute value for a given array/object.'],
+    label: 'attribute',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns the attribute value for a given array/object.'].join(
+        '\n'
+      ),
+    },
     parameters: [
       {
         label: 'mixed $object',
@@ -252,10 +288,13 @@ const twigFunctions: twigFunction[] = [
     return: 'mixed',
   },
   {
-    name: 'block',
-    documentation: [
-      'When a template uses inheritance and if you want to print a block multiple times, use the `block` function',
-    ],
+    label: 'block',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'When a template uses inheritance and if you want to print a block multiple times, use the `block` function',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $name',
@@ -266,10 +305,13 @@ const twigFunctions: twigFunction[] = [
     ],
   },
   {
-    name: 'html_classes',
-    documentation: [
-      'The `html_classes` function returns a string by conditionally joining class names together',
-    ],
+    label: 'html_classes',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `html_classes` function returns a string by conditionally joining class names together',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'mixed ...$args',
@@ -278,16 +320,22 @@ const twigFunctions: twigFunction[] = [
     return: 'string',
   },
   {
-    name: 'parent',
-    documentation: [
-      "When a template uses inheritance, it's possible to render the contents of the parent block when overriding a block by using the `parent` function",
-    ],
+    label: 'parent',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        "When a template uses inheritance, it's possible to render the contents of the parent block when overriding a block by using the `parent` function",
+      ].join('\n'),
+    },
   },
   {
-    name: 'country_timezones',
-    documentation: [
-      'The `country_timezones` function returns the names of the timezones associated with a given country code',
-    ],
+    label: 'country_timezones',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `country_timezones` function returns the names of the timezones associated with a given country code',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $country',
@@ -296,10 +344,13 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'language_names',
-    documentation: [
-      'The `language_names` function returns the names of the languages',
-    ],
+    label: 'language_names',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `language_names` function returns the names of the languages',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $locale = null',
@@ -308,10 +359,13 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'script_names',
-    documentation: [
-      'The `script_names` function returns the names of the scripts',
-    ],
+    label: 'script_names',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `script_names` function returns the names of the scripts',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $locale = null',
@@ -320,10 +374,13 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'country_names',
-    documentation: [
-      'The `country_names` function returns the names of the countries',
-    ],
+    label: 'country_names',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `country_names` function returns the names of the countries',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $locale = null',
@@ -332,10 +389,13 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'locale_names',
-    documentation: [
-      'The `locale_names` function returns the names of the locales',
-    ],
+    label: 'locale_names',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `locale_names` function returns the names of the locales',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $locale = null',
@@ -344,10 +404,13 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'currency_names',
-    documentation: [
-      'The `currency_names` function returns the names of the currencies',
-    ],
+    label: 'currency_names',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `currency_names` function returns the names of the currencies',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $locale = null',
@@ -356,10 +419,13 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'timezone_names',
-    documentation: [
-      'The `timezone_names` function returns the names of the timezones',
-    ],
+    label: 'timezone_names',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `timezone_names` function returns the names of the timezones',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $locale = null',
@@ -368,13 +434,16 @@ const twigFunctions: twigFunction[] = [
     return: 'array',
   },
   {
-    name: 'template_from_string',
-    documentation: [
-      'Loads a template from a string.',
-      '```twig',
-      '{{ include(template_from_string("Hello {{ name }}")) }}',
-      '```',
-    ],
+    label: 'template_from_string',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Loads a template from a string.',
+        '```twig',
+        '{{ include(template_from_string("Hello {{ name }}")) }}',
+        '```',
+      ].join('\n'),
+    },
     parameters: [
       {
         label: 'string $template',
@@ -395,9 +464,10 @@ export const twigFunctionsSignatureInformation = new Map<
   SignatureInformation
 >(
   twigFunctions.map((item) => {
+    const label = item.label;
     const params = item.parameters?.map((item) => item.label).join(', ');
     const signatureInformation: SignatureInformation = {
-      label: `${item.name}(${params ?? ''})`,
+      label: `${item.label}(${params ?? ''})`,
       parameters: item.parameters,
     };
 
@@ -405,13 +475,6 @@ export const twigFunctionsSignatureInformation = new Map<
       signatureInformation.label += `: ${item.return}`;
     }
 
-    if (item.documentation) {
-      signatureInformation.documentation = {
-        kind: MarkupKind.Markdown,
-        value: item.documentation.join('\n'),
-      };
-    }
-
-    return [item.name, signatureInformation];
+    return [label, signatureInformation];
   })
 );
