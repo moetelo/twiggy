@@ -65,13 +65,18 @@ export class SignatureHelpProvider {
     let activeParameter = 0;
 
     if (signatureInformation.parameters?.length) {
-      let node: SyntaxNode | null = cursorNode;
+      let node: SyntaxNode | null = argumentsNode.firstChild;
 
       while (node) {
-        if (node.isNamed()) {
+        if (node.text === ',') {
           activeParameter++;
         }
-        node = node.previousNamedSibling;
+
+        if (node.equals(cursorNode)) {
+          break;
+        }
+
+        node = node.nextSibling;
       }
     }
 
