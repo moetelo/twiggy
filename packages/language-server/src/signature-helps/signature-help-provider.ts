@@ -7,27 +7,7 @@ import {
 import { Server } from '../server';
 import { findNodeByPosition } from '../utils/find-element-by-position';
 import type { SyntaxNode } from 'web-tree-sitter';
-
-const twigFunctions = new Map<string, SignatureInformation>([
-  [
-    'date',
-    {
-      label: 'date',
-      documentation: 'Converts an input to a \\DateTime instance.',
-      parameters: [
-        {
-          label: 'date',
-          documentation: 'A date or null to use the current time',
-        },
-        {
-          label: 'timezone',
-          documentation:
-            'The target timezone, null to use the default, false to leave unchanged',
-        },
-      ],
-    },
-  ],
-]);
+import { twigFunctionsSignatureInformation } from '../common';
 
 export class SignatureHelpProvider {
   server: Server;
@@ -75,7 +55,8 @@ export class SignatureHelpProvider {
       return;
     }
 
-    const signatureInformation = twigFunctions.get(callName);
+    const signatureInformation =
+      twigFunctionsSignatureInformation.get(callName);
 
     if (!signatureInformation) {
       return;
