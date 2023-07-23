@@ -717,6 +717,783 @@ export const twigFunctions: twigFunction[] = [
   },
 ];
 
+export const twigFilters: twigFunction[] = [
+  {
+    label: 'date',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Converts a date to the given format.',
+        '```twig',
+        '{{ post.published_at|date("m/d/Y") }}',
+        '```',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string|null $format = null',
+        documentation: 'The date format',
+      },
+      {
+        label: '\\DateTimeZone|string|false|null $timezone = null',
+        documentation: 'The date timezone',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'date_modify',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Returns a new date object modified.',
+        '```twig',
+        '{{ post.published_at|date_modify("-1day")|date("m/d/Y") }}',
+        '```',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string $modifier',
+        documentation: 'A modifier string',
+      },
+    ],
+  },
+  {
+    label: 'format',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns a formatted string.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: '...$values',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'replace',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Replaces strings within a string.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'from',
+        documentation: 'The placeholder values as a hash',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'number_format',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Number format filter.',
+        '',
+        'All of the formatting options can be left null, in that case the defaults will be used. Supplying any of the parameters will override the defaults set in the environment object.',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'int $decimal',
+        documentation: 'The number of decimal points to display',
+      },
+      {
+        label: 'string $decimalPoint',
+        documentation: 'The character(s) to use for the decimal point',
+      },
+      {
+        label: 'string $thousandSep',
+        documentation: 'The character(s) to use for the thousands separator',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'abs',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Absolute value'].join('\n'),
+    },
+    return: 'int|float',
+  },
+  {
+    label: 'round',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Rounds a number.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'int|float $precision',
+        documentation: 'The rounding precision',
+      },
+      {
+        label: 'string $method',
+        documentation: 'The method to use for rounding',
+      },
+    ],
+    return: 'int|float',
+  },
+  {
+    label: 'url_encode',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'URL encodes (RFC 3986) a string as a path segment or an array as a query string.',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'json_encode',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns the JSON representation of a value'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'options',
+        documentation:
+          "A bitmask of json_encode options: {{data|json_encode(constant('JSON_PRETTY_PRINT')) }}. Combine constants using bitwise operators: {{ data|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_HEX_QUOT')) }}",
+      },
+    ],
+    return: 'string|false',
+  },
+  {
+    label: 'convert_encoding',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The convert_encoding filter converts a string from one encoding to another.',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string $to',
+        documentation: 'The output charset',
+      },
+      {
+        label: 'string $from',
+        documentation: 'The input charset',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'title',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns a titlecased string.'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'capitalize',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns a capitalized string.'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'upper',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Converts a string to uppercase.'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'lower',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Converts a string to lowercase.'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'striptags',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Strips HTML and PHP tags from a string.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string[]|string|null $allowable_tags',
+        documentation: 'Tags which should not be stripped',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'trim',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns a trimmed string.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string|null $characterMask',
+      },
+      {
+        label: "string $side = 'both'",
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'nl2br',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Inserts HTML line breaks before all newlines in a string.'].join(
+        '\n'
+      ),
+    },
+    return: 'string',
+  },
+  {
+    label: 'spaceless',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Removes whitespaces between HTML tags.'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'join',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Joins the values to a string.',
+        '',
+        'The separators between elements are empty strings per default, you can define them with the optional parameters.',
+        '```twig',
+        "{{ [1, 2, 3]|join(', ', ' and ') }}",
+        '{# returns 1, 2 and 3 #}',
+        '```',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string $glue',
+        documentation: 'The separator',
+      },
+      {
+        label: 'string|null $and = null',
+        documentation: 'The separator for the last pair',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'split',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Splits the string into an array.',
+        '',
+        '```twig',
+        '{{ "one,two,three"|split(\',\') }}',
+        '{# returns [one, two, three] #}',
+        '```',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string $delimiter',
+        documentation: 'The delimiter',
+      },
+      {
+        label: 'int $limit',
+        documentation: 'The limit',
+      },
+    ],
+    return: 'array',
+  },
+  {
+    label: 'sort',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Sorts an array.'].join('\n'),
+    },
+    return: 'array',
+  },
+  {
+    label: 'merge',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Merges any number of arrays or Traversable objects.',
+        '',
+        '```twig',
+        "{% set items = { 'apple': 'fruit', 'orange': 'fruit' } %}",
+        '',
+        "{% set items = items|merge({ 'peugeot': 'car' }, { 'banana': 'fruit' }) %}",
+        '',
+        "{# items now contains { 'apple': 'fruit', 'orange': 'fruit', 'peugeot': 'car', 'banana': 'fruit' } #}",
+        '```',
+      ].join('\n'),
+    },
+    return: 'array',
+  },
+  {
+    label: 'batch',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Batches item.',
+        '',
+        '```twig',
+        "{% set items = { 'apple': 'fruit', 'orange': 'fruit' } %}",
+        '',
+        "{% set items = items|merge({ 'peugeot': 'car' }, { 'banana': 'fruit' }) %}",
+        '',
+        "{# items now contains { 'apple': 'fruit', 'orange': 'fruit', 'peugeot': 'car', 'banana': 'fruit' } #}",
+        '```',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'int $size',
+        documentation: 'The size of the batch',
+      },
+      {
+        label: 'mixed $fill',
+        documentation: 'A value used to fill missing items',
+      },
+    ],
+    return: 'array',
+  },
+  {
+    label: 'column',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Returns the values from a single column in the input array.',
+        '',
+        '```twig',
+        '<pre>',
+        "  {% set items = [{ 'fruit' : 'apple'}, {'fruit' : 'orange' }] %}",
+        '',
+        "  {% set fruits = items|column('fruit') %}",
+        '',
+        "  {# fruits now contains ['apple', 'orange'] #}",
+        '</pre>',
+        '```',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'mixed $name',
+        documentation: 'The column name',
+      },
+      {
+        label: 'mixed $index',
+        documentation:
+          'The column to use as the index/keys for the returned array',
+      },
+    ],
+    return: 'array',
+  },
+  {
+    label: 'filter',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `filter` filter filters elements of a sequence or a mapping using an arrow function.',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'arrow',
+        documentation: 'The arrow function',
+      },
+    ],
+    return: 'array',
+  },
+  {
+    label: 'map',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `map` filter applies an arrow function to the elements of a sequence or a mapping.',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'arrow',
+        documentation: 'The arrow function',
+      },
+    ],
+    return: 'array',
+  },
+  {
+    label: 'reduce',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `reduce` filter iteratively reduces a sequence or a mapping to a single value using an arrow function, so as to reduce it to a single value.',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'arrow',
+        documentation: 'The arrow function',
+      },
+      {
+        label: 'initial',
+        documentation: 'The initial value',
+      },
+    ],
+    return: 'array',
+  },
+  {
+    label: 'reverse',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Reverses a variable.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'bool $preserveKeys',
+        documentation: 'Whether to preserve key or not',
+      },
+    ],
+    return: 'mixed',
+  },
+  {
+    label: 'length',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Slices a variable.'].join('\n'),
+    },
+    return: 'int',
+  },
+  {
+    label: 'slice',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns the length of a variable.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'int $start',
+        documentation: 'Start of the slice',
+      },
+      {
+        label: 'int $length',
+        documentation: 'Size of the slice',
+      },
+      {
+        label: 'bool $preserveKeys',
+        documentation:
+          'Whether to preserve key or not (when the input is an array)',
+      },
+    ],
+    return: 'mixed',
+  },
+  {
+    label: 'first',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns the first element of the item.'].join('\n'),
+    },
+    return: 'mixed',
+  },
+  {
+    label: 'last',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns the last element of the item.'].join('\n'),
+    },
+    return: 'mixed',
+  },
+  {
+    label: 'default',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The default filter returns the passed default value if the value is undefined or empty, otherwise the value of the variable',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'default',
+        documentation: 'The default value',
+      },
+    ],
+    return: 'mixed',
+  },
+  {
+    label: 'keys',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Returns the keys for the given array.'].join('\n'),
+    },
+    return: 'array',
+  },
+  {
+    label: 'data_uri',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'Creates a data URI (RFC 2397).',
+        'Length validation is not performed on purpose, validation should be done before calling this filter.',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'escape',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Escapes a string.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string $strategy',
+        documentation: 'The escaping strategy',
+      },
+      {
+        label: 'string $charset',
+        documentation: 'The charset',
+      },
+      {
+        label: 'bool $autoescape',
+        documentation:
+          'Whether the function is called by the auto-escaping feature (true) or by the developer (false)',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'e',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Escapes a string.'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'string $strategy',
+        documentation: 'The escaping strategy',
+      },
+      {
+        label: 'string $charset',
+        documentation: 'The charset',
+      },
+      {
+        label: 'bool $autoescape',
+        documentation:
+          'Whether the function is called by the auto-escaping feature (true) or by the developer (false)',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'raw',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Marks a variable as being safe.'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'inky_to_html',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['Marks a variable as being safe.'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'country_name',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `country_name` filter returns the country name given its ISO-3166 two-letter code',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'currency_name',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `currency_name` filter returns the currency name given its three-letter code',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'currency_symbol',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The currency_symbol filter returns the currency symbol given its three-letter code',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'language_name',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `language_name` filter returns the language name given its two-letter code',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'locale_name',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `locale_name` filter returns the locale name given its two-letter code',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'timezone_name',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `timezone_name` filter returns the timezone name given a timezone identifier',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'format_currency',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `format_currency` filter formats a number as a currency',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'currency',
+        documentation: 'The currency',
+      },
+      {
+        label: 'attrs',
+        documentation: 'A map of attributes',
+      },
+      {
+        label: 'locale',
+        documentation: 'The locale',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'format_number',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['The `format_number` filter formats a number'].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'locale',
+        documentation: 'The locale',
+      },
+      {
+        label: 'attrs',
+        documentation: 'A map of attributes',
+      },
+      {
+        label: 'style',
+        documentation: 'The style of the number output',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'format_datetime',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: ['The `format_datetime` filter formats a date time'].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'format_date',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `format_date` filter formats a date. It behaves in the exact same way as the format_datetime filter, but without the time.',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'format_time',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `format_time` filter formats a time. It behaves in the exact same way as the format_datetime filter, but without the date.',
+      ].join('\n'),
+    },
+    return: 'string',
+  },
+  {
+    label: 'markdown_to_html',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `markdown_to_html` filter converts a block of Markdown to HTML',
+      ].join('\n'),
+    },
+  },
+  {
+    label: 'html_to_markdown',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `html_to_markdown` filter converts a block of HTML to Markdown',
+      ].join('\n'),
+    },
+  },
+  {
+    label: 'slug',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The slug filter transforms a given string into another string that only includes safe ASCII characters.',
+      ].join('\n'),
+    },
+    parameters: [
+      {
+        label: 'separator',
+        documentation:
+          'The separator that is used to join words (defaults to -)',
+      },
+      {
+        label: 'locale',
+        documentation:
+          'The locale of the original string (if none is specified, it will be automatically detected)',
+      },
+    ],
+    return: 'string',
+  },
+  {
+    label: 'u',
+    documentation: {
+      kind: MarkupKind.Markdown,
+      value: [
+        'The `u` filter wraps a text in a Unicode object (a Symfony UnicodeString instance) that exposes methods to "manipulate" the string.',
+      ].join('\n'),
+    },
+  },
+];
+
 export const twigFunctionsSignatureInformation = new Map<
   string,
   SignatureInformation

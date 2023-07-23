@@ -18,6 +18,7 @@ const twigFunctionSnippets: CompletionItem[] = twigFunctions.map((item) =>
     insertText: `${item.label}($1)$0`,
     insertTextFormat: InsertTextFormat.Snippet,
     command: triggerParameterHints,
+    detail: 'Function',
   })
 );
 
