@@ -9,7 +9,7 @@
     "typescript": "^5.1.3"
   },
   "dependencies": {
-    "tree-sitter-twig": "^0.1.1",
+    "tree-sitter-twig": "^0.3.0",
     "vscode-languageserver": "^8.1.0",
     "vscode-languageserver-textdocument": "^1.0.8",
     "vscode-uri": "^3.0.7",

@@ -1,7 +1,7 @@
 import { Connection, HoverParams } from 'vscode-languageserver';
 import { Server } from '../server';
 import { findNodeByPosition } from '../utils/find-element-by-position';
-import { globalVariables } from '../common';
+import { twigGlobalVariables } from '../common';
 import { bottomTopCursorIterator } from '../utils/bottom-top-cursor-iterator';
 
 // export type onHoverHandler = Parameters<Connection['onHover']>[0];
@@ -32,7 +32,7 @@ export class Hover {
 
     if (cursorNode.type === 'identifier') {
       // Global variable
-      for (const item of globalVariables) {
+      for (const item of twigGlobalVariables) {
         if (item.label === cursorNode.text) {
           return {
             contents: item.documentation,
