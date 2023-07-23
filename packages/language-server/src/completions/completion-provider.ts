@@ -4,7 +4,7 @@ import { findNodeByPosition } from '../utils/find-element-by-position';
 import { templatePaths } from './template-paths';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
-import { functionsAndFilters } from './functions-and-filters';
+import { functions } from './functions';
 
 export class CompletionProvider {
   server: Server;
@@ -36,7 +36,7 @@ export class CompletionProvider {
 
     [
       globalVariables(cursorNode),
-      functionsAndFilters(cursorNode),
+      functions(cursorNode),
       localVariables(cursorNode),
       templatePaths(
         cursorNode,
