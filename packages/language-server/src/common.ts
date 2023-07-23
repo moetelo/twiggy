@@ -92,6 +92,16 @@ export const twigTests = [
     label: `odd`,
     documentation: '`odd` returns true if the given number is odd',
   },
+  {
+    label: `rootform`,
+    documentation:
+      'This test will check if the current form does not have a parent form view.',
+  },
+  {
+    label: `selectedchoice`,
+    documentation:
+      'This test will check if the current choice is equal to the selected_value or if the current choice is in the array (when selected_value is an array).',
+  },
 ];
 
 type twigFunction = {
@@ -714,6 +724,39 @@ export const twigFunctions: twigFunction[] = [
         label: "string domain = 'messages'",
       },
     ],
+  },
+  {
+    label: 'form',
+  },
+  {
+    label: 'form_end',
+  },
+  {
+    label: 'form_errors',
+  },
+  {
+    label: 'form_help',
+  },
+  {
+    label: 'form_label',
+  },
+  {
+    label: 'form_parent',
+  },
+  {
+    label: 'form_rest',
+  },
+  {
+    label: 'form_row',
+  },
+  {
+    label: 'form_start',
+  },
+  {
+    label: 'form_widget',
+  },
+  {
+    label: 'importmap',
   },
 ];
 
@@ -1491,6 +1534,51 @@ export const twigFilters: twigFunction[] = [
         'The `u` filter wraps a text in a Unicode object (a Symfony UnicodeString instance) that exposes methods to "manipulate" the string.',
       ].join('\n'),
     },
+  },
+  {
+    label: 'abbr_class',
+  },
+  {
+    label: 'abbr_method',
+  },
+  {
+    label: 'file_excerpt',
+  },
+  {
+    label: 'file_link',
+  },
+  {
+    label: 'file_relative',
+  },
+  {
+    label: 'format_args',
+  },
+  {
+    label: 'format_args_as_text',
+  },
+  {
+    label: 'format_file',
+  },
+  {
+    label: 'format_file_from_text',
+  },
+  {
+    label: 'humanize',
+  },
+  {
+    label: 'sanitize_html',
+  },
+  {
+    label: 'serialize',
+  },
+  {
+    label: 'trans',
+  },
+  {
+    label: 'yaml_dump',
+  },
+  {
+    label: 'yaml_encode',
   },
 ];
 
