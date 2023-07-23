@@ -2,22 +2,16 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigGlobalVariables } from '../common';
 
-export function globalVariables(cursorNode: SyntaxNode) {
-  let completions: CompletionItem[] = [];
+const completions: CompletionItem[] = twigGlobalVariables.map((item) =>
+  Object.assign({}, item, {
+    kind: CompletionItemKind.Variable,
+    detail: 'global variable',
+  })
+);
 
+export function globalVariables(cursorNode: SyntaxNode) {
   if (cursorNode.type !== 'identifier') {
     return;
-  }
-
-  for (const item of twigGlobalVariables) {
-    completions.push(
-      Object.assign(
-        {
-          kind: CompletionItemKind.Constant,
-        },
-        item
-      )
-    );
   }
 
   return completions;

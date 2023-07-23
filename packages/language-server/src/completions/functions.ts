@@ -12,13 +12,13 @@ const triggerParameterHints = Command.create(
   'editor.action.triggerParameterHints'
 );
 
-const twigFunctionSnippets: CompletionItem[] = twigFunctions.map((item) =>
+const completions: CompletionItem[] = twigFunctions.map((item) =>
   Object.assign({}, item, {
     kind: CompletionItemKind.Function,
     insertText: `${item.label}($1)$0`,
     insertTextFormat: InsertTextFormat.Snippet,
     command: triggerParameterHints,
-    detail: 'Function',
+    detail: 'function',
   })
 );
 
@@ -27,5 +27,5 @@ export function functions(cursorNode: SyntaxNode) {
     return;
   }
 
-  return twigFunctionSnippets;
+  return completions;
 }
