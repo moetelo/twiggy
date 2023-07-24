@@ -11,6 +11,7 @@ import { DocumentCache } from './document-cache';
 import { Hover } from './hovers';
 import { CompletionProvider } from './completions/completion-provider';
 import { SignatureHelpProvider } from './signature-helps/signature-help-provider';
+import { semanticTokensLegend } from './semantic-tokens/tokens-provider';
 
 export class Server {
   connection: Connection;
@@ -39,6 +40,10 @@ export class Server {
         },
         signatureHelpProvider: {
           triggerCharacters: ['(', ','],
+        },
+        semanticTokensProvider: {
+          legend: semanticTokensLegend,
+          full: true,
         },
       };
 
