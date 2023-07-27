@@ -12,6 +12,20 @@ const tokenTypes = new Map<string, number>(
   semanticTokensLegend.tokenTypes.map((v, i) => [v, i])
 );
 
+const typeToTokenMap = new Map<string, string>([
+  ['identifier', 'variable'],
+  ['null', 'constant'],
+  ['boolean', 'constant'],
+]);
+
+for (const [type, token] of typeToTokenMap) {
+  const idx = tokenTypes.get(token);
+
+  if (idx) {
+    tokenTypes.set(type, idx);
+  }
+}
+
 export class SemanticTokensProvider {
   server: Server;
 
@@ -51,13 +65,7 @@ export class SemanticTokensProvider {
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
-        tokensBuilder.push(
-          lineNumber++,
-          charNumber,
-          line.length,
-          tokenType,
-          0
-        );
+        tokensBuilder.push(lineNumber++, charNumber, line.length, tokenType, 0);
 
         charNumber = 0;
       }

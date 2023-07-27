@@ -35,6 +35,10 @@
         "id": "embedded_end",
         "superType": "embedded_delimiter",
         "description": "End of embedded"
+      },
+      {
+        "id": "constant",
+        "description": "Constants of twig"
       }
     ],
     "configurationDefaults": {
@@ -43,6 +47,9 @@
         "rules": {
           "embedded_delimiter": {
             "foreground": "#9AA83A"
+          },
+          "constant": {
+            "foreground": "#994646"
           }
         }
       }
