@@ -12,6 +12,8 @@ export const semanticTokensLegend: SemanticTokensLegend = {
     'string',
     'number',
     'operator',
+    'embedded_begin',
+    'embedded_end',
   ],
   tokenModifiers: [],
 };
