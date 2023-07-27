@@ -44,35 +44,22 @@ export class SemanticTokensProvider {
       }
 
       const start = pointToPosition(node.startPosition);
+      const lines = node.nodeText.split('\n');
+      let lineNumber = start.line;
+      let charNumber = start.character;
 
-      // comments may be multi line
-      // split to lines and push line by line
-      if (node.nodeType === 'comment') {
-        const lines = node.nodeText.split('\n');
-        let lineNumber = start.line;
-        let charNumber = start.character;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
 
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-
-          tokensBuilder.push(
-            lineNumber++,
-            charNumber,
-            line.length,
-            tokenType,
-            0
-          );
-
-          charNumber = 0;
-        }
-      } else {
         tokensBuilder.push(
-          start.line,
-          start.character,
-          node.endIndex - node.startIndex,
+          lineNumber++,
+          charNumber,
+          line.length,
           tokenType,
           0
         );
+
+        charNumber = 0;
       }
     }
 
