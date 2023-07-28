@@ -12,16 +12,6 @@ const tokenTypes = new Map<string, number>(
   semanticTokensLegend.tokenTypes.map((v, i) => [v, i])
 );
 
-const typeToTokenMap = new Map<string, string>([['identifier', 'variable']]);
-
-for (const [type, token] of typeToTokenMap) {
-  const idx = tokenTypes.get(token);
-
-  if (idx) {
-    tokenTypes.set(type, idx);
-  }
-}
-
 export class SemanticTokensProvider {
   server: Server;
 
