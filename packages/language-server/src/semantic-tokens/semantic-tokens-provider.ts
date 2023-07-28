@@ -49,7 +49,7 @@ export class SemanticTokensProvider {
     for (const node of nodes) {
       const tokenType = tokenTypes.get(node.nodeType);
 
-      if (!tokenType) {
+      if (tokenType === undefined) {
         continue;
       }
 
