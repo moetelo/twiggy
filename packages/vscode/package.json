@@ -37,8 +37,14 @@
         "description": "End of embedded"
       },
       {
-        "id": "constant",
-        "description": "Constants of twig"
+        "id": "null",
+        "superType": "constant",
+        "description": "null or none"
+      },
+      {
+        "id": "boolean",
+        "superType": "constant",
+        "description": "true or false"
       }
     ],
     "configurationDefaults": {

@@ -12,11 +12,7 @@ const tokenTypes = new Map<string, number>(
   semanticTokensLegend.tokenTypes.map((v, i) => [v, i])
 );
 
-const typeToTokenMap = new Map<string, string>([
-  ['identifier', 'variable'],
-  ['null', 'constant'],
-  ['boolean', 'constant'],
-]);
+const typeToTokenMap = new Map<string, string>([['identifier', 'variable']]);
 
 for (const [type, token] of typeToTokenMap) {
   const idx = tokenTypes.get(token);

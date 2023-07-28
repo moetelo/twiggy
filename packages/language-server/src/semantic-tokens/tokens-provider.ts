@@ -14,7 +14,8 @@ export const semanticTokensLegend: SemanticTokensLegend = {
     'operator',
     'embedded_begin',
     'embedded_end',
-    'constant',
+    'null',
+    'boolean',
   ],
   tokenModifiers: [],
 };
