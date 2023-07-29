@@ -3,6 +3,8 @@ import {
   SignatureInformation,
   ParameterInformation,
   MarkupContent,
+  CompletionItemKind,
+  CompletionItem,
 } from 'vscode-languageserver';
 
 export const twigGlobalVariables = [
@@ -1601,3 +1603,46 @@ export const twigFunctionsSignatureInformation = new Map<
     return [label, signatureInformation];
   })
 );
+
+export const forLoopProperties: CompletionItem[] = [
+  {
+    label: 'index',
+    detail: 'The current iteration of the loop. (1 indexed)',
+    kind: CompletionItemKind.Property,
+  },
+  {
+    label: 'index0',
+    detail: 'The current iteration of the loop. (0 indexed)',
+    kind: CompletionItemKind.Property,
+  },
+  {
+    label: 'revindex',
+    detail: 'The number of iterations from the end of the loop (1 indexed)',
+    kind: CompletionItemKind.Property,
+  },
+  {
+    label: 'revindex0',
+    detail: 'The number of iterations from the end of the loop (0 indexed)',
+    kind: CompletionItemKind.Property,
+  },
+  {
+    label: 'first',
+    detail: 'True if first iteration',
+    kind: CompletionItemKind.Property,
+  },
+  {
+    label: 'last',
+    detail: 'True if last iteration',
+    kind: CompletionItemKind.Property,
+  },
+  {
+    label: 'length',
+    detail: 'The number of items in the sequence',
+    kind: CompletionItemKind.Property,
+  },
+  {
+    label: 'parent',
+    detail: 'The parent context',
+    kind: CompletionItemKind.Property,
+  },
+];
