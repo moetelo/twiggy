@@ -5,6 +5,7 @@ import { twigGlobalVariables } from '../common';
 import { bottomTopCursorIterator } from '../utils/bottom-top-cursor-iterator';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
+import { forLoop } from './for-loop';
 
 export type onHoverHandlerReturn = ReturnType<
   Parameters<Connection['onHover']>[0]
@@ -35,7 +36,7 @@ export class HoverProvider {
     }
 
     let result;
-    let hovers = [globalVariables, localVariables];
+    let hovers = [globalVariables, localVariables, forLoop];
 
     for (const fn of hovers) {
       if ((result = fn(cursorNode))) {
