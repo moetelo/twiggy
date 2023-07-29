@@ -10,9 +10,7 @@ const completions: CompletionItem[] = twigFilters.map((item) =>
 );
 
 export function filters(cursorNode: SyntaxNode) {
-  if (cursorNode.text !== '|') {
-    return;
+  if (cursorNode.text === '|') {
+    return completions;
   }
-
-  return completions;
 }

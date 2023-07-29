@@ -1,9 +1,4 @@
-import {
-  ParameterInformation,
-  SignatureInformation,
-  SignatureHelp,
-  SignatureHelpParams,
-} from 'vscode-languageserver';
+import { SignatureHelp, SignatureHelpParams } from 'vscode-languageserver';
 import { Server } from '../server';
 import { findNodeByPosition } from '../utils/find-element-by-position';
 import type { SyntaxNode } from 'web-tree-sitter';

@@ -30,7 +30,7 @@ export class Hover {
       return;
     }
 
-    if (cursorNode.type === 'identifier') {
+    if (cursorNode.type === 'variable') {
       // Global variable
       for (const item of twigGlobalVariables) {
         if (item.label === cursorNode.text) {

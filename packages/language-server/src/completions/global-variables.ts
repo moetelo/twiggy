@@ -10,9 +10,7 @@ const completions: CompletionItem[] = twigGlobalVariables.map((item) =>
 );
 
 export function globalVariables(cursorNode: SyntaxNode) {
-  if (cursorNode.type !== 'identifier') {
-    return;
+  if (cursorNode.type === 'variable') {
+    return completions;
   }
-
-  return completions;
 }
