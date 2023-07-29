@@ -3,11 +3,11 @@ import { SyntaxNode } from 'web-tree-sitter';
 import { bottomTopCursorIterator } from '../utils/bottom-top-cursor-iterator';
 
 export function localVariables(cursorNode: SyntaxNode) {
-  let completions: CompletionItem[] = [];
-
-  if (cursorNode.type !== 'identifier') {
+  if (cursorNode.type !== 'variable') {
     return;
   }
+
+  let completions: CompletionItem[] = [];
 
   for (let node of bottomTopCursorIterator(cursorNode)) {
     if (node.type === 'set') {

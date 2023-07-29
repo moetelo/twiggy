@@ -24,7 +24,42 @@
         ],
         "configuration": "./languages/twig.configuration.json"
       }
-    ]
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "embedded_begin",
+        "superType": "embedded_delimiter",
+        "description": "Begin of embedded"
+      },
+      {
+        "id": "embedded_end",
+        "superType": "embedded_delimiter",
+        "description": "End of embedded"
+      },
+      {
+        "id": "null",
+        "superType": "constant",
+        "description": "null or none"
+      },
+      {
+        "id": "boolean",
+        "superType": "constant",
+        "description": "true or false"
+      }
+    ],
+    "configurationDefaults": {
+      "editor.semanticTokenColorCustomizations": {
+        "enabled": true,
+        "rules": {
+          "embedded_delimiter": {
+            "foreground": "#9AA83A"
+          },
+          "constant": {
+            "foreground": "#D16969"
+          }
+        }
+      }
+    }
   },
   "devDependencies": {
     "@types/node": "^20.2.6",

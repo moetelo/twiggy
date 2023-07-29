@@ -2,11 +2,6 @@
   "comments": {
     "blockComment": ["{#", "#}"]
   },
-  "brackets": [
-    ["{", "}"],
-    ["[", "]"],
-    ["(", ")"]
-  ],
   "surroundingPairs": [
     { "open": "'", "close": "'" },
     { "open": "\"", "close": "\"" },

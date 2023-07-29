@@ -23,9 +23,7 @@ const completions: CompletionItem[] = twigFunctions.map((item) =>
 );
 
 export function functions(cursorNode: SyntaxNode) {
-  if (cursorNode.type !== 'identifier') {
-    return;
+  if (cursorNode.type === 'variable' || cursorNode.type === 'function') {
+    return completions;
   }
-
-  return completions;
 }
