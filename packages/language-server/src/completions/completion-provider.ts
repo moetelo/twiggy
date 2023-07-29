@@ -6,6 +6,7 @@ import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
 import { functions } from './functions';
 import { filters } from './filters';
+import { forLoop } from './for-loop';
 
 export class CompletionProvider {
   server: Server;
@@ -40,6 +41,7 @@ export class CompletionProvider {
       functions(cursorNode),
       filters(cursorNode),
       localVariables(cursorNode),
+      forLoop(cursorNode),
       templatePaths(
         cursorNode,
         uri,
