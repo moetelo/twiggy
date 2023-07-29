@@ -8,7 +8,7 @@ import {
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { validateTwigDocument } from './utils/validate-twig-document';
 import { DocumentCache } from './document-cache';
-import { Hover } from './hovers';
+import { HoverProvider } from './hovers/hover-provider';
 import { CompletionProvider } from './completions/completion-provider';
 import { SignatureHelpProvider } from './signature-helps/signature-help-provider';
 import { semanticTokensLegend } from './semantic-tokens/tokens-provider';
@@ -24,7 +24,7 @@ export class Server {
     this.connection = connection;
     this.documents = new TextDocuments(TextDocument);
 
-    new Hover(this);
+    new HoverProvider(this);
     new CompletionProvider(this);
     new SignatureHelpProvider(this);
     new SemanticTokensProvider(this);
