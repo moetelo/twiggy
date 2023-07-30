@@ -89,6 +89,7 @@
     "typescript": "^5.1.3"
   },
   "dependencies": {
+    "twig-language-server": "^0.1.0",
     "vscode-languageclient": "^8.1.0"
   }
 }
