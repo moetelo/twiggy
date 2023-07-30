@@ -1,6 +1,9 @@
 {
   "name": "vscode-twig",
   "displayName": "Twig",
+  "description": "A Twig extension for VS Code",
+  "author": "Stanislav Romanov <kaermorchen@gmail.com>",
+  "license": "Mozilla Public License 2.0",
   "version": "0.0.0",
   "engines": {
     "vscode": "^1.74.0"
@@ -9,6 +12,25 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
+  "publisher": "stanislav",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaermorchen/twig-language-server",
+    "directory": "packages/vscode"
+  },
+  "files": [
+    "out/",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "Twig"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "icon": "assets/logo.png",
   "scripts": {},
   "contributes": {
     "languages": [
