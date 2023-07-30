@@ -23,6 +23,9 @@
         "launchEditor": false
       },
       "@release-it-plugins/workspaces": {
+        "workspaces": [
+          "packages/language-server"
+        ],
         "additionalManifests": {
           "versionUpdates": [
             "package.json",
