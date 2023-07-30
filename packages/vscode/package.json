@@ -4,7 +4,7 @@
   "description": "A Twig extension for VS Code",
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "Mozilla Public License 2.0",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.74.0"
   },
