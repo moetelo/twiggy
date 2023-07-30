@@ -1,7 +1,19 @@
 {
   "name": "twig-language-server",
   "version": "0.0.0",
-  "main": "index.js",
+  "author": "Stanislav Romanov <kaermorchen@gmail.com>",
+  "license": "Mozilla Public License 2.0",
+  "main": "out/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaermorchen/twig-language-server",
+    "directory": "packages/language-server"
+  },
+  "files": [
+    "out/",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {},
   "devDependencies": {
     "@types/node": "^20.2.6",
