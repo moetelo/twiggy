@@ -1,6 +1,6 @@
 {
   "name": "vscode-twig",
-  "displayName": "Twig",
+  "displayName": "Modern Twig",
   "description": "A Twig extension for VS Code",
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "Mozilla Public License 2.0",
