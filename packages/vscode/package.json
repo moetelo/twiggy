@@ -31,7 +31,9 @@
     "Linters"
   ],
   "icon": "assets/logo.png",
-  "scripts": {},
+  "scripts": {
+    "vscode:prepublish": "tsc --build"
+  },
   "contributes": {
     "languages": [
       {
@@ -85,7 +87,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.2.6",
-    "@types/vscode": "^1.79.0",
+    "@types/vscode": "^1.74.0",
     "typescript": "^5.1.3"
   },
   "dependencies": {
