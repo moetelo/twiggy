@@ -1,4 +1,16 @@
 
+
+## v0.2.0 (2023-07-31)
+
+#### :rocket: Enhancement
+* `language-server`, `vscode`
+  * [#13](https://github.com/kaermorchen/twig-language-server/pull/13) Added deploy the extension on publish event ([@kaermorchen](https://github.com/kaermorchen))
+* `vscode`
+  * [#12](https://github.com/kaermorchen/twig-language-server/pull/12) Add language-server as dependency ([@kaermorchen](https://github.com/kaermorchen))
+
+#### Committers: 1
+- Stanislav Romanov ([@kaermorchen](https://github.com/kaermorchen))
+
 ## v0.1.0 (2023-07-30)
 
 #### :rocket: Enhancement
