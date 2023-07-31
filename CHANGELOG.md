@@ -1,5 +1,15 @@
 
 
+
+## v0.2.2 (2023-07-31)
+
+#### :memo: Documentation
+* `vscode`
+  * [#15](https://github.com/kaermorchen/twig-language-server/pull/15) Update README.md ([@kaermorchen](https://github.com/kaermorchen))
+
+#### Committers: 1
+- Stanislav Romanov ([@kaermorchen](https://github.com/kaermorchen))
+
 ## v0.2.1 (2023-07-31)
 
 ## v0.2.0 (2023-07-31)

@@ -1,6 +1,6 @@
 {
   "name": "twig-language-server",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "Mozilla Public License 2.0",
   "main": "out/index.js",
