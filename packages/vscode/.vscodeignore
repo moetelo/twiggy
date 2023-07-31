@@ -1,0 +1,10 @@
+# Ignore all
+*
+*/**
+
+# Excludes
+!out/**/*
+!assets/**/*
+!package.json
+!README.md
+!LICENSE
