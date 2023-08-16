@@ -1,6 +1,16 @@
 
 
 
+
+## v0.2.3 (2023-08-16)
+
+#### :bug: Bug Fix
+* `vscode`
+  * [#17](https://github.com/kaermorchen/twig-language-server/pull/17) Fix extension build ([@kaermorchen](https://github.com/kaermorchen))
+
+#### Committers: 1
+- Stanislav Romanov ([@kaermorchen](https://github.com/kaermorchen))
+
 ## v0.2.2 (2023-07-31)
 
 #### :memo: Documentation
