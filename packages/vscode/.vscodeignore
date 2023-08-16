@@ -1,11 +1,10 @@
-# Ignore all
-**
+# See https://github.com/microsoft/vscode-vsce/issues/580
+# External ignore files
 ../**
 ../../**
 
-# Excludes
-!out/**
-!assets/**
-!package.json
-!README.md
-!LICENSE
+# Local ingore files
+src
+.vscodeignore
+package-lock.json
+tsconfig.json
