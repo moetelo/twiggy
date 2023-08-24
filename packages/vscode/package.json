@@ -49,6 +49,16 @@
         "configuration": "./languages/twig.configuration.json"
       }
     ],
+    "grammars": [
+      {
+        "language": "twig",
+        "scopeName": "text.html.twig",
+        "path": "./syntaxes/twig.tmLanguage.json",
+        "embeddedLanguages": {
+          "text.html.derivative": "html"
+        }
+      }
+    ],
     "semanticTokenTypes": [
       {
         "id": "embedded_begin",
