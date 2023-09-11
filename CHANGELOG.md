@@ -2,6 +2,16 @@
 
 
 
+
+## v0.4.0 (2023-09-11)
+
+#### :rocket: Enhancement
+* `vscode`
+  * [#20](https://github.com/kaermorchen/twig-language-server/pull/20) Simplify, refine tmLanguage.json ([@IHIutch](https://github.com/IHIutch))
+
+#### Committers: 1
+- Jonathan Hutchison ([@IHIutch](https://github.com/IHIutch))
+
 ## v0.3.0 (2023-08-25)
 
 ## v0.2.3 (2023-08-16)
