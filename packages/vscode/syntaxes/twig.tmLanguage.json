@@ -1,4 +1,9 @@
 {
+  "information_for_contributors": [
+    "This textmate grammars provide Twig syntax highlighting support.",
+    "This document has been heavily inspired by the work of the vscode-liquid repo",
+    "found here https://github.com/panoply/vscode-liquid."
+  ],
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "Twig",
   "patterns": [
