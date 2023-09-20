@@ -32,7 +32,7 @@ export class Server {
     // Bindings
     connection.onInitialize((initializeParams: InitializeParams) => {
       this.workspaceFolder = initializeParams.workspaceFolders![0];
-      this.documentCache = new DocumentCache(this);
+      this.documentCache = new DocumentCache(this.workspaceFolder);
 
       const capabilities: ServerCapabilities = {
         hoverProvider: true,

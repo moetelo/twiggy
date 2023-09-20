@@ -1,9 +1,8 @@
 import { URI } from 'vscode-uri';
-import { Server } from './server';
 import readDir from './utils/read-dir';
 import { parseTwig } from './utils/parse-twig';
 import { readFile } from 'fs/promises';
-import { DocumentUri } from 'vscode-languageserver';
+import { DocumentUri, WorkspaceFolder } from 'vscode-languageserver';
 import { fsPathToDocumentUri } from './utils/fs-path-to-document-uri';
 import Parser from 'web-tree-sitter';
 
@@ -35,17 +34,17 @@ export class Document {
 }
 
 export class DocumentCache {
-  server: Server;
+  workspaceFolder!: WorkspaceFolder;
   documents: Map<DocumentUri, Document> = new Map();
 
-  constructor(server: Server) {
-    this.server = server;
+  constructor(workspaceFolder: WorkspaceFolder) {
+    this.workspaceFolder = workspaceFolder;
 
     this.initDocuments();
   }
 
   async initDocuments() {
-    const iterator = readDir(URI.parse(this.server.workspaceFolder.uri).fsPath);
+    const iterator = readDir(URI.parse(this.workspaceFolder.uri).fsPath);
     const reIsTwig = /.twig$/i;
 
     for await (const filePath of iterator) {
