@@ -1,4 +1,5 @@
 import {
+  ClientCapabilities,
   Connection,
   InitializeParams,
   ServerCapabilities,
@@ -13,12 +14,15 @@ import { CompletionProvider } from './completions/completion-provider';
 import { SignatureHelpProvider } from './signature-helps/signature-help-provider';
 import { semanticTokensLegend } from './semantic-tokens/tokens-provider';
 import { SemanticTokensProvider } from './semantic-tokens/semantic-tokens-provider';
+import { ConfigurationManager } from './configuration/configuration-manager';
 
 export class Server {
   connection: Connection;
   documents: TextDocuments<TextDocument>;
   documentCache!: DocumentCache;
   workspaceFolder!: WorkspaceFolder;
+
+  clientCapabilities!: ClientCapabilities;
 
   constructor(connection: Connection) {
     this.connection = connection;
@@ -33,6 +37,8 @@ export class Server {
     connection.onInitialize((initializeParams: InitializeParams) => {
       this.workspaceFolder = initializeParams.workspaceFolders![0];
       this.documentCache = new DocumentCache(this);
+
+      this.clientCapabilities = initializeParams.capabilities;
 
       const capabilities: ServerCapabilities = {
         hoverProvider: true,
@@ -50,6 +56,12 @@ export class Server {
       };
 
       return { capabilities };
+    });
+
+    this.connection.onInitialized(async () => {
+      if (this.clientCapabilities.workspace?.didChangeConfiguration) {
+        new ConfigurationManager(this);
+      }
     });
 
     this.documents.onDidChangeContent((change) => {

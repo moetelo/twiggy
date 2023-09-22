@@ -35,6 +35,11 @@
     "vscode:prepublish": "tsc --build"
   },
   "contributes": {
+    "configuration": {
+      "title": "Modern Twig",
+      "properties": {
+      }
+    },
     "languages": [
       {
         "id": "twig",
