@@ -7,10 +7,21 @@ import { Server } from '../server';
 import { PreOrderCursorIterator } from '../utils/pre-order-cursor-iterator';
 import { pointToPosition } from '../utils/point-to-position';
 import { semanticTokensLegend } from './tokens-provider';
+import { TreeCursor } from 'web-tree-sitter';
 
 const tokenTypes = new Map<string, number>(
   semanticTokensLegend.tokenTypes.map((v, i) => [v, i])
 );
+
+const functionTokenType = tokenTypes.get('function')!;
+
+const resolveTokenType = (node: TreeCursor) => {
+  if (node.nodeType === 'property' && node.currentNode().parent!.nextSibling?.type === 'arguments') {
+    return functionTokenType;
+  }
+
+  return tokenTypes.get(node.nodeType);
+}
 
 export class SemanticTokensProvider {
   server: Server;
@@ -37,7 +48,7 @@ export class SemanticTokensProvider {
     const nodes = new PreOrderCursorIterator(cst.walk());
 
     for (const node of nodes) {
-      const tokenType = tokenTypes.get(node.nodeType);
+      const tokenType = resolveTokenType(node);
 
       if (tokenType === undefined) {
         continue;
@@ -48,9 +59,7 @@ export class SemanticTokensProvider {
       let lineNumber = start.line;
       let charNumber = start.character;
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-
+      for (const line of lines) {
         tokensBuilder.push(lineNumber++, charNumber, line.length, tokenType, 0);
 
         charNumber = 0;
