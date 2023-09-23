@@ -1,10 +1,8 @@
-import * as path from 'path';
 import {
   workspace,
   ExtensionContext,
   window,
   WorkspaceFolder,
-  FileSystemWatcher,
   RelativePattern,
 } from 'vscode';
 import {
