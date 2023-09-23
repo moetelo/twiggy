@@ -1,29 +1,49 @@
-import { Position } from 'vscode-languageserver';
+import { Position, Range } from 'vscode-languageserver';
 import { SyntaxNode } from 'web-tree-sitter';
 import { rangeContainsPosition } from './range-contains-position';
 import { pointToPosition } from './point-to-position';
-import { positionsToRange } from './positions-to-range';
+import { isEmptyEmbedded } from './is-empty-embedded';
+import { comparePositions } from './compare-positions';
 
 export function findNodeByPosition(
   node: SyntaxNode,
-  position: Position
+  position: Position,
 ): SyntaxNode | undefined {
-  const range = positionsToRange(
+  const range = Range.create(
     pointToPosition(node.startPosition),
     pointToPosition(node.endPosition)
   );
 
-  if (rangeContainsPosition(range, position)) {
-    if (node.children.length > 0) {
-      for (let i = 0; i < node.children.length; i++) {
-        const child = findNodeByPosition(node.children[i], position);
+  if (!rangeContainsPosition(range, position)) {
+    // Cursor inside of empty embedded: {{ | }}
+    if (isEmptyEmbedded(node)) {
+      const rangeInsideEmptyEmbedded = Range.create(
+        pointToPosition(node.endPosition),
+        pointToPosition(node.nextSibling!.startPosition)
+      );
 
-        if (child) {
-          return child;
-        }
+      if (rangeContainsPosition(rangeInsideEmptyEmbedded, position)) {
+        return node;
       }
-    } else {
-      return node;
+    }
+
+    return;
+  }
+
+  if (!node.childCount) {
+    return node;
+  }
+
+  // Cursor right after embedded_begin: {{| }}
+  if (isEmptyEmbedded(node) && comparePositions(pointToPosition(node.endPosition), position) === 0) {
+    return node;
+  }
+
+  for (const child of node.children) {
+    const foundNode = findNodeByPosition(child, position);
+
+    if (foundNode) {
+      return foundNode;
     }
   }
 }

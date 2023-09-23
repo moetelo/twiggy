@@ -44,7 +44,7 @@ export class Server {
         hoverProvider: true,
         completionProvider: {
           resolveProvider: true,
-          triggerCharacters: ['"', "'", '|', '.'],
+          triggerCharacters: ['"', "'", '|', '.', '{'],
         },
         signatureHelpProvider: {
           triggerCharacters: ['(', ','],

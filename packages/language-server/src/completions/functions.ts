@@ -6,6 +6,7 @@ import {
 } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../common';
+import { isEmptyEmbedded } from '../utils/is-empty-embedded';
 
 const triggerParameterHints = Command.create(
   'Trigger parameter hints',
@@ -23,7 +24,7 @@ const completions: CompletionItem[] = twigFunctions.map((item) =>
 );
 
 export function functions(cursorNode: SyntaxNode) {
-  if (cursorNode.type === 'variable' || cursorNode.type === 'function') {
+  if (['variable', 'function'].includes(cursorNode.type) || isEmptyEmbedded(cursorNode)) {
     return completions;
   }
 }
