@@ -7,7 +7,8 @@
       "request": "launch",
       "preLaunchTask": "${defaultBuildTask}",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode"
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode",
+        "--disable-extensions",
       ],
       "outFiles": [
         "${workspaceFolder}/packages/vscode/out/*.js"
@@ -19,8 +20,8 @@
       "request": "attach",
       "port": 6009,
       "restart": true,
-      "sourceMaps":true,
-      "smartStep":true,
+      "sourceMaps": true,
+      "smartStep": true,
       "outFiles": [
         "${workspaceRoot}/packages/language-server/out/**/*.js"
       ]
