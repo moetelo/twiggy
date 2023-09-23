@@ -11,7 +11,7 @@ export function forLoop(cursorNode: SyntaxNode) {
   if (
     cursorNode.text === '.' &&
     cursorNode.previousSibling?.type === 'variable' &&
-    cursorNode.previousSibling?.text === 'loop'
+    cursorNode.previousSibling.text === 'loop'
   ) {
     return forLoopProperties;
   }
