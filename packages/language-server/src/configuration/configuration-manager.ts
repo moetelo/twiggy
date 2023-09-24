@@ -3,7 +3,7 @@ import { Server } from '../server';
 import { LanguageServerSettings } from './language-server-settings';
 
 export class ConfigurationManager {
-  readonly configurationSection = 'modernTwig';
+  readonly configurationSection = 'twiggy';
   server: Server;
 
   constructor(server: Server) {

@@ -1,8 +1,8 @@
 {
-  "name": "vscode-twig",
-  "displayName": "Modern Twig",
-  "description": "A Twig extension for VS Code",
-  "author": "Stanislav Romanov <kaermorchen@gmail.com>",
+  "name": "twiggy",
+  "displayName": "Twiggy",
+  "description": "Twig language support for VS Code",
+  "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
   "version": "0.4.0",
   "engines": {
@@ -12,10 +12,10 @@
     "onStartupFinished"
   ],
   "main": "./out/extension.js",
-  "publisher": "stanislav",
+  "publisher": "moetelo",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kaermorchen/twig-language-server",
+    "url": "https://github.com/Shifu462/twiggy",
     "directory": "packages/vscode"
   },
   "files": [
@@ -36,7 +36,7 @@
   },
   "contributes": {
     "configuration": {
-      "title": "Modern Twig",
+      "title": "Twiggy",
       "properties": {
       }
     },

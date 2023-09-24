@@ -1,6 +1,6 @@
 {
   "version": "0.4.0",
-  "repository": "https://github.com/kaermorchen/twig-language-server",
+  "repository": "https://github.com/Shifu462/twiggy",
   "private": true,
   "workspaces": [
     "packages/language-server",
@@ -11,7 +11,7 @@
     "watch": "npm run build -- --watch",
     "release": "release-it"
   },
-  "author": "Stanislav Romanov <kaermorchen@gmail.com>",
+  "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
   "release-it": {
     "hooks": {
