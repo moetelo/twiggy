@@ -15,5 +15,8 @@ export class ConfigurationManager {
 
   async onDidChangeConfiguration({ settings }: DidChangeConfigurationParams) {
     const config: LanguageServerSettings | undefined = settings?.[this.configurationSection];
+
+    const phpBinConsoleCommand = config?.completion?.phpBinConsoleCommand?.trim();
+    await this.server.completionProvider.initializeGlobalsFromCommand(phpBinConsoleCommand);
   }
 }

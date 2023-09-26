@@ -39,7 +39,12 @@
   "contributes": {
     "configuration": {
       "title": "Twiggy",
-      "properties": {}
+      "properties": {
+        "twiggy.completion.phpBinConsoleCommand": {
+          "type": "string",
+          "markdownDescription": "Shell command that will be used for PHP command execution. \n\ne.g. `php bin/console` \n\nSee: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
+        }
+      }
     },
     "languages": [
       {

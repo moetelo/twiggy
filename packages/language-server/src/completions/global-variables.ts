@@ -1,17 +1,30 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigGlobalVariables } from '../common';
+import { TwigVariable } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/is-empty-embedded';
 
-const completions: CompletionItem[] = twigGlobalVariables.map((item) =>
-  Object.assign({}, item, {
-    kind: CompletionItemKind.Variable,
-    detail: 'global variable',
-  })
-);
+const commonCompletionItem: Partial<CompletionItem> = {
+  kind: CompletionItemKind.Variable,
+  commitCharacters: ['|', '.'],
+  detail: 'global variable',
+};
 
-export function globalVariables(cursorNode: SyntaxNode) {
+const completions: CompletionItem[] = twigGlobalVariables.map((item) => ({
+  ...commonCompletionItem,
+  ...item,
+}));
+
+export function globalVariables(cursorNode: SyntaxNode, globals: TwigVariable[]) {
   if (cursorNode.type === 'variable' || isEmptyEmbedded(cursorNode)) {
-    return completions;
+    const completionsPhp = globals.map((variable): CompletionItem => ({
+      ...commonCompletionItem,
+      label: variable.identifier,
+    }));
+
+    return [
+      ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
+      ...completionsPhp,
+    ];
   }
 }

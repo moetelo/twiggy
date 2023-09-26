@@ -6,6 +6,7 @@ import {
 } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../common';
+import { TwigFunctionLike } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/is-empty-embedded';
 
 const triggerParameterHints = Command.create(
@@ -13,18 +14,30 @@ const triggerParameterHints = Command.create(
   'editor.action.triggerParameterHints'
 );
 
-const completions: CompletionItem[] = twigFunctions.map((item) =>
-  Object.assign({}, item, {
-    kind: CompletionItemKind.Function,
-    insertText: `${item.label}($1)$0`,
-    insertTextFormat: InsertTextFormat.Snippet,
-    command: triggerParameterHints,
-    detail: 'function',
-  })
-);
+const commonCompletionItem: Partial<CompletionItem> = {
+  kind: CompletionItemKind.Function,
+  insertTextFormat: InsertTextFormat.Snippet,
+  command: triggerParameterHints,
+  detail: 'function',
+};
 
-export function functions(cursorNode: SyntaxNode) {
+const completions: CompletionItem[] = twigFunctions.map((item) => ({
+  ...item,
+  ...commonCompletionItem,
+  insertText: `${item.label}($1)$0`,
+}));
+
+export function functions(cursorNode: SyntaxNode, functions: TwigFunctionLike[]) {
   if (['variable', 'function'].includes(cursorNode.type) || isEmptyEmbedded(cursorNode)) {
-    return completions;
+    const completionsPhp = functions.map((func): CompletionItem => ({
+        ...commonCompletionItem,
+        label: func.identifier,
+        insertText: `${func.identifier}($1)$0`,
+    }));
+
+    return [
+      ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
+      ...completionsPhp,
+    ];
   }
 }

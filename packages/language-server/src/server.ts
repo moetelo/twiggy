@@ -17,19 +17,20 @@ import { SemanticTokensProvider } from './semantic-tokens/semantic-tokens-provid
 import { ConfigurationManager } from './configuration/configuration-manager';
 
 export class Server {
-  connection: Connection;
-  documents: TextDocuments<TextDocument>;
+  readonly connection: Connection;
+  readonly documents: TextDocuments<TextDocument>;
   documentCache!: DocumentCache;
   workspaceFolder!: WorkspaceFolder;
 
   clientCapabilities!: ClientCapabilities;
+  completionProvider: CompletionProvider;
 
   constructor(connection: Connection) {
     this.connection = connection;
     this.documents = new TextDocuments(TextDocument);
 
     new HoverProvider(this);
-    new CompletionProvider(this);
+    this.completionProvider = new CompletionProvider(this);
     new SignatureHelpProvider(this);
     new SemanticTokensProvider(this);
 
