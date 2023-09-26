@@ -7,6 +7,7 @@ import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
 import path from 'path';
 import { trimTwigExtension } from '../utils/trim-twig-extension';
 import { SyntaxNode } from 'web-tree-sitter';
+import { templateUsingFunctions, templateUsingStatements } from '../constants/template-usage';
 
 export function templatePaths(
   cursorNode: SyntaxNode,
@@ -41,11 +42,11 @@ export function templatePaths(
     // {% include 'template.html' %}
     // {% extends 'template.html' %}
     // {% use 'template.html' %}
-    ['import', 'from', 'include', 'extends', 'use'].includes(node.type) ||
+    templateUsingStatements.includes(node.type) ||
     // {{ include('template.html') }}
     // {{ source('template.html') }}
     (node.type === 'arguments' &&
-      ['include', 'source'].includes(
+      templateUsingFunctions.includes(
         node.parent?.childForFieldName('name')?.text || ''
       )) ||
     // {{ block("title", "common_blocks.twig") }}

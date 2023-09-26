@@ -15,12 +15,15 @@ import { SignatureHelpProvider } from './signature-helps/signature-help-provider
 import { semanticTokensLegend } from './semantic-tokens/tokens-provider';
 import { SemanticTokensProvider } from './semantic-tokens/semantic-tokens-provider';
 import { ConfigurationManager } from './configuration/configuration-manager';
+import { DefinitionProvider } from './definitions/definition-provider';
 
 export class Server {
   readonly connection: Connection;
   readonly documents: TextDocuments<TextDocument>;
   documentCache!: DocumentCache;
   workspaceFolder!: WorkspaceFolder;
+
+  definitionProvider: DefinitionProvider;
 
   clientCapabilities!: ClientCapabilities;
   completionProvider: CompletionProvider;
@@ -33,6 +36,7 @@ export class Server {
     this.completionProvider = new CompletionProvider(this);
     new SignatureHelpProvider(this);
     new SemanticTokensProvider(this);
+    this.definitionProvider = new DefinitionProvider(this);
 
     // Bindings
     connection.onInitialize((initializeParams: InitializeParams) => {
@@ -43,6 +47,7 @@ export class Server {
 
       const capabilities: ServerCapabilities = {
         hoverProvider: true,
+        definitionProvider: true,
         completionProvider: {
           resolveProvider: true,
           triggerCharacters: ['"', "'", '|', '.', '{'],
