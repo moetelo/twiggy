@@ -3,6 +3,12 @@
 
 
 
+## v0.5.0 (2023-09-27)
+
+* Implement `SymbolProvider` for Twig locals.
+* Support Go to Definition for `include`, `import` etc
+* Resolve Twig filters, functions, globals via `debug:twig` command.
+
 ## v0.4.0 (2023-09-11)
 
 #### :rocket: Enhancement
