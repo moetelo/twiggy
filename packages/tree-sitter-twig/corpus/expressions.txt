@@ -1,0 +1,576 @@
+==================
+Identifier
+==================
+{{ user }}
+---
+(template
+  (output
+    (variable)))
+
+==================
+Null
+==================
+{{ null }}
+---
+(template
+  (output
+    (null)))
+
+==================
+None
+==================
+{{ none }}
+---
+(template
+  (output
+    (null)))
+
+==================
+Interger
+==================
+{{ 42 }}
+---
+(template
+  (output
+    (number)))
+
+==================
+Float
+==================
+{{ 42.35 }}
+---
+(template
+  (output
+    (number)))
+
+==================
+True
+==================
+{{ true }}
+---
+(template
+  (output
+    (boolean)))
+
+==================
+False
+==================
+{{ false }}
+---
+(template
+  (output
+    (boolean)))
+
+==================
+String
+==================
+{{ 'hello' }}
+---
+(template
+  (output
+    (string)))
+
+==================
+String interpolation
+==================
+{{ "foo #{ 43 } #{ bar } baz" }}
+---
+(template
+  (output
+    (interpolated_string
+      (string)
+      (number)
+      (string)
+      (variable)
+      (string))))
+
+==================
+String interpolation deeper
+==================
+{{ "foo #{"foo #{bar} baz"} baz" }}
+---
+(template
+  (output
+    (interpolated_string
+      (string)
+      (interpolated_string
+        (string)
+        (variable)
+        (string))
+      (string))))
+
+==================
+String interpolation escaped character
+==================
+{{ "foo \#{} \" \n" }}
+---
+(template
+  (output
+    (string)))
+
+==================
+Array empty
+==================
+{{ [] }}
+---
+(template
+  (output
+    (array)))
+
+==================
+Array
+==================
+{{ [1, 2, 'foo', "bar"] }}
+---
+(template
+  (output
+    (array
+      (number)
+      (number)
+      (string)
+      (string))))
+
+==================
+Array with end comma
+==================
+{{ [1, 2,] }}
+---
+(template
+  (output
+    (array
+      (number)
+      (number))))
+
+==================
+Array with spread element
+==================
+{{ [1, 2, ...moreNumbers] }}
+---
+(template
+  (output
+    (array
+      (number)
+      (number)
+      (spread_element
+        (variable)))))
+
+==================
+Object empty
+==================
+{{ {} }}
+---
+(template
+  (output
+    (object)))
+
+==================
+Object
+==================
+{{ {'foo': 'bar'} }}
+---
+(template
+  (output
+    (object
+      (pair
+        (string)
+        (string)))))
+
+==================
+Object property keys as names
+==================
+{{ { foo: 'foo', bar: 'bar' } }}
+---
+(template
+  (output
+    (object
+      (pair
+        (variable)
+        (string))
+      (pair
+        (variable)
+        (string)))))
+
+==================
+Object property keys as integer
+==================
+{{ { 2: 'foo', 4: 'bar' } }}
+---
+(template
+  (output
+    (object
+      (pair
+        (number)
+        (string))
+      (pair
+        (number)
+        (string)))))
+
+==================
+Object property as the variable name
+==================
+{{ { foo } }}
+---
+(template
+  (output
+    (object
+      (variable))))
+
+==================
+Object parentheses property
+==================
+{{ { (foo): 'foo' } }}
+---
+(template
+  (output
+    (object
+      (pair
+        (computed_property_name
+          (variable))
+        (string)))))
+
+==================
+Object with spread element
+==================
+{{ { 'foo': 10, ...moreRatings } }}
+---
+(template
+  (output
+    (object
+      (pair
+        (string)
+        (number))
+      (spread_element
+        (variable)))))
+
+==================
+Arrow function with arguments
+==================
+{{ (a, b) => 42 }}
+---
+(template
+  (output
+    (arrow_function
+      (parameter)
+      (parameter)
+      (number))))
+
+==================
+Arrow function without arguments
+==================
+{{ () => 42 }}
+---
+(template
+  (output
+    (arrow_function
+      (number))))
+
+==================
+Arrow function single argument
+==================
+{{ v => 42 }}
+---
+(template
+  (output
+    (arrow_function
+      (parameter)
+      (number))))
+
+==================
+Parenthesized expression
+==================
+{{ (42) }}
+---
+(template
+  (output
+    (parenthesized_expression
+      (number))))
+
+==================
+Member expression
+==================
+{{ user.name }}
+---
+(template
+  (output
+    (member_expression
+      (variable)
+      (property))))
+
+==================
+Member expression index
+==================
+{{ arr.0 }}
+---
+(template
+  (output
+    (member_expression
+      (variable)
+      (property))))
+
+==================
+Member expression deeper
+==================
+{{ user.name.first }}
+---
+(template
+  (output
+    (member_expression
+      (member_expression
+        (variable)
+        (property))
+      (property))))
+
+==================
+Subscript expression
+==================
+{{ user['name'] }}
+---
+(template
+  (output
+    (subscript_expression
+      (variable)
+      (string))))
+
+==================
+Subscript expression slice
+==================
+{{ '123456'[1:2] }}
+{{ '123456'[:-2] }}
+{{ [1,2,3][2:] }}
+{{ [1,2,3][:] }}
+---
+(template
+  (output
+    (subscript_expression
+      (string)
+      (slice
+        (number)
+        (number))))
+  (output
+    (subscript_expression
+      (string)
+      (slice
+        (unary_expression
+          (number)))))
+  (output
+    (subscript_expression
+      (array
+        (number)
+        (number)
+        (number))
+      (slice
+        (number))))
+  (output
+    (subscript_expression
+      (array
+        (number)
+        (number)
+        (number))
+      (slice))))
+
+==================
+Subscript expression deeper
+==================
+{{ user['name'][prop] }}
+---
+(template
+  (output
+    (subscript_expression
+      (subscript_expression
+        (variable)
+        (string))
+      (variable))))
+
+==================
+Call expression without arguments
+==================
+{{ range() }}
+---
+(template
+  (output
+    (call_expression
+      (function)
+      (arguments))))
+
+==================
+Call call expression
+==================
+{{ range()() }}
+---
+(template
+  (output
+    (call_expression
+      (call_expression
+        (function)
+        (arguments))
+      (arguments))))
+
+==================
+Call expression with arguments
+==================
+{{ range(0, 3) }}
+---
+(template
+  (output
+    (call_expression
+      (function)
+      (arguments
+        (number)
+        (number)))))
+
+==================
+Call expression with one argument
+==================
+{{ join(',') }}
+---
+(template
+  (output
+    (call_expression
+      (function)
+      (arguments
+        (string)))))
+
+==================
+Call expression with one named argument
+==================
+{{ join(splitter=',') }}
+---
+(template
+  (output
+    (call_expression
+      (function)
+      (arguments
+        (named_argument
+          (string)
+          (string))))))
+
+==================
+Call expression with named arguments
+==================
+{{ range(low=1, high=10, step=2) }}
+---
+(template
+  (output
+    (call_expression
+      (function)
+      (arguments
+        (named_argument
+          (string)
+          (number))
+        (named_argument
+          (string)
+          (number))
+        (named_argument
+          (string)
+          (number))))))
+
+==================
+Call expression with arguments and named arguments
+==================
+{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}
+---
+(template
+  (output
+    (filter_expression
+      (string)
+      (function)
+      (arguments
+        (string)
+        (named_argument
+          (string)
+          (string))))))
+
+==================
+Unary expression
+==================
+{{ -42 }}
+---
+(template
+  (output
+    (unary_expression
+      (number))))
+
+==================
+Binary expression
+==================
+{{ a + b }}
+---
+(template
+  (output
+    (binary_expression
+      (variable)
+      (variable))))
+
+==================
+Binary and unary expressions
+==================
+{{ -42 + a * 'b' }}
+---
+(template
+  (output
+    (binary_expression
+      (unary_expression
+        (number))
+      (binary_expression
+        (variable)
+        (string)))))
+
+==================
+Ternary operator
+==================
+{{ foo ? 'yes' : 'no' }}
+---
+(template
+  (output
+    (ternary_expression
+      (variable)
+      (string)
+      (string))))
+
+==================
+Ternary operator short
+==================
+{{ foo ?: 'no' }}
+---
+(template
+  (output
+    (ternary_expression
+      (variable)
+      (string))))
+
+==================
+Filter without arguments
+==================
+{{ name|title }}
+---
+(template
+  (output
+    (filter_expression
+      (variable)
+      (function))))
+
+==================
+Filter with arguments
+==================
+{{ name|join(', ') }}
+---
+(template
+  (output
+    (filter_expression
+      (variable)
+      (function)
+      (arguments
+        (string)))))
+
+==================
+Filter multiple
+==================
+{{ name|striptags|title }}
+---
+(template
+  (output
+    (filter_expression
+      (filter_expression
+        (variable)
+        (function))
+      (function))))

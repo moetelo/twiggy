@@ -11,7 +11,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "publisher": "moetelo",
   "repository": {
     "type": "git",
@@ -32,13 +32,14 @@
   ],
   "icon": "assets/logo.png",
   "scripts": {
-    "vscode:prepublish": "tsc --build"
+    "vscode:prepublish": "",
+    "build": "node ./build/index.mjs",
+    "dev": "node ./build/index.mjs --dev"
   },
   "contributes": {
     "configuration": {
       "title": "Twiggy",
-      "properties": {
-      }
+      "properties": {}
     },
     "languages": [
       {
@@ -68,10 +69,11 @@
   "devDependencies": {
     "@types/node": "^20.2.6",
     "@types/vscode": "^1.74.0",
+    "esbuild": "^0.19.3",
     "typescript": "^5.1.3"
   },
   "dependencies": {
-    "twig-language-server": "^0.4.0",
-    "vscode-languageclient": "^8.1.0"
+    "twig-language-server": "workspace:*",
+    "vscode-languageclient": "^9.0.0"
   }
 }

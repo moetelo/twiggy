@@ -1,0 +1,721 @@
+==================
+Tag empty
+==================
+{% unknown_tag %}
+---
+(template
+  (tag))
+
+==================
+Tag with expression
+==================
+{% unknown_tag 2 + 3 %}
+---
+(template
+  (tag
+    (binary_expression
+      (number)
+      (number))))
+
+==================
+Tag with expressions
+==================
+{% unknown_tag arg1 2 + 3 %}
+---
+(template
+  (tag
+    (variable)
+    (binary_expression
+      (number)
+      (number))))
+
+==================
+Apply
+==================
+{% apply upper %}
+  his text becomes uppercase
+{% endapply %}
+---
+(template
+  (apply
+    (function)
+    (source_elements
+      (content))))
+
+==================
+Apply multiple filters
+==================
+{% apply lower|escape('html') %}
+  <strong>SOME TEXT</strong>
+{% endapply %}
+---
+(template
+  (apply
+    (filter_expression
+      (variable)
+      (function)
+      (arguments
+        (string)))
+    (source_elements
+      (content))))
+
+==================
+Autoescape
+==================
+{% autoescape %}
+  Everything will be automatically escaped in this block
+  using the HTML strategy
+{% endautoescape %}
+---
+(template
+  (autoescape
+    (source_elements
+      (content))))
+
+==================
+Autoescape string argument
+==================
+{% autoescape 'html' %}
+  Everything will be automatically escaped in this block
+  using the HTML strategy
+{% endautoescape %}
+---
+(template
+  (autoescape
+    (string)
+    (source_elements
+      (content))))
+
+==================
+Autoescape boolean argument
+==================
+{% autoescape false %}
+  Everything will be automatically escaped in this block
+  using the HTML strategy
+{% endautoescape %}
+---
+(template
+  (autoescape
+    (boolean)
+    (source_elements
+      (content))))
+
+==================
+Block
+==================
+{% block title %}Index{% endblock %}
+---
+(template
+  (block
+    (identifier)
+    (source_elements
+      (content))))
+
+==================
+Block with end-tag
+==================
+{% block sidebar %}{% endblock sidebar %}
+---
+(template
+  (block
+    (identifier)
+    (identifier)))
+
+==================
+Block shortcut
+==================
+{% block title page_title|title %}
+---
+(template
+  (block
+    (identifier)
+    (filter_expression
+      (variable)
+      (function))))
+
+==================
+Cache
+==================
+{% cache "cache key" %}
+    Cached forever (depending on the cache implementation)
+{% endcache %}
+---
+(template
+  (cache
+    (string)
+    (source_elements
+      (content))))
+
+==================
+Cache with key and expiration
+==================
+{% cache "cache key" ttl(300) %}
+    Cached for 300 seconds
+{% endcache %}
+---
+(template
+  (cache
+    (string)
+    (call_expression
+      (function)
+      (arguments
+        (number)))
+    (source_elements
+      (content))))
+
+==================
+Deprecated
+==================
+{% deprecated 'The "base.twig" template is deprecated, use "layout.twig" instead.' %}
+---
+(template
+  (deprecated
+    (string)))
+
+==================
+Do
+==================
+{% do 1 + 2 %}
+---
+(template
+  (do
+    (binary_expression
+      (number)
+      (number))))
+
+==================
+Embed
+==================
+{% embed "teasers_skeleton.twig" %}{% endembed %}
+---
+(template
+  (embed
+    (string)))
+
+==================
+Embed with variable
+==================
+{% embed "base" with {'foo': 'bar'} %}
+    ...
+{% endembed %}
+---
+(template
+  (embed
+    (string)
+    (object
+      (pair
+        (string)
+        (string)))
+    (source_elements
+      (content))))
+
+==================
+Embed with variable only
+==================
+{% embed "base" with {'foo': 'bar'} only %}
+    ...
+{% endembed %}
+---
+(template
+  (embed
+    (string)
+    (object
+      (pair
+        (string)
+        (string)))
+    (source_elements
+      (content))))
+
+==================
+Embed ignore missing
+==================
+{% embed "base" ignore missing %}
+    ...
+{% endembed %}
+---
+(template
+  (embed
+    (string)
+    (source_elements
+      (content))))
+
+==================
+Extends
+==================
+{% extends "base.twig" %}
+---
+(template
+  (extends
+    (string)))
+
+==================
+Extends with ternary operator
+==================
+{% extends standalone ? "minimum.html" : "base.html" %}
+---
+(template
+  (extends
+    (ternary_expression
+      (variable)
+      (string)
+      (string))))
+
+==================
+Flush
+==================
+{% flush %}
+---
+(template
+  (flush))
+
+==================
+For
+==================
+{% for user in users %}
+  {{ user.username }}
+{% endfor %}
+---
+(template
+  (for
+    (variable)
+    (variable)
+    (source_elements
+      (output
+        (member_expression
+          (variable)
+          (property))))))
+
+==================
+For with sequence of numbers
+==================
+{% for i in 0..10 %}
+  {{ i }}
+{% endfor %}
+---
+(template
+  (for
+    (variable)
+    (binary_expression
+      (number)
+      (number))
+    (source_elements
+      (output
+        (variable)))))
+
+==================
+For with else
+==================
+{% for user in users %}
+  {{ user.username }}
+{% else %}
+  no user found
+{% endfor %}
+---
+(template
+  (for
+    (variable)
+    (variable)
+    (source_elements
+      (output
+        (member_expression
+          (variable)
+          (property))))
+    (source_elements
+      (content))))
+
+==================
+For with kye, value
+==================
+{% for key, user in users %}
+  <li>{{ key }}: {{ user.username|e }}</li>
+{% endfor %}
+---
+(template
+  (for
+    (variable)
+    (variable)
+    (variable)
+    (source_elements
+      (content)
+      (output
+        (variable))
+      (content)
+      (output
+        (filter_expression
+          (member_expression
+            (variable)
+            (property))
+          (function)))
+      (content))))
+
+==================
+From
+==================
+{% from "macros.twig" import hello %}
+---
+(template
+  (from
+    (string)
+    (variable)))
+
+==================
+From multiple
+==================
+{% from "macros.twig" import hello, world %}
+---
+(template
+  (from
+    (string)
+    (variable)
+    (variable)))
+
+==================
+From as operator
+==================
+{% from "macros.twig" import input as input_field %}
+---
+(template
+  (from
+    (string)
+    (as_operator
+      (variable)
+      (variable))))
+
+==================
+If
+==================
+{% if online == false %}
+  Our website is in maintenance mode
+{% endif %}
+---
+(template
+  (if
+    (binary_expression
+      (variable)
+      (boolean))
+    (source_elements
+      (content))))
+
+==================
+If else
+==================
+{% if product.stock > 10 %}
+   Available
+{% else %}
+   Sold-out!
+{% endif %}
+---
+(template
+  (if
+    (binary_expression
+      (member_expression
+        (variable)
+        (property))
+      (number))
+    (source_elements
+      (content))
+    (source_elements
+      (content))))
+
+==================
+If elseif
+==================
+{% if product.stock > 10 %}
+   Available
+{% elseif product.stock > 0 %}
+   Only {{ product.stock }} left!
+{% endif %}
+---
+(template
+  (if
+    (binary_expression
+      (member_expression
+        (variable)
+        (property))
+      (number))
+    (source_elements
+      (content))
+    (elseif
+      (binary_expression
+        (member_expression
+          (variable)
+          (property))
+        (number))
+      (source_elements
+        (content)
+        (output
+          (member_expression
+            (variable)
+            (property)))
+        (content)))))
+
+==================
+If elseif else
+==================
+{% if product.stock > 10 %}
+   Available
+{% elseif product.stock > 0 %}
+   Only {{ product.stock }} left!
+{% else %}
+   Sold-out!
+{% endif %}
+---
+(template
+  (if
+    (binary_expression
+      (member_expression
+        (variable)
+        (property))
+      (number))
+    (source_elements
+      (content))
+    (elseif
+      (binary_expression
+        (member_expression
+          (variable)
+          (property))
+        (number))
+      (source_elements
+        (content)
+        (output
+          (member_expression
+            (variable)
+            (property)))
+        (content)))
+    (source_elements
+      (content))))
+
+==================
+Import
+==================
+{% import "macros.twig" as macros %}
+---
+(template
+  (import
+    (string)
+    (variable)))
+
+==================
+Include
+==================
+{% include 'header.html' %}
+---
+(template
+  (include
+    (string)))
+
+==================
+Include with variable
+==================
+{% include 'template.html' with {'foo': 'bar'} %}
+---
+(template
+  (include
+    (string)
+    (object
+      (pair
+        (string)
+        (string)))))
+
+==================
+Include with variable only
+==================
+{% include 'template.html' with {'foo': 'bar'} only %}
+---
+(template
+  (include
+    (string)
+    (object
+      (pair
+        (string)
+        (string)))))
+
+==================
+Include ignore missing
+==================
+{% include 'sidebar.html' ignore missing %}
+---
+(template
+  (include
+    (string)))
+
+==================
+Macro
+==================
+{% macro input(name) %}
+  <input name="{{ name }}"/>
+{% endmacro %}
+---
+(template
+  (macro
+    (identifier)
+    (arguments
+      (variable))
+    (source_elements
+      (content)
+      (output
+        (variable))
+      (content))))
+
+==================
+Macro with end name
+==================
+{% macro input() %}
+    ...
+{% endmacro input %}
+---
+(template
+  (macro
+    (identifier)
+    (arguments)
+    (source_elements
+      (content))
+    (identifier)))
+
+==================
+Sandbox
+==================
+{% sandbox %}
+  ...
+{% endsandbox %}
+---
+(template
+  (sandbox
+    (source_elements
+      (content))))
+
+==================
+Set
+==================
+{% set foo = [1, 2] %}
+---
+(template
+  (set
+    (variable)
+    (array
+      (number)
+      (number))))
+
+==================
+Set several variables
+==================
+{% set foo, bar = 'foo', 'bar' %}
+---
+(template
+  (set
+    (variable)
+    (variable)
+    (string)
+    (string)))
+
+==================
+Set block
+==================
+{% set foo %}
+  Hello {{ username }}!
+{% endset %}
+---
+(template
+  (set_block
+    (variable)
+    (source_elements
+      (content)
+      (output
+        (variable))
+      (content))))
+==================
+Use
+==================
+{% use "blocks.html" %}
+---
+(template
+  (use
+    (string)))
+
+==================
+Use with variable
+==================
+{% use "blocks.html" with sidebar as base_sidebar, title as base_title %}
+---
+(template
+  (use
+    (string)
+    (as_operator
+      (variable)
+      (variable))
+    (as_operator
+      (variable)
+      (variable))))
+
+==================
+Verbatim
+==================
+{% verbatim %}
+  ...
+{% endverbatim %}
+---
+(template
+  (verbatim
+    (source_elements
+      (content))))
+
+==================
+With
+==================
+{% with %}
+  ...
+{% endwith %}
+---
+(template
+  (with
+    (source_elements
+      (content))))
+
+==================
+With variables
+==================
+{% with { foo: 42 } %}
+  ...
+{% endwith %}
+---
+(template
+  (with
+    (object
+      (pair
+        (variable)
+        (number)))
+    (source_elements
+      (content))))
+
+==================
+With variables only
+==================
+{% with { foo: 42 } only %}
+  ...
+{% endwith %}
+---
+(template
+  (with
+    (object
+      (pair
+        (variable)
+        (number)))
+    (source_elements
+      (content))))
+
+==================
+Trans
+==================
+{% if display_submitted %}
+  {% trans %}
+    Hello
+  {% endtrans %}
+{% endif %}
+---
+(template
+  (if
+    (variable)
+    (source_elements
+      (tag)
+      (content)
+      (tag))))

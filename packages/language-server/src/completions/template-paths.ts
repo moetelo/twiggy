@@ -4,7 +4,7 @@ import {
   DocumentUri,
 } from 'vscode-languageserver/node';
 import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
-import { dirname, relative } from 'path';
+import path from 'path';
 import { trimTwigExtension } from '../utils/trim-twig-extension';
 import { SyntaxNode } from 'web-tree-sitter';
 
@@ -53,11 +53,11 @@ export function templatePaths(
       node.parent?.childForFieldName('name')?.text === 'block' &&
       cursorNode?.equals(node.namedChildren[1]))
   ) {
-    const currentPath = dirname(documentUriToFsPath(currentDocumentUri));
+    const currentPath = path.dirname(documentUriToFsPath(currentDocumentUri));
 
     for (const twigPath of documentsPaths) {
       completions.push({
-        label: relative(
+        label: path.relative(
           currentPath,
           documentUriToFsPath(trimTwigExtension(twigPath))
         ),

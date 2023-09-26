@@ -8,6 +8,19 @@
     ],
     "sourceMap": true,
     "rootDir": "src",
-    "strict": true
-  }
+    "strict": true,
+    "paths": {
+      "@server": [
+        "../language-server/src/"
+      ],
+      "@tree-sitter-twig": [
+        "../tree-sitter-twig"
+      ]
+    },
+  },
+  "references": [
+    {
+      "path": "../language-server/tsconfig.json"
+    }
+  ]
 }

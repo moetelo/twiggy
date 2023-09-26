@@ -20,3 +20,11 @@ This is a fork of [kaermorchen/twig-language-server (Modern Twig)](https://githu
 
 - [Twig Language Server](packages/language-server/)
 - [VSCode Twig extension](packages/vscode/)
+
+
+## Development
+
+```bash
+pnpm install
+pnpm run dev
+```

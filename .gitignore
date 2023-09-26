@@ -1,3 +1,4 @@
 node_modules/
-out/
+packages/vscode/dist
 .vscode/settings.json
+*.vsix

@@ -1,0 +1,39 @@
+==================
+Divisible by
+==================
+{% if loop.index is divisible by(3) %}
+  ...
+{% endif %}
+---
+(template
+  (if
+    (binary_expression
+      (member_expression
+        (variable)
+        (property))
+      (call_expression
+        (function)
+        (arguments
+          (number))))
+    (source_elements
+      (content))))
+
+==================
+Same as
+==================
+{% if foo.attribute is same as(false) %}
+  ...
+{% endif %}
+---
+(template
+  (if
+    (binary_expression
+      (member_expression
+        (variable)
+        (property))
+      (call_expression
+        (function)
+        (arguments
+          (boolean))))
+    (source_elements
+      (content))))

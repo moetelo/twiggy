@@ -47,7 +47,8 @@ async function addWorkspaceFolder(
     return;
   }
 
-  const module = require.resolve('twig-language-server');
+  const module = require.resolve('./server');
+
   const serverOptions: ServerOptions = {
     run: { module, transport: TransportKind.ipc },
     debug: {
@@ -80,6 +81,8 @@ async function addWorkspaceFolder(
   clients.set(folderPath, client);
 
   await client.start();
+
+  outputChannel.appendLine('Language server started for: ' + folderPath);
 }
 
 async function removeWorkspaceFolder(
