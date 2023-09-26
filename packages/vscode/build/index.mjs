@@ -65,6 +65,23 @@ async function watchDev(options) {
   /**
    * @type {esbuild.Plugin}
    */
+  const triggerVscodeDebug = {
+    name: 'trigger-vscode-problem-matcher-debug',
+    setup(build) {
+      let isFirstBuild = true;
+
+      build.onEnd(_result => {
+        if (isFirstBuild) {
+          console.log('[watch] build finished, watching for changes...');
+          isFirstBuild = false;
+        }
+      });
+    },
+  };
+
+  /**
+   * @type {esbuild.Plugin}
+   */
   const watchLogPlugin = {
     name: 'watch-log-plugin',
     setup(build) {
@@ -86,6 +103,7 @@ async function watchDev(options) {
     ...options,
     logLevel: 'error',
     plugins: [
+      triggerVscodeDebug,
       watchLogPlugin,
     ],
   });
