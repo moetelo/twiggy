@@ -33,19 +33,14 @@ const isPathInsideTemplateEmbedding = (stringNode: SyntaxNode): boolean => {
 };
 
 export class DefinitionProvider {
-  private readonly defaultTemplatesDirectory = 'templates';
-  private templatesDirectory = this.defaultTemplatesDirectory;
-
   server: Server;
+
+  templatesDirectory!: string;
 
   constructor(server: Server) {
     this.server = server;
 
     this.server.connection.onDefinition(this.onDefinition.bind(this));
-  }
-
-  setTemplatesDirectory(templatesDirectory: string | undefined) {
-    this.templatesDirectory = templatesDirectory || this.defaultTemplatesDirectory;
   }
 
   async onDefinition(params: DefinitionParams): Promise<Definition | undefined> {
