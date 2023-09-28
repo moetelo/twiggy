@@ -19,7 +19,7 @@
     "directory": "packages/vscode"
   },
   "files": [
-    "out/",
+    "dist/",
     "LICENSE",
     "README.md"
   ],
