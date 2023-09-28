@@ -1,5 +1,5 @@
 import { SyntaxNode } from 'web-tree-sitter';
-import { onHoverHandlerReturn } from './hover-provider';
+import { onHoverHandlerReturn } from './HoverProvider';
 import { forLoopProperties } from '../common';
 import { findParentByType } from '../utils/find-parent-by-type';
 

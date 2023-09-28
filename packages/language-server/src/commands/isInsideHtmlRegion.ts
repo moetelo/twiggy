@@ -1,17 +1,11 @@
 import { Position } from 'vscode-languageserver';
-import { findNodeByPosition } from '../utils/find-element-by-position';
-import { Document } from '../document-cache';
+import { findNodeByPosition } from '../utils/findElementByPosition';
+import { Document } from '../documents';
 
 export async function isInsideHtmlRegion(
-    document: Document,
+    { tree }: Document,
     position: Position,
-): Promise<boolean | undefined> {
-    const cst = await document.cst();
-    const cursorNode = findNodeByPosition(cst.rootNode, position);
-
-    if (!cursorNode) {
-        return;
-    }
-
-    return cursorNode.type === 'content';
+): Promise<boolean> {
+    const node = findNodeByPosition(tree.rootNode, position);
+    return node?.type === 'content';
 }

@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionParams } from 'vscode-languageserver/node';
 import { Server } from '../server';
-import { findNodeByPosition } from '../utils/find-element-by-position';
+import { findNodeByPosition } from '../utils/findElementByPosition';
 import { templatePaths } from './template-paths';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
@@ -41,14 +41,13 @@ export class CompletionProvider {
 
   async onCompletion(params: CompletionParams) {
     const uri = params.textDocument.uri;
-    const document = this.server.documentCache.getDocument(uri);
+    const document = this.server.documentCache.get(uri);
 
     if (!document) {
       return;
     }
 
-    const cst = await document.cst();
-    const cursorNode = findNodeByPosition(cst.rootNode, params.position);
+    const cursorNode = findNodeByPosition(document.tree.rootNode, params.position);
 
     if (!cursorNode) {
       return;

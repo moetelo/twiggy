@@ -1,5 +1,5 @@
 import { SyntaxNode } from 'web-tree-sitter';
-import { onHoverHandlerReturn } from './hover-provider';
+import { onHoverHandlerReturn } from './HoverProvider';
 import { twigFunctions } from '../common';
 
 export function functions(cursorNode: SyntaxNode): onHoverHandlerReturn {

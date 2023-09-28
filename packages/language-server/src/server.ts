@@ -7,16 +7,16 @@ import {
     WorkspaceFolder,
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { validateTwigDocument } from './utils/validate-twig-document';
-import { DocumentCache } from './document-cache';
-import { HoverProvider } from './hovers/hover-provider';
-import { CompletionProvider } from './completions/completion-provider';
-import { SignatureHelpProvider } from './signature-helps/signature-help-provider';
+import { validateTwigDocument } from './diagnostics';
+import { DocumentCache } from './documents';
+import { HoverProvider } from './hovers/HoverProvider';
+import { CompletionProvider } from './completions/CompletionProvider';
+import { SignatureHelpProvider } from './signature-helps/SignatureHelpProvider';
 import { semanticTokensLegend } from './semantic-tokens/tokens-provider';
-import { SemanticTokensProvider } from './semantic-tokens/semantic-tokens-provider';
+import { SemanticTokensProvider } from './semantic-tokens/SemanticTokensProvider';
 import { ConfigurationManager } from './configuration/configuration-manager';
-import { DefinitionProvider } from './definitions/definition-provider';
-import { SymbolProvider } from './symbols/symbol-provider';
+import { DefinitionProvider } from './definitions';
+import { SymbolProvider } from './symbols/SymbolProvider';
 import {
     Command,
     ExecuteCommandProvider,
@@ -27,11 +27,10 @@ export class Server {
     readonly documents: TextDocuments<TextDocument>;
     documentCache!: DocumentCache;
     workspaceFolder!: WorkspaceFolder;
-
-    definitionProvider: DefinitionProvider;
-
     clientCapabilities!: ClientCapabilities;
-    completionProvider: CompletionProvider;
+
+    readonly definitionProvider: DefinitionProvider;
+    readonly completionProvider: CompletionProvider;
 
     constructor(connection: Connection) {
         this.connection = connection;
@@ -46,9 +45,10 @@ export class Server {
         new ExecuteCommandProvider(this);
 
         // Bindings
-        connection.onInitialize((initializeParams: InitializeParams) => {
+        connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
             this.documentCache = new DocumentCache(this.workspaceFolder);
+            await this.documentCache.initDocuments();
 
             this.clientCapabilities = initializeParams.capabilities;
 
@@ -81,13 +81,9 @@ export class Server {
             }
         });
 
-        this.documents.onDidChangeContent((change) => {
-            validateTwigDocument(change.document, connection);
-
-            // Update text in documentCache
-            this.documentCache
-                .getDocument(change.document.uri)
-                ?.setText(change.document.getText());
+        this.documents.onDidChangeContent(async ({ document }) => {
+            const doc = await this.documentCache.updateText(document.uri, document.getText());
+            validateTwigDocument(connection, doc);
         });
 
         this.documents.listen(connection);

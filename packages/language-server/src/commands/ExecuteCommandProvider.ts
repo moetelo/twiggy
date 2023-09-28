@@ -1,4 +1,4 @@
-import { ExecuteCommandParams, Position } from 'vscode-languageserver';
+import { DocumentUri, ExecuteCommandParams, Position } from 'vscode-languageserver';
 import { Server } from '../server';
 import { isInsideHtmlRegion } from './isInsideHtmlRegion';
 
@@ -28,8 +28,8 @@ export class ExecuteCommandProvider {
             return;
         }
 
-        const [url, position] = params.arguments as [string, Position];
-        const document = this.server.documentCache.getDocument(url);
+        const [uri, position] = params.arguments as [DocumentUri, Position];
+        const document = this.server.documentCache.get(uri);
 
         if (!document) {
             return;

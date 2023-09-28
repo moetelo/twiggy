@@ -1,12 +1,10 @@
-import { Connection, Definition, DefinitionLink, DefinitionParams, Range } from 'vscode-languageserver';
+import { Connection, Definition, DefinitionParams, DocumentUri, Range } from 'vscode-languageserver';
 import { Server } from '../server';
-import { findNodeByPosition } from '../utils/find-element-by-position';
-import { SyntaxNode, Tree } from 'web-tree-sitter';
+import { findNodeByPosition } from '../utils/findElementByPosition';
+import { SyntaxNode } from 'web-tree-sitter';
 import { templateUsingFunctions, templateUsingStatements } from '../constants/template-usage';
-import { Document } from '../document-cache';
-import { PreOrderCursorIterator } from '../utils/pre-order-cursor-iterator';
-import { getStringNodeValue, getNodeRange } from '../utils/node';
-import { collectLocals } from '../symbols/locals';
+import { Document } from '../documents';
+import { getStringNodeValue } from '../utils/node';
 
 export type onDefinitionHandlerReturn = ReturnType<
   Parameters<Connection['onDefinition']>[0]
@@ -56,22 +54,20 @@ export class DefinitionProvider {
   }
 
   async onDefinition(params: DefinitionParams): Promise<Definition | undefined> {
-    const uri = params.textDocument.uri;
-    const document = this.server.documentCache.getDocument(uri);
+    const document = this.server.documentCache.get(params.textDocument.uri);
 
     if (!document) {
       return;
     }
 
-    const cst = await document.cst();
-    const cursorNode = findNodeByPosition(cst.rootNode, params.position);
+    const cursorNode = findNodeByPosition(document.tree.rootNode, params.position);
 
     if (!cursorNode) {
       return;
     }
 
     if (isPathInsideTemplateEmbedding(cursorNode)) {
-      const templatePath = this.resolveTemplatePath(
+      const templatePath = this.resolveTemplateUri(
         getStringNodeValue(cursorNode),
       );
 
@@ -81,43 +77,43 @@ export class DefinitionProvider {
     if (isIdentifierOf('block', cursorNode)) {
       const blockName = cursorNode.text;
 
-      let extendedTwigDocument: Document | undefined = await this.getExtendedTemplate(document);
-      while (extendedTwigDocument) {
-        const symbol = await extendedTwigDocument.getSymbolByName(blockName, 'block');
+      let extendedDocument: Document | undefined = await this.getExtendedTemplate(document);
+      while (extendedDocument) {
+        await extendedDocument.ensureParsed();
+        const symbol = await extendedDocument.getSymbolByName(blockName, 'block');
         if (!symbol) {
-          extendedTwigDocument = await this.getExtendedTemplate(extendedTwigDocument);
+          extendedDocument = await this.getExtendedTemplate(extendedDocument);
           continue;
         }
 
         return {
-          uri: extendedTwigDocument.uri,
+          uri: extendedDocument.uri,
           range: symbol.nameRange,
         };
       }
     }
   }
 
-  resolveTemplatePath(filePath: string): string {
+  resolveTemplateUri(filePath: string): DocumentUri {
     return `${this.server.workspaceFolder.uri}/${this.templatesDirectory}/${filePath}`;
   }
 
   private async getExtendedTemplate(document: Document) {
-    const tree = await document.cst();
-    const extendsNode = tree.rootNode.children.find(node => node.type === 'extends')?.childForFieldName('expr');
+    const extendsNode = document.tree.rootNode.children.find(node => node.type === 'extends')?.childForFieldName('expr');
 
     if (!extendsNode) {
       return undefined;
     }
 
-    const templatePath = this.resolveTemplatePath(
+    const templatePath = this.resolveTemplateUri(
       getStringNodeValue(extendsNode),
     );
 
-    return this.server.documentCache.getDocument(templatePath);
+    return this.server.documentCache.get(templatePath);
   }
 
   resolveTemplateDefinition(templatePath: string): Definition | undefined {
-    const document = this.server.documentCache.getDocument(templatePath);
+    const document = this.server.documentCache.get(templatePath);
 
     if (!document) {
       return;

@@ -3,7 +3,7 @@ import Parser from 'web-tree-sitter';
 
 let parser: Parser;
 
-export async function parseTwig(content: string): Promise<Parser.Tree> {
+export async function parseTwig(content: string, previousTree?: Parser.Tree): Promise<Parser.Tree> {
   if (!parser) {
     const wasmPath = require.resolve('./tree-sitter-twig.wasm');
 
@@ -12,5 +12,5 @@ export async function parseTwig(content: string): Promise<Parser.Tree> {
     parser.setLanguage(await Parser.Language.load(await readFile(wasmPath)));
   }
 
-  return parser.parse(content);
+  return parser.parse(content, previousTree);
 }

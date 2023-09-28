@@ -1,5 +1,5 @@
 import { SyntaxNode } from 'web-tree-sitter';
-import { onHoverHandlerReturn } from './hover-provider';
+import { onHoverHandlerReturn } from './HoverProvider';
 import { collectLocals } from '../symbols/locals';
 import { closestByPredicate } from '../utils/node';
 

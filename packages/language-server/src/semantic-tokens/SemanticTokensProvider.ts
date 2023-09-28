@@ -37,15 +37,14 @@ export class SemanticTokensProvider {
   async serverRequestHandler(params: SemanticTokensParams) {
     const semanticTokens: SemanticTokens = { data: [] };
     const uri = params.textDocument.uri;
-    const document = this.server.documentCache.getDocument(uri);
+    const document = this.server.documentCache.get(uri);
 
     if (!document) {
       return semanticTokens;
     }
 
-    const cst = await document.cst();
     const tokensBuilder = new SemanticTokensBuilder();
-    const nodes = new PreOrderCursorIterator(cst.walk());
+    const nodes = new PreOrderCursorIterator(document.tree.walk());
 
     for (const node of nodes) {
       const tokenType = resolveTokenType(node);
