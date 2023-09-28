@@ -1,9 +1,13 @@
+import { Command } from 'twig-language-server/src/commands/ExecuteCommandProvider';
 import {
   workspace,
   ExtensionContext,
   window,
   WorkspaceFolder,
   RelativePattern,
+  commands,
+  CompletionList,
+  Uri,
 } from 'vscode';
 import {
   LanguageClient,
@@ -58,6 +62,16 @@ async function addWorkspaceFolder(
     },
   };
 
+  const virtualDocumentContents = new Map<string, string>();
+
+  workspace.registerTextDocumentContentProvider('embedded-content', {
+    provideTextDocumentContent(uri) {
+      const originalUri = uri.path.slice('/'.length, -'.html'.length);
+      const decodedUri = decodeURIComponent(originalUri);
+      return virtualDocumentContents.get(decodedUri);
+    },
+  });
+
   const clientOptions: LanguageClientOptions = {
     workspaceFolder,
     outputChannel,
@@ -69,6 +83,33 @@ async function addWorkspaceFolder(
       },
     ],
     synchronize: { fileEvents },
+    middleware: {
+      async provideCompletionItem(
+        document,
+        position,
+        context,
+        token,
+        next,
+      ) {
+        const originalUri = document.uri.toString(true);
+        const isInsideHtmlRegion = await commands.executeCommand<boolean>(Command.IsInsideHtmlRegion, originalUri, position);
+
+        if (!isInsideHtmlRegion) {
+          return await next(document, position, context, token);
+        }
+
+        virtualDocumentContents.set(originalUri, document.getText());
+
+        const encodedUri = encodeURIComponent(originalUri);
+        const vdocUri = Uri.parse(`embedded-content://html/${encodedUri}.html`);
+        return await commands.executeCommand<CompletionList>(
+          'vscode.executeCompletionItemProvider',
+          vdocUri,
+          position,
+          context.triggerCharacter,
+        );
+      },
+    },
   };
 
   const client = new LanguageClient(
@@ -86,7 +127,7 @@ async function addWorkspaceFolder(
 }
 
 async function removeWorkspaceFolder(
-  workspaceFolder: WorkspaceFolder
+  workspaceFolder: WorkspaceFolder,
 ): Promise<void> {
   const folderPath = workspaceFolder.uri.fsPath;
   const client = clients.get(folderPath);
