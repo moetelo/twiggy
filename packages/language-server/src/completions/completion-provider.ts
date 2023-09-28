@@ -12,6 +12,7 @@ import { TwigDebugInfo, getSectionsFromPhpDebugTwig } from './debug-twig';
 export class CompletionProvider {
   server: Server;
   twigInfo?: TwigDebugInfo;
+  templatesDirectory!: string;
 
   constructor(server: Server) {
     this.server = server;
@@ -39,7 +40,6 @@ export class CompletionProvider {
   }
 
   async onCompletion(params: CompletionParams) {
-    let completions: CompletionItem[] = [];
     const uri = params.textDocument.uri;
     const document = this.server.documentCache.getDocument(uri);
 
@@ -54,6 +54,8 @@ export class CompletionProvider {
       return;
     }
 
+    const completions: CompletionItem[] = [];
+
     [
       globalVariables(cursorNode, this.twigInfo?.Globals || []),
       functions(cursorNode, this.twigInfo?.Functions || []),
@@ -62,11 +64,11 @@ export class CompletionProvider {
       forLoop(cursorNode),
       templatePaths(
         cursorNode,
-        uri,
-        this.server.documentCache.documents.keys()
+        `${this.server.workspaceFolder.uri}/${this.templatesDirectory}`,
+        this.server.documentCache.documents.keys(),
       ),
     ].forEach((result) => {
-      if (Array.isArray(result)) {
+      if (result) {
         completions.push(...result);
       }
     });

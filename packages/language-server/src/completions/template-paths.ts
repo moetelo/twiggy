@@ -5,13 +5,12 @@ import {
 } from 'vscode-languageserver/node';
 import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
 import path from 'path';
-import { trimTwigExtension } from '../utils/trim-twig-extension';
 import { SyntaxNode } from 'web-tree-sitter';
 import { templateUsingFunctions, templateUsingStatements } from '../constants/template-usage';
 
 export function templatePaths(
   cursorNode: SyntaxNode,
-  currentDocumentUri: DocumentUri,
+  templatesPath: string,
   documentsPaths: IterableIterator<DocumentUri>
 ) {
   if (cursorNode.type !== 'string') {
@@ -54,14 +53,15 @@ export function templatePaths(
       node.parent?.childForFieldName('name')?.text === 'block' &&
       cursorNode?.equals(node.namedChildren[1]))
   ) {
-    const currentPath = path.dirname(documentUriToFsPath(currentDocumentUri));
-
     for (const twigPath of documentsPaths) {
+      if (!twigPath.startsWith(templatesPath)) {
+        continue;
+      }
+
+      const relativePath = path.relative(templatesPath, twigPath);
+
       completions.push({
-        label: path.relative(
-          currentPath,
-          documentUriToFsPath(trimTwigExtension(twigPath))
-        ),
+        label: relativePath,
         kind: CompletionItemKind.File,
       });
     }

@@ -33,11 +33,11 @@ export class Server {
     this.connection = connection;
     this.documents = new TextDocuments(TextDocument);
 
+    new SemanticTokensProvider(this);
     new SymbolProvider(this);
     new HoverProvider(this);
-    this.completionProvider = new CompletionProvider(this);
     new SignatureHelpProvider(this);
-    new SemanticTokensProvider(this);
+    this.completionProvider = new CompletionProvider(this);
     this.definitionProvider = new DefinitionProvider(this);
 
     // Bindings
