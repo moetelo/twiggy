@@ -1,8 +1,3 @@
-
-
-
-
-
 ## v0.5.0 (2023-09-27)
 
 * Implement `SymbolProvider` for Twig locals.

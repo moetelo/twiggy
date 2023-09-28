@@ -49,8 +49,8 @@ async function buildProduction(options) {
   await cp('./LICENSE', './dist/LICENSE');
   await cp('./package.json', './dist/package.json');
 
-  // Copy original, not symlinked README.md
   await cp('../../README.md', './dist/README.md');
+  await cp('../../CHANGELOG.md', './dist/CHANGELOG.md');
 
   const vsceCommand = isPublish ? 'publish' : 'package';
   spawnSync('vsce', [vsceCommand, '--no-dependencies'], {
