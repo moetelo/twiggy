@@ -5,6 +5,8 @@ import { readFile } from 'fs/promises';
 import { DocumentUri, WorkspaceFolder } from 'vscode-languageserver';
 import { fsPathToDocumentUri } from './utils/fs-path-to-document-uri';
 import Parser from 'web-tree-sitter';
+import { collectLocals } from './symbols/locals';
+import { LocalSymbol, LocalSymbolInformation } from './symbols/types';
 
 export class Document {
   filePath: string;
@@ -12,6 +14,10 @@ export class Document {
 
   constructor(filePath: string) {
     this.filePath = filePath;
+  }
+
+  get uri(): DocumentUri {
+    return fsPathToDocumentUri(this.filePath);
   }
 
   async setText(text: string) {
@@ -31,6 +37,22 @@ export class Document {
 
     return await parseTwig(text);
   }
+
+  async locals(): Promise<LocalSymbolInformation> {
+    const cst = await this.cst();
+    return collectLocals(cst);
+  }
+
+  async getSymbolByName(name: string, symbolType: keyof LocalSymbolInformation): Promise<LocalSymbol | undefined> {
+    const locals = await this.locals();
+
+    const symbol = locals[symbolType].find(s => s.name === name);
+    if (symbol) return symbol;
+
+    if (symbolType === 'block') {
+      return locals.block.flatMap(b => b.symbols.block).find(s => s.name === name);
+    }
+  }
 }
 
 export class DocumentCache {
@@ -44,16 +66,17 @@ export class DocumentCache {
   }
 
   async initDocuments() {
-    const iterator = readDir(URI.parse(this.workspaceFolder.uri).fsPath);
-    const reIsTwig = /.twig$/i;
+    const workspaceDir = URI.parse(this.workspaceFolder.uri).fsPath;
 
-    for await (const filePath of iterator) {
-      if (reIsTwig.test(filePath)) {
-        this.documents.set(
-          fsPathToDocumentUri(filePath),
-          new Document(filePath)
-        );
+    for await (const filePath of readDir(workspaceDir)) {
+      if (!filePath.endsWith('.twig')) {
+        continue;
       }
+
+      this.documents.set(
+        fsPathToDocumentUri(filePath),
+        new Document(filePath),
+      );
     }
   }
 

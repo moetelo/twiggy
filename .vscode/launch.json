@@ -11,7 +11,7 @@
         "--disable-extensions",
       ],
       "outFiles": [
-        "${workspaceFolder}/packages/vscode/dist/*.js"
+        "${workspaceFolder}/packages/vscode/dist/*",
       ],
     },
     {
@@ -23,7 +23,7 @@
       "sourceMaps": true,
       "smartStep": true,
       "outFiles": [
-        "${workspaceRoot}/packages/vscode/dist/**/*.js"
+        "${workspaceRoot}/packages/vscode/dist/*",
       ]
     }
   ],
@@ -31,8 +31,8 @@
     {
       "name": "Extension + Server",
       "configurations": [
+        "Server",
         "Extension",
-        "Server"
       ],
       "stopAll": true
     }

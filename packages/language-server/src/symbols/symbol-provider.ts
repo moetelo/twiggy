@@ -5,20 +5,20 @@ import { LocalSymbolInformation } from './types';
 
 const mapLocalsToSymbols = (locals: LocalSymbolInformation): DocumentSymbol[] => {
   return [
-    ...locals.variables.map((item): DocumentSymbol => ({
+    ...locals.variable.map((item): DocumentSymbol => ({
       name: item.name,
       kind: SymbolKind.Variable,
       range: item.range,
       selectionRange: item.nameRange,
     })),
-    ...locals.macros.map((item): DocumentSymbol => ({
+    ...locals.macro.map((item): DocumentSymbol => ({
       name: 'macro ' + item.name,
       kind: SymbolKind.Function,
       range: item.range,
       selectionRange: item.nameRange,
       children: mapLocalsToSymbols(item.symbols),
     })),
-    ...locals.blocks.map((item): DocumentSymbol => ({
+    ...locals.block.map((item): DocumentSymbol => ({
       name: 'block ' + item.name,
       kind: SymbolKind.Property,
       range: item.range,

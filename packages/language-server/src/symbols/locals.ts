@@ -1,13 +1,13 @@
 import { FunctionArgument, LocalSymbolInformation } from './types';
 import { IWalkable } from '../types/IWalkable';
-import { getNodeRange } from '../utils/getNodeRange';
+import { getNodeRange } from '../utils/node';
 
 
 export const collectLocals = (tree: IWalkable | null): LocalSymbolInformation => {
   const localSymbols: LocalSymbolInformation = {
-    variables: [],
-    macros: [],
-    blocks: [],
+    variable: [],
+    macro: [],
+    block: [],
   };
 
   if (!tree) {
@@ -23,7 +23,7 @@ export const collectLocals = (tree: IWalkable | null): LocalSymbolInformation =>
       const nameNode = blockNode.childForFieldName('name')!;
       const bodyNode = blockNode.childForFieldName('body');
 
-      localSymbols.blocks.push({
+      localSymbols.block.push({
         name: nameNode.text,
         range: getNodeRange(cursor),
         nameRange: getNodeRange(nameNode),
@@ -38,7 +38,7 @@ export const collectLocals = (tree: IWalkable | null): LocalSymbolInformation =>
       const variableNode = setNode.childForFieldName('variable')!;
       const valueNode = setNode.childForFieldName('value')!;
 
-      localSymbols.variables.push({
+      localSymbols.variable.push({
         name: variableNode.text,
         nameRange: getNodeRange(variableNode),
         value: valueNode.text,
@@ -68,7 +68,7 @@ export const collectLocals = (tree: IWalkable | null): LocalSymbolInformation =>
           };
         }) || [];
 
-      localSymbols.macros.push({
+      localSymbols.macro.push({
         name: nameNode.text,
         nameRange: getNodeRange(nameNode),
         args,

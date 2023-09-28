@@ -1,35 +1,47 @@
-import { Connection, Definition, DefinitionParams, Range } from 'vscode-languageserver';
+import { Connection, Definition, DefinitionLink, DefinitionParams, Range } from 'vscode-languageserver';
 import { Server } from '../server';
 import { findNodeByPosition } from '../utils/find-element-by-position';
-import { SyntaxNode } from 'web-tree-sitter';
+import { SyntaxNode, Tree } from 'web-tree-sitter';
 import { templateUsingFunctions, templateUsingStatements } from '../constants/template-usage';
+import { Document } from '../document-cache';
+import { PreOrderCursorIterator } from '../utils/pre-order-cursor-iterator';
+import { getStringNodeValue, getNodeRange } from '../utils/node';
+import { collectLocals } from '../symbols/locals';
 
 export type onDefinitionHandlerReturn = ReturnType<
   Parameters<Connection['onDefinition']>[0]
 >;
 
-const isFunctionCall = (cursorNode: SyntaxNode | null, functionName: string): boolean => {
-  return !!cursorNode
-    && cursorNode.type === 'call_expression'
-    && cursorNode.childForFieldName('name')?.text === functionName;
+const isFunctionCall = (node: SyntaxNode | null, functionName: string): boolean => {
+  return !!node
+    && node.type === 'call_expression'
+    && node.childForFieldName('name')?.text === functionName;
 };
 
 
-const isPathInsideTemplateEmbedding = (stringNode: SyntaxNode): boolean => {
-  if (stringNode.type !== 'string' || !stringNode.parent) {
+const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
+  if (node.type !== 'string' || !node.parent) {
     return false;
   }
 
-  const isInsideStatement = templateUsingStatements.includes(stringNode.parent.type);
+  const isInsideStatement = templateUsingStatements.includes(node.parent.type);
 
   if (isInsideStatement) {
     return true;
   }
 
-  const isInsideFunctionCall = stringNode.parent?.type === 'arguments'
-    && templateUsingFunctions.some(func => isFunctionCall(stringNode.parent!.parent, func));
+  const isInsideFunctionCall = node.parent?.type === 'arguments'
+    && templateUsingFunctions.some(func => isFunctionCall(node.parent!.parent, func));
 
   return isInsideFunctionCall;
+};
+
+const isIdentifierOf = (type: 'block' | 'macro', node: SyntaxNode): boolean => {
+  if (!node.parent || node.parent.type !== type) {
+    return false;
+  }
+
+  return node.type === 'identifier';
 };
 
 export class DefinitionProvider {
@@ -54,21 +66,65 @@ export class DefinitionProvider {
     const cst = await document.cst();
     const cursorNode = findNodeByPosition(cst.rootNode, params.position);
 
-    if (!cursorNode || !isPathInsideTemplateEmbedding(cursorNode)) {
+    if (!cursorNode) {
       return;
     }
 
-    const filePath = cursorNode.text.slice('"'.length, -'"'.length);
-    const fullFilePath = `${this.server.workspaceFolder.uri}/${this.templatesDirectory}/${filePath}`;
+    if (isPathInsideTemplateEmbedding(cursorNode)) {
+      const templatePath = this.resolveTemplatePath(
+        getStringNodeValue(cursorNode),
+      );
 
-    const file = this.server.documentCache.getDocument(fullFilePath);
+      return this.resolveTemplateDefinition(templatePath);
+    }
 
-    if (!file) {
+    if (isIdentifierOf('block', cursorNode)) {
+      const blockName = cursorNode.text;
+
+      let extendedTwigDocument: Document | undefined = await this.getExtendedTemplate(document);
+      while (extendedTwigDocument) {
+        const symbol = await extendedTwigDocument.getSymbolByName(blockName, 'block');
+        if (!symbol) {
+          extendedTwigDocument = await this.getExtendedTemplate(extendedTwigDocument);
+          continue;
+        }
+
+        return {
+          uri: extendedTwigDocument.uri,
+          range: symbol.nameRange,
+        };
+      }
+    }
+  }
+
+  resolveTemplatePath(filePath: string): string {
+    return `${this.server.workspaceFolder.uri}/${this.templatesDirectory}/${filePath}`;
+  }
+
+  private async getExtendedTemplate(document: Document) {
+    const tree = await document.cst();
+    const extendsNode = tree.rootNode.children.find(node => node.type === 'extends')?.childForFieldName('expr');
+
+    if (!extendsNode) {
+      return undefined;
+    }
+
+    const templatePath = this.resolveTemplatePath(
+      getStringNodeValue(extendsNode),
+    );
+
+    return this.server.documentCache.getDocument(templatePath);
+  }
+
+  resolveTemplateDefinition(templatePath: string): Definition | undefined {
+    const document = this.server.documentCache.getDocument(templatePath);
+
+    if (!document) {
       return;
     }
 
     return {
-      uri: file.filePath,
+      uri: document.uri,
       range: Range.create(0, 0, 0, 0),
     }
   }
