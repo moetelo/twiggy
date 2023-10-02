@@ -6,7 +6,7 @@ import {
     TwigVariable,
 } from './types';
 import { IWalkable } from '../types/IWalkable';
-import { getNodeRange } from '../utils/node';
+import { getNodeRange, getStringNodeValue } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 
 function toBlock(node: SyntaxNode): TwigBlock {
@@ -79,6 +79,14 @@ export function collectLocals(tree: IWalkable | null): LocalSymbolInformation {
 
     do {
         switch (cursor.nodeType) {
+            case 'extends':
+                const expr = cursor.currentNode().childForFieldName('expr');
+
+                if (expr) {
+                    localSymbols.extends = getStringNodeValue(expr);
+                }
+
+                continue;
             case 'block':
                 const block = toBlock(cursor.currentNode());
                 localSymbols.block.push(block);

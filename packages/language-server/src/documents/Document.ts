@@ -62,7 +62,7 @@ export class Document {
 
     getSymbolByName(
         name: string,
-        symbolType: keyof LocalSymbolInformation,
+        symbolType: Exclude<keyof LocalSymbolInformation, 'extends'>,
     ): LocalSymbol | undefined {
         const symbol = this.locals[symbolType].find((s) => s.name === name);
         if (symbol) return symbol;

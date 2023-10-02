@@ -99,16 +99,11 @@ export class DefinitionProvider {
   }
 
   private async getExtendedTemplate(document: Document) {
-    const extendsNode = document.tree.rootNode.children.find(node => node.type === 'extends')?.childForFieldName('expr');
-
-    if (!extendsNode) {
+    if (!document.locals.extends) {
       return undefined;
     }
 
-    const templatePath = this.resolveTemplateUri(
-      getStringNodeValue(extendsNode),
-    );
-
+    const templatePath = this.resolveTemplateUri(document.locals.extends);
     return this.server.documentCache.get(templatePath);
   }
 

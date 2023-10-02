@@ -1,10 +1,10 @@
 import { Range } from 'vscode-languageserver/node';
 
 export interface LocalSymbol {
-  range: Range;
-
   name: string;
   nameRange: Range;
+
+  range: Range;
 }
 
 export interface TwigVariable extends LocalSymbol {
@@ -25,6 +25,7 @@ export interface TwigBlock extends LocalSymbol {
 }
 
 export type LocalSymbolInformation = {
+  extends?: string;
   variable: TwigVariable[];
   macro: TwigMacro[];
   block: TwigBlock[];
