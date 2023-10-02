@@ -43,7 +43,6 @@ export class SemanticTokensProvider {
       return semanticTokens;
     }
 
-    await document.ensureParsed();
     const tokensBuilder = new SemanticTokensBuilder();
     const nodes = new PreOrderCursorIterator(document.tree.walk());
 

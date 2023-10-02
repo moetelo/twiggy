@@ -19,9 +19,9 @@ export class DocumentCache {
         return this.add(documentUri);
     }
 
-    async updateText(documentUri: DocumentUri, text: string) {
+    updateText(documentUri: DocumentUri, text: string) {
         const document = this.getOrCreate(documentUri);
-        await document.setText(text);
+        document.setText(text);
 
         return document;
     }

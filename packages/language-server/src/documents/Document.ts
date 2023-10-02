@@ -1,4 +1,4 @@
-import { parseTwig } from '../utils/parseTwig';
+import { parser } from '../utils/parser';
 import { readFile } from 'fs/promises';
 import { DocumentUri } from 'vscode-languageserver';
 import Parser from 'web-tree-sitter';
@@ -6,8 +6,24 @@ import { collectLocals } from '../symbols/locals';
 import { LocalSymbol, LocalSymbolInformation } from '../symbols/types';
 import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
 
-class NoTextError extends Error {}
-class TreeNotParsedError extends Error {}
+class NoTextError extends Error {
+    get message() {
+        return 'Document text is not set. File: ' + documentUriToFsPath(this.uri);
+    }
+
+    constructor(readonly uri: DocumentUri) {
+        super();
+    }
+}
+class TreeNotParsedError extends Error {
+    get message() {
+        return 'Document tree is not parsed yet. File: ' + documentUriToFsPath(this.uri);
+    }
+
+    constructor(readonly uri: DocumentUri) {
+        super();
+    }
+}
 
 export class Document {
     readonly uri: DocumentUri;
@@ -22,31 +38,31 @@ export class Document {
     }
 
     get tree() {
-        if (!this.#tree) throw new TreeNotParsedError;
+        if (!this.#tree) throw new TreeNotParsedError(this.uri);
 
         return this.#tree;
     }
 
     get locals() {
-        if (!this.#locals) throw new TreeNotParsedError;
+        if (!this.#locals) throw new TreeNotParsedError(this.uri);
 
         return this.#locals;
     }
 
     get text() {
-        if (!this.#text) throw new NoTextError;
+        if (!this.#text) throw new NoTextError(this.uri);
 
         return this.#text;
     }
 
-    async setText(text: string) {
+    setText(text: string) {
         if (text === this.#text) {
             return;
         }
 
         this.#text = text;
 
-        this.#tree = await parseTwig(this.#text);
+        this.#tree = parser.parse(this.#text);
         this.#locals = collectLocals(this.#tree);
     }
 
@@ -57,7 +73,7 @@ export class Document {
 
         const fsPath = documentUriToFsPath(this.uri);
         const text = await readFile(fsPath, 'utf-8');
-        await this.setText(text);
+        this.setText(text);
     }
 
     getSymbolByName(

@@ -21,6 +21,7 @@ import {
     Command,
     ExecuteCommandProvider,
 } from './commands/ExecuteCommandProvider';
+import { initializeParser } from './utils/parser';
 
 export class Server {
     readonly connection: Connection;
@@ -46,6 +47,8 @@ export class Server {
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
             this.clientCapabilities = initializeParams.capabilities;
+
+            await initializeParser();
 
             const capabilities: ServerCapabilities = {
                 hoverProvider: true,
@@ -77,8 +80,8 @@ export class Server {
         });
 
         this.documents.onDidChangeContent(async ({ document }) => {
-            const doc = await this.documentCache.updateText(document.uri, document.getText());
-            validateTwigDocument(connection, doc);
+            const doc = this.documentCache.updateText(document.uri, document.getText());
+            await validateTwigDocument(connection, doc);
         });
         this.documents.listen(connection);
     }
