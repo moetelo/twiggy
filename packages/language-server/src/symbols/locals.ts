@@ -1,84 +1,98 @@
-import { FunctionArgument, LocalSymbolInformation } from './types';
+import {
+    FunctionArgument,
+    LocalSymbolInformation,
+    TwigBlock,
+    TwigMacro,
+    TwigVariable,
+} from './types';
 import { IWalkable } from '../types/IWalkable';
 import { getNodeRange } from '../utils/node';
+import { SyntaxNode } from 'web-tree-sitter';
 
+function toBlock(node: SyntaxNode): TwigBlock {
+    const nameNode = node.childForFieldName('name')!;
+    const bodyNode = node.childForFieldName('body');
 
-export const collectLocals = (tree: IWalkable | null): LocalSymbolInformation => {
-  const localSymbols: LocalSymbolInformation = {
-    variable: [],
-    macro: [],
-    block: [],
-  };
-
-  if (!tree) {
-    return localSymbols;
-  }
-
-  const cursor = tree.walk();
-  cursor.gotoFirstChild();
-
-  do {
-    if (cursor.nodeType === 'block') {
-      const blockNode = cursor.currentNode();
-      const nameNode = blockNode.childForFieldName('name')!;
-      const bodyNode = blockNode.childForFieldName('body');
-
-      localSymbols.block.push({
+    return {
         name: nameNode.text,
-        range: getNodeRange(cursor),
+        range: getNodeRange(node),
         nameRange: getNodeRange(nameNode),
         symbols: collectLocals(bodyNode),
-      });
+    };
+}
 
-      continue;
-    }
+function toVariable(node: SyntaxNode): TwigVariable {
+    const variableNode = node.childForFieldName('variable')!;
+    const valueNode = node.childForFieldName('value')!;
 
-    if (cursor.nodeType === 'set') {
-      const setNode = cursor.currentNode();
-      const variableNode = setNode.childForFieldName('variable')!;
-      const valueNode = setNode.childForFieldName('value')!;
-
-      localSymbols.variable.push({
+    return {
         name: variableNode.text,
         nameRange: getNodeRange(variableNode),
         value: valueNode.text,
-        range: getNodeRange(cursor),
-      });
+        range: getNodeRange(node),
+    };
+}
 
-      continue;
-    }
+function toMacro(node: SyntaxNode): TwigMacro {
+    const nameNode = node.childForFieldName('name')!;
+    const argumentsNode = node.childForFieldName('arguments');
+    const bodyNode = node.childForFieldName('body');
 
-    if (cursor.nodeType === 'macro') {
-      const macroNode = cursor.currentNode();
+    const args =
+        argumentsNode
+            ?.descendantsOfType('argument')
+            .map((argumentNode): FunctionArgument => {
+                const argNameNode =
+                    argumentNode.childForFieldName('key') || argumentNode;
+                const value = argumentNode.childForFieldName('value')?.text;
 
-      const nameNode = macroNode.childForFieldName('name')!;
-      const argumentsNode = macroNode.childForFieldName('arguments');
-      const bodyNode = macroNode.childForFieldName('body');
+                return {
+                    name: argNameNode.text,
+                    nameRange: getNodeRange(argNameNode),
+                    value,
+                    range: getNodeRange(argumentNode),
+                };
+            }) || [];
 
-      const args = argumentsNode?.descendantsOfType('argument')
-        .map((argumentNode): FunctionArgument => {
-          const argNameNode = argumentNode.childForFieldName('key') || argumentNode;
-          const value = argumentNode.childForFieldName('value')?.text;
-
-          return {
-            name: argNameNode.text,
-            nameRange: getNodeRange(argNameNode),
-            value,
-            range: getNodeRange(argumentNode),
-          };
-        }) || [];
-
-      localSymbols.macro.push({
+    return {
         name: nameNode.text,
         nameRange: getNodeRange(nameNode),
         args,
-        range: getNodeRange(cursor),
+        range: getNodeRange(node),
         symbols: collectLocals(bodyNode),
-      });
+    };
+}
 
-      continue;
+export function collectLocals(tree: IWalkable | null): LocalSymbolInformation {
+    const localSymbols: LocalSymbolInformation = {
+        variable: [],
+        macro: [],
+        block: [],
+    };
+
+    if (!tree) {
+        return localSymbols;
     }
-  } while (cursor.gotoNextSibling());
 
-  return localSymbols;
-};
+    const cursor = tree.walk();
+    cursor.gotoFirstChild();
+
+    do {
+        switch (cursor.nodeType) {
+            case 'block':
+                const block = toBlock(cursor.currentNode());
+                localSymbols.block.push(block);
+                continue;
+            case 'set':
+                const variable = toVariable(cursor.currentNode());
+                localSymbols.variable.push(variable);
+                continue;
+            case 'macro':
+                const macro = toMacro(cursor.currentNode());
+                localSymbols.macro.push(macro);
+                continue;
+        }
+    } while (cursor.gotoNextSibling());
+
+    return localSymbols;
+}

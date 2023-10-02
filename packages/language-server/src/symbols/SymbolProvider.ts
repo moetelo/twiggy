@@ -1,6 +1,5 @@
 import { DocumentSymbol, DocumentSymbolParams, SymbolKind } from 'vscode-languageserver';
 import { Server } from '../server';
-import { collectLocals } from './locals';
 import { LocalSymbolInformation } from './types';
 
 const mapLocalsToSymbols = (locals: LocalSymbolInformation): DocumentSymbol[] => {
