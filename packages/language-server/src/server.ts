@@ -24,8 +24,8 @@ import {
 
 export class Server {
     readonly connection: Connection;
-    readonly documents: TextDocuments<TextDocument>;
-    documentCache!: DocumentCache;
+    readonly documents = new TextDocuments(TextDocument);
+    readonly documentCache = new DocumentCache();
     workspaceFolder!: WorkspaceFolder;
     clientCapabilities!: ClientCapabilities;
 
@@ -34,7 +34,6 @@ export class Server {
 
     constructor(connection: Connection) {
         this.connection = connection;
-        this.documents = new TextDocuments(TextDocument);
 
         new SemanticTokensProvider(this);
         new SymbolProvider(this);
@@ -44,12 +43,8 @@ export class Server {
         this.definitionProvider = new DefinitionProvider(this);
         new ExecuteCommandProvider(this);
 
-        // Bindings
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
-            this.documentCache = new DocumentCache(this.workspaceFolder);
-            await this.documentCache.initDocuments();
-
             this.clientCapabilities = initializeParams.capabilities;
 
             const capabilities: ServerCapabilities = {
@@ -85,7 +80,6 @@ export class Server {
             const doc = await this.documentCache.updateText(document.uri, document.getText());
             validateTwigDocument(connection, doc);
         });
-
         this.documents.listen(connection);
     }
 }
