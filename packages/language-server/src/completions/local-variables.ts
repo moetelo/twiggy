@@ -1,30 +1,33 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { bottomTopCursorIterator } from '../utils/bottom-top-cursor-iterator';
+import { Document } from '../documents';
+import { FunctionArgument, TwigVariable } from '../symbols/types';
+import { isEmptyEmbedded } from '../utils/is-empty-embedded';
+import { rangeContainsPosition } from '../utils/range-contains-position';
+import { pointToPosition } from '../utils/point-to-position';
 
-export function localVariables(cursorNode: SyntaxNode) {
-  if (cursorNode.type !== 'variable') {
+const toCompletionItem = (variable: TwigVariable | FunctionArgument): CompletionItem => ({
+  label: variable.name,
+  kind: CompletionItemKind.Variable,
+  detail: variable.value,
+});
+
+
+export function localVariables(document: Document, cursorNode: SyntaxNode) {
+  if (cursorNode.type !== 'variable' && !isEmptyEmbedded(cursorNode)) {
     return;
   }
 
-  let completions: CompletionItem[] = [];
+  const cursorPosition = pointToPosition(cursorNode.startPosition);
 
-  for (let node of bottomTopCursorIterator(cursorNode)) {
-    if (node.type === 'set') {
-      let cursor = node.walk();
+  const blocks = document.locals.block.filter(x => rangeContainsPosition(x.range, cursorPosition));
+  const macroses = document.locals.macro.filter(x => rangeContainsPosition(x.range, cursorPosition));
 
-      cursor.gotoFirstChild();
+  const scopedVariables = [ ...macroses, ...blocks ].flatMap(x => x.symbols.variable);
 
-      while (cursor.gotoNextSibling()) {
-        if (cursor.currentFieldName() === 'variable') {
-          completions.push({
-            label: cursor.nodeText,
-            kind: CompletionItemKind.Variable,
-          });
-        }
-      }
-    }
-  }
-
-  return completions;
+  return [
+    ...scopedVariables,
+    ...macroses.flatMap(x => x.args),
+    ...document.locals.variable,
+  ].map(toCompletionItem);
 }

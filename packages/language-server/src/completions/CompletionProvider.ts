@@ -18,9 +18,7 @@ export class CompletionProvider {
     this.server = server;
 
     this.server.connection.onCompletion(this.onCompletion.bind(this));
-    this.server.connection.onCompletionResolve(
-      this.onCompletionResolve.bind(this)
-    );
+    this.server.connection.onCompletionResolve(item => item);
   }
 
   async initializeGlobalsFromCommand(phpBinConsoleCommand: string | undefined) {
@@ -56,11 +54,11 @@ export class CompletionProvider {
     const completions: CompletionItem[] = [];
 
     [
+      localVariables(document, cursorNode),
+      forLoop(cursorNode),
       globalVariables(cursorNode, this.twigInfo?.Globals || []),
       functions(cursorNode, this.twigInfo?.Functions || []),
       filters(cursorNode, this.twigInfo?.Filters || []),
-      localVariables(cursorNode),
-      forLoop(cursorNode),
       templatePaths(
         cursorNode,
         `${this.server.workspaceFolder.uri}/${this.templatesDirectory}`,
@@ -73,9 +71,5 @@ export class CompletionProvider {
     });
 
     return completions;
-  }
-
-  async onCompletionResolve(item: CompletionItem): Promise<CompletionItem> {
-    return Promise.resolve(item);
   }
 }

@@ -38,26 +38,31 @@ function toMacro(node: SyntaxNode): TwigMacro {
     const argumentsNode = node.childForFieldName('arguments');
     const bodyNode = node.childForFieldName('body');
 
-    const args =
-        argumentsNode
-            ?.descendantsOfType('argument')
-            .map((argumentNode): FunctionArgument => {
-                const argNameNode =
-                    argumentNode.childForFieldName('key') || argumentNode;
-                const value = argumentNode.childForFieldName('value')?.text;
+    const variableArgs = argumentsNode?.descendantsOfType('variable')
+        .map((argumentNode): FunctionArgument => ({
+            name: argumentNode.text,
+            nameRange: getNodeRange(argumentNode),
+            range: getNodeRange(argumentNode),
+        })) || [];
 
-                return {
-                    name: argNameNode.text,
-                    nameRange: getNodeRange(argNameNode),
-                    value,
-                    range: getNodeRange(argumentNode),
-                };
-            }) || [];
+    const namedArgs = argumentsNode
+        ?.descendantsOfType('named_argument')
+        .map((argumentNode): FunctionArgument => {
+            const argNameNode = argumentNode.childForFieldName('key')!;
+            const value = argumentNode.childForFieldName('value')!.text;
+
+            return {
+                name: argNameNode.text,
+                nameRange: getNodeRange(argNameNode),
+                value,
+                range: getNodeRange(argumentNode),
+            };
+        }) || [];
 
     return {
         name: nameNode.text,
         nameRange: getNodeRange(nameNode),
-        args,
+        args: [...variableArgs, ...namedArgs],
         range: getNodeRange(node),
         symbols: collectLocals(bodyNode),
     };
