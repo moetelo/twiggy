@@ -60,10 +60,10 @@ export class Document {
         await this.setText(text);
     }
 
-    async getSymbolByName(
+    getSymbolByName(
         name: string,
         symbolType: keyof LocalSymbolInformation,
-    ): Promise<LocalSymbol | undefined> {
+    ): LocalSymbol | undefined {
         const symbol = this.locals[symbolType].find((s) => s.name === name);
         if (symbol) return symbol;
 

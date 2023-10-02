@@ -80,7 +80,7 @@ export class DefinitionProvider {
       let extendedDocument: Document | undefined = await this.getExtendedTemplate(document);
       while (extendedDocument) {
         await extendedDocument.ensureParsed();
-        const symbol = await extendedDocument.getSymbolByName(blockName, 'block');
+        const symbol = extendedDocument.getSymbolByName(blockName, 'block');
         if (!symbol) {
           extendedDocument = await this.getExtendedTemplate(extendedDocument);
           continue;
