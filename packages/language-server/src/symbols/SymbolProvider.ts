@@ -45,6 +45,7 @@ export class SymbolProvider {
       return [];
     }
 
+    await document.ensureParsed();
     return mapLocalsToSymbols(document.locals);
   }
 }
