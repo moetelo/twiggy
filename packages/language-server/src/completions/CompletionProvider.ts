@@ -8,6 +8,7 @@ import { functions } from './functions';
 import { filters } from './filters';
 import { forLoop } from './for-loop';
 import { TwigDebugInfo, getSectionsFromPhpDebugTwig } from './debug-twig';
+import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
 
 export class CompletionProvider {
   server: Server;
@@ -59,10 +60,9 @@ export class CompletionProvider {
       globalVariables(cursorNode, this.twigInfo?.Globals || []),
       functions(cursorNode, this.twigInfo?.Functions || []),
       filters(cursorNode, this.twigInfo?.Filters || []),
-      templatePaths(
+      await templatePaths(
         cursorNode,
-        `${this.server.workspaceFolder.uri}/${this.templatesDirectory}`,
-        this.server.documentCache.documents.keys(),
+        documentUriToFsPath(`${this.server.workspaceFolder.uri}/${this.templatesDirectory}`),
       ),
     ].forEach((result) => {
       if (result) {

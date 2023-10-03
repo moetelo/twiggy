@@ -85,10 +85,10 @@ export function collectLocals(tree: IWalkable | null): LocalSymbolInformation {
     do {
         switch (cursor.nodeType) {
             case 'extends':
-                const expr = cursor.currentNode().childForFieldName('expr');
+                const exprNode = cursor.currentNode().childForFieldName('expr');
 
-                if (expr) {
-                    localSymbols.extends = getStringNodeValue(expr);
+                if (exprNode?.type === 'string') {
+                    localSymbols.extends = getStringNodeValue(exprNode);
                 }
 
                 continue;
