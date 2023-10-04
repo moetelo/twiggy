@@ -24,7 +24,7 @@ export class CompletionProvider {
 
   async initializeGlobalsFromCommand(phpBinConsoleCommand: string | undefined) {
     this.twigInfo = phpBinConsoleCommand
-      ? await getSectionsFromPhpDebugTwig(phpBinConsoleCommand + ' debug:twig')
+      ? await getSectionsFromPhpDebugTwig(phpBinConsoleCommand + ' debug:twig --format json')
       : undefined;
 
     if (this.twigInfo) {
