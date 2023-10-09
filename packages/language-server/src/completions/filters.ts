@@ -4,25 +4,36 @@ import { twigFilters } from '../common';
 import { TwigFunctionLike } from './debug-twig';
 
 const commonCompletionItem: Partial<CompletionItem> = {
-  kind: CompletionItemKind.Function,
-  detail: 'filter',
+    kind: CompletionItemKind.Function,
+    detail: 'filter',
 };
 
 const completions: CompletionItem[] = twigFilters.map((item) => ({
-  ...commonCompletionItem,
-  ...item,
+    ...commonCompletionItem,
+    ...item,
 }));
 
 export function filters(cursorNode: SyntaxNode, filters: TwigFunctionLike[]) {
-  if (cursorNode.text === '|') {
-    const completionsPhp = filters.map((func): CompletionItem => ({
-      ...commonCompletionItem,
-      label: func.identifier,
-    }));
+    if (
+        cursorNode.text === '|' ||
+        (cursorNode.type === 'function' &&
+            cursorNode.parent!.type === 'filter_expression')
+    ) {
+        const completionsPhp = filters.map(
+            (func): CompletionItem => ({
+                ...commonCompletionItem,
+                label: func.identifier,
+            }),
+        );
 
-    return [
-      ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
-      ...completionsPhp,
-    ];
-  }
+        return [
+            ...completions.filter(
+                (comp) =>
+                    !completionsPhp.find(
+                        (compPhp) => compPhp.label === comp.label,
+                    ),
+            ),
+            ...completionsPhp,
+        ];
+    }
 }
