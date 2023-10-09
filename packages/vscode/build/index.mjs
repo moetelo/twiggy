@@ -44,14 +44,6 @@ async function buildProduction(options) {
     },
   }).catch(() => process.exit(1));
 
-  await cp('./assets', './dist/assets', { recursive: true });
-
-  await cp('./LICENSE', './dist/LICENSE');
-  await cp('./package.json', './dist/package.json');
-
-  await cp('../../README.md', './dist/README.md');
-  await cp('../../CHANGELOG.md', './dist/CHANGELOG.md');
-
   const vsceCommand = isPublish ? 'publish' : 'package';
   spawnSync('vsce', [vsceCommand, '--no-dependencies'], {
     stdio: 'inherit',

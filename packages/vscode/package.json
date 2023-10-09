@@ -18,11 +18,6 @@
     "url": "https://github.com/moetelo/twiggy",
     "directory": "packages/vscode"
   },
-  "files": [
-    "dist/",
-    "LICENSE",
-    "README.md"
-  ],
   "keywords": [
     "Twig"
   ],
