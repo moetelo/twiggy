@@ -1,10 +1,14 @@
 import { DidChangeConfigurationNotification, DidChangeConfigurationParams } from 'vscode-languageserver';
 import { Server } from '../server';
 import { LanguageServerSettings } from './language-server-settings';
-import { getTemplatePathMappingsFromSymfony } from '../utils/symfony/twigConfig';
+import { TemplatePathMapping, getTemplatePathMappingsFromSymfony } from '../utils/symfony/twigConfig';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
+    readonly defaultMappings: TemplatePathMapping[] = [
+        { namespace: '', directory: 'templates' },
+    ];
+
     server: Server;
 
     constructor(server: Server) {
@@ -22,7 +26,7 @@ export class ConfigurationManager {
 
         const mappings = phpBinConsoleCommand
             ? await getTemplatePathMappingsFromSymfony(phpBinConsoleCommand)
-            : [];
+            : this.defaultMappings;
 
         this.server.completionProvider.templateMappings = mappings;
         this.server.definitionProvider.templateMappings = mappings;
