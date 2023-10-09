@@ -3,9 +3,8 @@ import {
     Diagnostic,
     DiagnosticSeverity,
 } from 'vscode-languageserver';
-import { getNodeRange } from '../utils/node';
+import { getNodeRange, PreOrderCursorIterator } from '../utils/node';
 import { Document } from '../documents';
-import { PreOrderCursorIterator } from '../utils/pre-order-cursor-iterator';
 
 export async function validateTwigDocument(
     connection: Connection,

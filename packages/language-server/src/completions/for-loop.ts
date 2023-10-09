@@ -1,8 +1,8 @@
 import { CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { forLoopProperties } from '../common';
-import { findParentByType } from '../utils/find-parent-by-type';
-import { isEmptyEmbedded } from '../utils/is-empty-embedded';
+import { findParentByType } from '../utils/node';
+import { isEmptyEmbedded } from '../utils/node';
 
 export function forLoop(cursorNode: SyntaxNode) {
   if (!findParentByType(cursorNode, 'for')) {

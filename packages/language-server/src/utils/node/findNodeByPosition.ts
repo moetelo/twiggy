@@ -1,10 +1,8 @@
 import { Position, Range } from 'vscode-languageserver';
 import { SyntaxNode } from 'web-tree-sitter';
-import { rangeContainsPosition } from './range-contains-position';
-import { pointToPosition } from './point-to-position';
-import { isEmptyEmbedded } from './is-empty-embedded';
-import { comparePositions } from './compare-positions';
-import { getNodeRange } from './node';
+import { rangeContainsPosition, comparePositions, pointToPosition } from '../position';
+import { isEmptyEmbedded } from './isEmptyEmbedded';
+import { getNodeRange } from '.';
 
 export function findNodeByPosition(
     node: SyntaxNode,

@@ -4,7 +4,7 @@ import { DocumentUri } from 'vscode-languageserver';
 import Parser from 'web-tree-sitter';
 import { collectLocals } from '../symbols/locals';
 import { LocalSymbol, LocalSymbolInformation } from '../symbols/types';
-import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
+import { documentUriToFsPath } from '../utils/uri';
 
 class NoTextError extends Error {
     get message() {

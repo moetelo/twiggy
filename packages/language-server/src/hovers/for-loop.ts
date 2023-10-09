@@ -1,7 +1,7 @@
 import { SyntaxNode } from 'web-tree-sitter';
 import { onHoverHandlerReturn } from './HoverProvider';
 import { forLoopProperties } from '../common';
-import { findParentByType } from '../utils/find-parent-by-type';
+import { findParentByType } from '../utils/node';
 
 export function forLoop(cursorNode: SyntaxNode): onHoverHandlerReturn {
   if (!findParentByType(cursorNode, 'for')) {

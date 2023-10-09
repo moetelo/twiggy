@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionParams } from 'vscode-languageserver/node';
 import { Server } from '../server';
-import { findNodeByPosition } from '../utils/findElementByPosition';
+import { findNodeByPosition } from '../utils/node';
 import { templatePaths } from './template-paths';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';

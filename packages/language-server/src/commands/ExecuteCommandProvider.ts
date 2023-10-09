@@ -1,6 +1,6 @@
 import { DocumentUri, ExecuteCommandParams, Position } from 'vscode-languageserver';
 import { Server } from '../server';
-import { isInsideHtmlRegion } from './isInsideHtmlRegion';
+import { isInsideHtmlRegion } from '../utils/node';
 
 export enum Command {
     IsInsideHtmlRegion = 'twiggy.is-inside-html-region',

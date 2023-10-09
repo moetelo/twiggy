@@ -1,6 +1,6 @@
 import { Connection, HoverParams } from 'vscode-languageserver';
 import { Server } from '../server';
-import { findNodeByPosition } from '../utils/findElementByPosition';
+import { findNodeByPosition } from '../utils/node';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
 import { forLoop } from './for-loop';

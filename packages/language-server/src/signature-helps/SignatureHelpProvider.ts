@@ -1,6 +1,6 @@
 import { SignatureHelp, SignatureHelpParams } from 'vscode-languageserver';
 import { Server } from '../server';
-import { findNodeByPosition } from '../utils/findElementByPosition';
+import { findNodeByPosition } from '../utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctionsSignatureInformation } from '../common';
 

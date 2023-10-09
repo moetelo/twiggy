@@ -6,7 +6,7 @@ import {
     Range,
 } from 'vscode-languageserver';
 import { Server } from '../server';
-import { findNodeByPosition } from '../utils/findElementByPosition';
+import { findNodeByPosition } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,
@@ -14,13 +14,11 @@ import {
 } from '../constants/template-usage';
 import { Document } from '../documents';
 import { getStringNodeValue } from '../utils/node';
-import { rangeContainsPosition } from '../utils/range-contains-position';
-import { pointToPosition } from '../utils/point-to-position';
+import { rangeContainsPosition, pointToPosition } from '../utils/position';
 import { TemplatePathMapping } from '../utils/symfony/twigConfig';
-import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
+import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { fileStat } from '../utils/files/fileStat';
 import * as path from 'path';
-import { toDocumentUri } from '../utils/toDocumentUri';
 
 export type onDefinitionHandlerReturn = ReturnType<
     Parameters<Connection['onDefinition']>[0]

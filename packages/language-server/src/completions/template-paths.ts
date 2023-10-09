@@ -7,7 +7,7 @@ import {
 } from '../constants/template-usage';
 import getTwigFiles from '../utils/getTwigFiles';
 import { TemplatePathMapping } from '../utils/symfony/twigConfig';
-import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
+import { documentUriToFsPath } from '../utils/uri';
 
 export async function templatePaths(
     cursorNode: SyntaxNode,

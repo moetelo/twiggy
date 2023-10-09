@@ -1,5 +1,5 @@
 import { DocumentUri } from 'vscode-languageserver';
-import { toDocumentUri } from '../utils/toDocumentUri';
+import { toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
 
 export class DocumentCache {

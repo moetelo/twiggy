@@ -2,9 +2,8 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { Document } from '../documents';
 import { FunctionArgument, TwigVariable } from '../symbols/types';
-import { isEmptyEmbedded } from '../utils/is-empty-embedded';
-import { rangeContainsPosition } from '../utils/range-contains-position';
-import { pointToPosition } from '../utils/point-to-position';
+import { isEmptyEmbedded } from '../utils/node';
+import { rangeContainsPosition, pointToPosition } from '../utils/position';
 
 const toCompletionItem = (variable: TwigVariable | FunctionArgument): CompletionItem => ({
   label: variable.name,

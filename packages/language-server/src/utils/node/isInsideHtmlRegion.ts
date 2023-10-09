@@ -1,6 +1,6 @@
 import { Position } from 'vscode-languageserver';
-import { findNodeByPosition } from '../utils/findElementByPosition';
-import { Document } from '../documents';
+import { findNodeByPosition } from './findNodeByPosition';
+import { Document } from '../../documents';
 
 export async function isInsideHtmlRegion(
     { tree }: Document,

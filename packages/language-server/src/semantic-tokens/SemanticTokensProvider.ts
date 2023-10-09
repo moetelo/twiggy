@@ -4,8 +4,8 @@ import {
   SemanticTokensBuilder,
 } from 'vscode-languageserver';
 import { Server } from '../server';
-import { PreOrderCursorIterator } from '../utils/pre-order-cursor-iterator';
-import { pointToPosition } from '../utils/point-to-position';
+import { PreOrderCursorIterator } from '../utils/node';
+import { pointToPosition } from '../utils/position';
 import { semanticTokensLegend } from './tokens-provider';
 import { TreeCursor } from 'web-tree-sitter';
 
