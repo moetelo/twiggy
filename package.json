@@ -1,6 +1,6 @@
 {
-  "version": "0.5.0",
-  "repository": "https://github.com/Shifu462/twiggy",
+  "version": "0.5.1",
+  "repository": "https://github.com/moetelo/twiggy",
   "private": true,
   "scripts": {
     "build": "pnpm run --dir ./packages/vscode build",

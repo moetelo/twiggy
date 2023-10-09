@@ -4,7 +4,7 @@
   "description": "Twig language support for VS Code",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -15,7 +15,7 @@
   "publisher": "moetelo",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Shifu462/twiggy",
+    "url": "https://github.com/moetelo/twiggy",
     "directory": "packages/vscode"
   },
   "files": [

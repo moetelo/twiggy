@@ -1,3 +1,9 @@
+## v0.5.1 (2023-10-09)
+
+* Local variable definitions.
+* Completion for scoped variables and macro arguments.
+* Definition and completion for namespaced templates, e.g. `include('@pages/page.html.twig')`.
+
 ## v0.5.0 (2023-09-27)
 
 * Implement `SymbolProvider` for Twig locals.

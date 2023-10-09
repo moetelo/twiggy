@@ -1,12 +1,12 @@
 {
   "name": "twig-language-server",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Shifu462/twiggy",
+    "url": "https://github.com/moetelo/twiggy",
     "directory": "packages/language-server"
   },
   "files": [
