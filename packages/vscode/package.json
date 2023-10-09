@@ -40,14 +40,9 @@
     "configuration": {
       "title": "Twiggy",
       "properties": {
-        "twiggy.completion.phpBinConsoleCommand": {
+        "twiggy.phpBinConsoleCommand": {
           "type": "string",
           "markdownDescription": "Shell command that will be used for PHP command execution. \n\ne.g. `php bin/console` \n\nSee: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
-        },
-        "twiggy.definition.templatesDirectory": {
-          "type": "string",
-          "default": "templates",
-          "markdownDescription": "Root directory for all .twig templates for definition features support."
         }
       }
     },

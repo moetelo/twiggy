@@ -8,12 +8,12 @@ import { functions } from './functions';
 import { filters } from './filters';
 import { forLoop } from './for-loop';
 import { TwigDebugInfo, getSectionsFromPhpDebugTwig } from './debug-twig';
-import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
+import { TemplatePathMapping } from '../utils/symfony/twigConfig';
 
 export class CompletionProvider {
   server: Server;
   twigInfo?: TwigDebugInfo;
-  templatesDirectory!: string;
+  templateMappings: TemplatePathMapping[] = [];
 
   constructor(server: Server) {
     this.server = server;
@@ -24,7 +24,7 @@ export class CompletionProvider {
 
   async initializeGlobalsFromCommand(phpBinConsoleCommand: string | undefined) {
     this.twigInfo = phpBinConsoleCommand
-      ? await getSectionsFromPhpDebugTwig(phpBinConsoleCommand + ' debug:twig --format json')
+      ? await getSectionsFromPhpDebugTwig(phpBinConsoleCommand)
       : undefined;
 
     if (this.twigInfo) {
@@ -62,7 +62,8 @@ export class CompletionProvider {
       filters(cursorNode, this.twigInfo?.Filters || []),
       await templatePaths(
         cursorNode,
-        documentUriToFsPath(`${this.server.workspaceFolder.uri}/${this.templatesDirectory}`),
+        this.server.workspaceFolder.uri,
+        this.templateMappings,
       ),
     ].forEach((result) => {
       if (result) {

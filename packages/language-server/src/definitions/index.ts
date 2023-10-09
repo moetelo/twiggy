@@ -16,6 +16,11 @@ import { Document } from '../documents';
 import { getStringNodeValue } from '../utils/node';
 import { rangeContainsPosition } from '../utils/range-contains-position';
 import { pointToPosition } from '../utils/point-to-position';
+import { TemplatePathMapping } from '../utils/symfony/twigConfig';
+import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
+import { fileStat } from '../utils/files/fileStat';
+import * as path from 'path';
+import { toDocumentUri } from '../utils/toDocumentUri';
 
 export type onDefinitionHandlerReturn = ReturnType<
     Parameters<Connection['onDefinition']>[0]
@@ -65,7 +70,7 @@ const isIdentifierOf = (type: 'block' | 'macro', node: SyntaxNode): boolean => {
 export class DefinitionProvider {
     server: Server;
 
-    templatesDirectory!: string;
+    templateMappings: TemplatePathMapping[] = [];
 
     constructor(server: Server) {
         this.server = server;
@@ -92,11 +97,13 @@ export class DefinitionProvider {
         }
 
         if (isPathInsideTemplateEmbedding(cursorNode)) {
-            const templatePath = this.resolveTemplateUri(
+            const templateUri = await this.resolveTemplateUri(
                 getStringNodeValue(cursorNode),
             );
 
-            return this.resolveTemplateDefinition(templatePath);
+            if (!templateUri) return;
+
+            return this.resolveTemplateDefinition(templateUri);
         }
 
         if (isIdentifierOf('block', cursorNode)) {
@@ -154,8 +161,27 @@ export class DefinitionProvider {
         }
     }
 
-    resolveTemplateUri(filePath: string): DocumentUri {
-        return `${this.server.workspaceFolder.uri}/${this.templatesDirectory}/${filePath}`;
+    async resolveTemplateUri(includeArgument: string): Promise<DocumentUri | undefined> {
+        const workspaceFolderDirectory = documentUriToFsPath(this.server.workspaceFolder.uri);
+
+        for (const { namespace, directory } of this.templateMappings) {
+            if (!includeArgument.startsWith(namespace)) {
+                continue;
+            }
+
+            const includePath = namespace === ''
+                ? path.join(directory, includeArgument)
+                : includeArgument.replace(namespace, directory);
+
+            const pathToTwig = path.resolve(workspaceFolderDirectory, includePath);
+
+            const stats = await fileStat(pathToTwig);
+            if (stats) {
+                return toDocumentUri(pathToTwig);
+            }
+        }
+
+        return undefined;
     }
 
     private async getExtendedTemplate(document: Document) {
@@ -163,8 +189,13 @@ export class DefinitionProvider {
             return undefined;
         }
 
-        const templatePath = this.resolveTemplateUri(document.locals.extends);
-        return this.server.documentCache.get(templatePath);
+        const templateUri = await this.resolveTemplateUri(document.locals.extends);
+
+        if (!templateUri) {
+            return undefined;
+        }
+
+        return this.server.documentCache.get(templateUri);
     }
 
     resolveTemplateDefinition(templatePath: string): Definition | undefined {

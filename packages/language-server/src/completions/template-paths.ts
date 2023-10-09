@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
+import { CompletionItem, CompletionItemKind, DocumentUri } from 'vscode-languageserver';
 import path from 'path';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
@@ -6,10 +6,13 @@ import {
     templateUsingStatements,
 } from '../constants/template-usage';
 import getTwigFiles from '../utils/getTwigFiles';
+import { TemplatePathMapping } from '../utils/symfony/twigConfig';
+import { documentUriToFsPath } from '../utils/document-uri-to-fs-path';
 
 export async function templatePaths(
     cursorNode: SyntaxNode,
-    templatesPath: string,
+    workspaceFolderUri: DocumentUri,
+    templateMappings: TemplatePathMapping[],
 ) {
     if (cursorNode.type !== 'string') {
         return;
@@ -51,13 +54,20 @@ export async function templatePaths(
             node.parent?.childForFieldName('name')?.text === 'block' &&
             cursorNode?.equals(node.namedChildren[1]))
     ) {
-        for (const twigPath of await getTwigFiles(templatesPath)) {
-            const relativePath = path.relative(templatesPath, twigPath);
+        const workspaceFolderDirectory = documentUriToFsPath(workspaceFolderUri);
 
-            completions.push({
-                label: relativePath,
-                kind: CompletionItemKind.File,
-            });
+        for (const { namespace, directory } of templateMappings) {
+            const templatesDirectory = path.resolve(workspaceFolderDirectory, directory);
+
+            for (const twigPath of await getTwigFiles(directory)) {
+                const relativePathToTwigFromTemplatesDirectory = path.relative(templatesDirectory, twigPath);
+                const includePath = path.join(namespace, relativePathToTwigFromTemplatesDirectory);
+
+                completions.push({
+                    label: includePath,
+                    kind: CompletionItemKind.File,
+                });
+            }
         }
     }
 
