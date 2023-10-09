@@ -32,7 +32,7 @@ Lorem { ipsum
 ==================
 Comment single line
 ==================
-{# сomment #}
+{# comment #}
 ---
 (template
   (comment))
@@ -50,9 +50,9 @@ Comment multi line
   (comment))
 
 ==================
-Сontent сomment content
+Content comment content
 ==================
-Lorem {# сomment #} ipsum
+Lorem {# comment #} ipsum
 ---
 (template
   (content)
@@ -62,7 +62,7 @@ Lorem {# сomment #} ipsum
 ==================
 Comment content  Comment
 ==================
-{# сomment #} Lorem  {# сomment #}
+{# comment #} Lorem  {# comment #}
 ---
 (template
   (comment)
