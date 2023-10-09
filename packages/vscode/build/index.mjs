@@ -120,7 +120,7 @@ async function main() {
 
   if (!grammarWasmExists) {
     console.log('Building wasm grammar. This may take a while.');
-    execSync('pnpm run build-grammar-wasm --workspace-root', { stdio: 'inherit' })
+    execSync('pnpm --workspace-root run build-grammar-wasm', { stdio: 'inherit' })
   }
 
   // Include wasm grammar
