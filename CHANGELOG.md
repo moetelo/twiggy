@@ -1,3 +1,10 @@
+## v0.5.3 (2023-10-10)
+
+* Provide completion, definition and signature help for macroses.
+* Insert spaces inside of `{{ | }}` and `{% | %}`.
+* Add hardcoded fallback for default templates directory.
+* Better completion for filters.
+
 ## v0.5.1 (2023-10-09)
 
 * Local variable definitions.
