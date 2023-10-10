@@ -1,15 +1,20 @@
-import { DocumentUri } from 'vscode-languageserver';
-import { toDocumentUri } from '../utils/uri';
+import { DocumentUri, WorkspaceFolder } from 'vscode-languageserver';
+import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
+import * as path from 'path';
+import { fileStat } from '../utils/files/fileStat';
+import { TemplatePathMapping } from '../utils/symfony/twigConfig';
 
 export class DocumentCache {
-    documents: Map<DocumentUri, Document> = new Map();
+    templateMappings: TemplatePathMapping[] = [];
+    readonly documents: Map<DocumentUri, Document> = new Map();
+    readonly workspaceFolderPath: string;
 
-    get(documentUri: DocumentUri) {
-        return this.getOrCreate(documentUri);
+    constructor(workspaceFolder: WorkspaceFolder) {
+        this.workspaceFolderPath = documentUriToFsPath(workspaceFolder.uri);
     }
 
-    getOrCreate(documentUri: DocumentUri) {
+    get(documentUri: DocumentUri) {
         const document = this.documents.get(documentUri);
 
         if (document) {
@@ -20,10 +25,32 @@ export class DocumentCache {
     }
 
     updateText(documentUri: DocumentUri, text: string) {
-        const document = this.getOrCreate(documentUri);
+        const document = this.get(documentUri);
         document.setText(text);
 
         return document;
+    }
+
+    async resolveByTwigPath(pathFromTwig: string) {
+        for (const { namespace, directory } of this.templateMappings) {
+            if (!pathFromTwig.startsWith(namespace)) {
+                continue;
+            }
+
+            const includePath = namespace === ''
+                ? path.join(directory, pathFromTwig)
+                : pathFromTwig.replace(namespace, directory);
+
+            const pathToTwig = path.resolve(this.workspaceFolderPath, includePath);
+
+            const stats = await fileStat(pathToTwig);
+            if (stats) {
+                const documentUri = toDocumentUri(pathToTwig);
+                return this.get(documentUri);
+            }
+        }
+
+        return undefined;
     }
 
     private add(documentUri: DocumentUri) {

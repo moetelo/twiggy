@@ -1,6 +1,6 @@
 import { DidChangeConfigurationNotification, DidChangeConfigurationParams } from 'vscode-languageserver';
 import { Server } from '../server';
-import { LanguageServerSettings } from './language-server-settings';
+import { LanguageServerSettings } from './LanguageServerSettings';
 import { TemplatePathMapping, getTemplatePathMappingsFromSymfony } from '../utils/symfony/twigConfig';
 
 export class ConfigurationManager {
@@ -30,7 +30,7 @@ export class ConfigurationManager {
             ? await getTemplatePathMappingsFromSymfony(phpBinConsoleCommand)
             : this.defaultMappings;
 
+        this.server.documentCache.templateMappings = mappings;
         this.server.completionProvider.templateMappings = mappings;
-        this.server.definitionProvider.templateMappings = mappings;
     }
 }

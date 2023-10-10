@@ -68,8 +68,6 @@ const isIdentifierOf = (type: 'block' | 'macro', node: SyntaxNode): boolean => {
 export class DefinitionProvider {
     server: Server;
 
-    templateMappings: TemplatePathMapping[] = [];
-
     constructor(server: Server) {
         this.server = server;
 
@@ -95,13 +93,16 @@ export class DefinitionProvider {
         }
 
         if (isPathInsideTemplateEmbedding(cursorNode)) {
-            const templateUri = await this.resolveTemplateUri(
+            const document = await this.server.documentCache.resolveByTwigPath(
                 getStringNodeValue(cursorNode),
             );
 
-            if (!templateUri) return;
+            if (!document) return;
 
-            return this.resolveTemplateDefinition(templateUri);
+            return {
+                uri: document.uri,
+                range: Range.create(0, 0, 0, 0),
+            };
         }
 
         if (isIdentifierOf('block', cursorNode)) {
@@ -159,53 +160,11 @@ export class DefinitionProvider {
         }
     }
 
-    async resolveTemplateUri(includeArgument: string): Promise<DocumentUri | undefined> {
-        const workspaceFolderDirectory = documentUriToFsPath(this.server.workspaceFolder.uri);
-
-        for (const { namespace, directory } of this.templateMappings) {
-            if (!includeArgument.startsWith(namespace)) {
-                continue;
-            }
-
-            const includePath = namespace === ''
-                ? path.join(directory, includeArgument)
-                : includeArgument.replace(namespace, directory);
-
-            const pathToTwig = path.resolve(workspaceFolderDirectory, includePath);
-
-            const stats = await fileStat(pathToTwig);
-            if (stats) {
-                return toDocumentUri(pathToTwig);
-            }
-        }
-
-        return undefined;
-    }
-
     private async getExtendedTemplate(document: Document) {
         if (!document.locals.extends) {
             return undefined;
         }
 
-        const templateUri = await this.resolveTemplateUri(document.locals.extends);
-
-        if (!templateUri) {
-            return undefined;
-        }
-
-        return this.server.documentCache.get(templateUri);
-    }
-
-    resolveTemplateDefinition(templatePath: string): Definition | undefined {
-        const document = this.server.documentCache.get(templatePath);
-
-        if (!document) {
-            return;
-        }
-
-        return {
-            uri: document.uri,
-            range: Range.create(0, 0, 0, 0),
-        };
+        return await this.server.documentCache.resolveByTwigPath(document.locals.extends);
     }
 }

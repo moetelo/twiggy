@@ -14,7 +14,7 @@ import { CompletionProvider } from './completions/CompletionProvider';
 import { SignatureHelpProvider } from './signature-helps/SignatureHelpProvider';
 import { semanticTokensLegend } from './semantic-tokens/tokens-provider';
 import { SemanticTokensProvider } from './semantic-tokens/SemanticTokensProvider';
-import { ConfigurationManager } from './configuration/configuration-manager';
+import { ConfigurationManager } from './configuration/ConfigurationManager';
 import { DefinitionProvider } from './definitions';
 import { SymbolProvider } from './symbols/SymbolProvider';
 import {
@@ -27,7 +27,7 @@ import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesIn
 export class Server {
     readonly connection: Connection;
     readonly documents = new TextDocuments(TextDocument);
-    readonly documentCache = new DocumentCache();
+    documentCache!: DocumentCache;
     workspaceFolder!: WorkspaceFolder;
     clientCapabilities!: ClientCapabilities;
 
@@ -51,6 +51,7 @@ export class Server {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
             this.clientCapabilities = initializeParams.capabilities;
 
+            this.documentCache = new DocumentCache(this.workspaceFolder);
             await initializeParser();
 
             const capabilities: ServerCapabilities = {
