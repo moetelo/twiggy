@@ -22,6 +22,7 @@ import {
     ExecuteCommandProvider,
 } from './commands/ExecuteCommandProvider';
 import { initializeParser } from './utils/parser';
+import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesInsertionProvider';
 
 export class Server {
     readonly connection: Connection;
@@ -32,6 +33,7 @@ export class Server {
 
     readonly definitionProvider: DefinitionProvider;
     readonly completionProvider: CompletionProvider;
+    readonly bracketSpacesInsertionProvider: BracketSpacesInsertionProvider;
 
     constructor(connection: Connection) {
         this.connection = connection;
@@ -42,6 +44,7 @@ export class Server {
         new SignatureHelpProvider(this);
         this.completionProvider = new CompletionProvider(this);
         this.definitionProvider = new DefinitionProvider(this);
+        this.bracketSpacesInsertionProvider =new BracketSpacesInsertionProvider(this);
         new ExecuteCommandProvider(this);
 
         connection.onInitialize(async (initializeParams: InitializeParams) => {

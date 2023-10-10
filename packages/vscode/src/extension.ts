@@ -9,6 +9,7 @@ import {
   CompletionList,
   Uri,
 } from 'vscode';
+import * as autoInsert from './autoInsert';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -117,6 +118,11 @@ async function addWorkspaceFolder(
     'Twig Language Server',
     serverOptions,
     clientOptions
+  );
+
+  await autoInsert.activate(
+    [ client ],
+    (document) => document.uri.fsPath.startsWith(folderPath),
   );
 
   clients.set(folderPath, client);

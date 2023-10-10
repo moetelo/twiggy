@@ -21,6 +21,8 @@ export class ConfigurationManager {
     async onDidChangeConfiguration({ settings }: DidChangeConfigurationParams) {
         const config: LanguageServerSettings | undefined = settings?.[this.configurationSection];
 
+        this.server.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
+
         const phpBinConsoleCommand = config?.phpBinConsoleCommand?.trim();
         await this.server.completionProvider.initializeGlobalsFromCommand(phpBinConsoleCommand);
 
