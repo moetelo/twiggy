@@ -10,34 +10,36 @@ import { TwigFunctionLike } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/node';
 
 const triggerParameterHints = Command.create(
-  'Trigger parameter hints',
-  'editor.action.triggerParameterHints'
+    'Trigger parameter hints',
+    'editor.action.triggerParameterHints'
 );
 
 const commonCompletionItem: Partial<CompletionItem> = {
-  kind: CompletionItemKind.Function,
-  insertTextFormat: InsertTextFormat.Snippet,
-  command: triggerParameterHints,
-  detail: 'function',
+    kind: CompletionItemKind.Function,
+    insertTextFormat: InsertTextFormat.Snippet,
+    command: triggerParameterHints,
+    detail: 'function',
 };
 
 const completions: CompletionItem[] = twigFunctions.map((item) => ({
-  ...item,
-  ...commonCompletionItem,
-  insertText: `${item.label}($1)$0`,
+    ...item,
+    ...commonCompletionItem,
+    insertText: `${item.label}($1)$0`,
 }));
 
-export function functions(cursorNode: SyntaxNode, functions: TwigFunctionLike[]) {
-  if (['variable', 'function'].includes(cursorNode.type) || isEmptyEmbedded(cursorNode)) {
-    const completionsPhp = functions.map((func): CompletionItem => ({
-        ...commonCompletionItem,
-        label: func.identifier,
-        insertText: `${func.identifier}($1)$0`,
-    }));
+export function functions(cursorNode: SyntaxNode, functions: TwigFunctionLike[]): CompletionItem[] {
+    if (['variable', 'function'].includes(cursorNode.type) || isEmptyEmbedded(cursorNode)) {
+        const completionsPhp = functions.map((func): CompletionItem => ({
+            ...commonCompletionItem,
+            label: func.identifier,
+            insertText: `${func.identifier}($1)$0`,
+        }));
 
-    return [
-      ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
-      ...completionsPhp,
-    ];
-  }
+        return [
+            ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
+            ...completionsPhp,
+        ];
+    }
+
+    return [];
 }

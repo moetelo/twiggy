@@ -13,16 +13,15 @@ export async function templatePaths(
     cursorNode: SyntaxNode,
     workspaceFolderUri: DocumentUri,
     templateMappings: TemplatePathMapping[],
-) {
+): Promise<CompletionItem[]> {
     if (cursorNode.type !== 'string') {
-        return;
+        return [];
     }
 
-    const completions: CompletionItem[] = [];
     let node = cursorNode.parent;
 
     if (!node) {
-        return;
+        return [];
     }
 
     // This case for array or ternary wrappers
@@ -33,7 +32,7 @@ export async function templatePaths(
     }
 
     if (!node) {
-        return;
+        return [];
     }
 
     if (
@@ -56,6 +55,8 @@ export async function templatePaths(
     ) {
         const workspaceFolderDirectory = documentUriToFsPath(workspaceFolderUri);
 
+        const completions: CompletionItem[] = [];
+
         for (const { namespace, directory } of templateMappings) {
             const templatesDirectory = path.resolve(workspaceFolderDirectory, directory);
 
@@ -69,7 +70,9 @@ export async function templatePaths(
                 });
             }
         }
+
+        return completions;
     }
 
-    return completions;
+    return [];
 }

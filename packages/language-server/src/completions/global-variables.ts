@@ -5,26 +5,28 @@ import { TwigVariable } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/node';
 
 const commonCompletionItem: Partial<CompletionItem> = {
-  kind: CompletionItemKind.Variable,
-  commitCharacters: ['|', '.'],
-  detail: 'global variable',
+    kind: CompletionItemKind.Variable,
+    commitCharacters: ['|', '.'],
+    detail: 'global variable',
 };
 
 const completions: CompletionItem[] = twigGlobalVariables.map((item) => ({
-  ...commonCompletionItem,
-  ...item,
+    ...commonCompletionItem,
+    ...item,
 }));
 
-export function globalVariables(cursorNode: SyntaxNode, globals: TwigVariable[]) {
-  if (cursorNode.type === 'variable' || isEmptyEmbedded(cursorNode)) {
-    const completionsPhp = globals.map((variable): CompletionItem => ({
-      ...commonCompletionItem,
-      label: variable.identifier,
-    }));
+export function globalVariables(cursorNode: SyntaxNode, globals: TwigVariable[]): CompletionItem[] {
+    if (cursorNode.type === 'variable' || isEmptyEmbedded(cursorNode)) {
+        const completionsPhp = globals.map((variable): CompletionItem => ({
+            ...commonCompletionItem,
+            label: variable.identifier,
+        }));
 
-    return [
-      ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
-      ...completionsPhp,
-    ];
-  }
+        return [
+            ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
+            ...completionsPhp,
+        ];
+    }
+
+    return [];
 }

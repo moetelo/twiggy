@@ -52,25 +52,17 @@ export class CompletionProvider {
       return;
     }
 
-    const completions: CompletionItem[] = [];
-
-    [
-      localVariables(document, cursorNode),
-      forLoop(cursorNode),
-      globalVariables(cursorNode, this.twigInfo?.Globals || []),
-      functions(cursorNode, this.twigInfo?.Functions || []),
-      filters(cursorNode, this.twigInfo?.Filters || []),
-      await templatePaths(
+    return [
+      ...localVariables(document, cursorNode),
+      ...forLoop(cursorNode),
+      ...globalVariables(cursorNode, this.twigInfo?.Globals || []),
+      ...functions(cursorNode, this.twigInfo?.Functions || []),
+      ...filters(cursorNode, this.twigInfo?.Filters || []),
+      ...await templatePaths(
         cursorNode,
         this.server.workspaceFolder.uri,
         this.templateMappings,
       ),
-    ].forEach((result) => {
-      if (result) {
-        completions.push(...result);
-      }
-    });
-
-    return completions;
+    ];
   }
 }

@@ -13,7 +13,7 @@ const completions: CompletionItem[] = twigFilters.map((item) => ({
     ...item,
 }));
 
-export function filters(cursorNode: SyntaxNode, filters: TwigFunctionLike[]) {
+export function filters(cursorNode: SyntaxNode, filters: TwigFunctionLike[]): CompletionItem[] {
     if (
         cursorNode.text === '|' ||
         (cursorNode.type === 'function' &&
@@ -36,4 +36,6 @@ export function filters(cursorNode: SyntaxNode, filters: TwigFunctionLike[]) {
             ...completionsPhp,
         ];
     }
+
+    return [];
 }
