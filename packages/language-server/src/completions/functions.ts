@@ -8,11 +8,7 @@ import { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../common';
 import { TwigFunctionLike } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/node';
-
-const triggerParameterHints = Command.create(
-    'Trigger parameter hints',
-    'editor.action.triggerParameterHints'
-);
+import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 
 const commonCompletionItem: Partial<CompletionItem> = {
     kind: CompletionItemKind.Function,

@@ -9,6 +9,7 @@ import { filters } from './filters';
 import { forLoop } from './for-loop';
 import { TwigDebugInfo, getSectionsFromPhpDebugTwig } from './debug-twig';
 import { TemplatePathMapping } from '../utils/symfony/twigConfig';
+import { variableProperties } from './variableProperties';
 
 export class CompletionProvider {
   server: Server;
@@ -58,6 +59,7 @@ export class CompletionProvider {
       ...globalVariables(cursorNode, this.twigInfo?.Globals || []),
       ...functions(cursorNode, this.twigInfo?.Functions || []),
       ...filters(cursorNode, this.twigInfo?.Filters || []),
+      ...await variableProperties(document, this.server.documentCache, cursorNode),
       ...await templatePaths(
         cursorNode,
         this.server.workspaceFolder.uri,

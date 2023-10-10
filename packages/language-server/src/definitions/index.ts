@@ -149,6 +149,7 @@ export class DefinitionProvider {
                 ...scopedVariables,
                 ...macroses.flatMap((x) => x.args),
                 ...document.locals.variable,
+                ...document.locals.imports,
             ].find((x) => x.name === cursorNode.text);
 
             if (!symbol) return;
@@ -156,6 +157,24 @@ export class DefinitionProvider {
             return {
                 uri: document.uri,
                 range: symbol.nameRange,
+            };
+        }
+
+        if (cursorNode.type === 'property') {
+            const macroName = cursorNode.text;
+            const importName = cursorNode.parent!.firstChild!.text;
+
+            const importedDocument = await this.server.documentCache.resolveImport(document, importName);
+            if (!importedDocument) return;
+
+            await importedDocument.ensureParsed();
+
+            const macro = importedDocument.locals.macro.find(macro => macro.name === macroName);
+            if (!macro) return;
+
+            return {
+                uri: importedDocument.uri,
+                range: macro.nameRange,
             };
         }
     }

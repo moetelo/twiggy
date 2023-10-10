@@ -53,6 +53,15 @@ export class DocumentCache {
         return undefined;
     }
 
+    async resolveImport(document: Document, variableName: string) {
+        if (variableName === '_self') return document;
+
+        const twigImport = document.locals.imports.find(imp => imp.name === variableName);
+        if (!twigImport) return;
+
+        return await this.resolveByTwigPath(twigImport.path)!;
+    }
+
     private add(documentUri: DocumentUri) {
         documentUri = toDocumentUri(documentUri);
 

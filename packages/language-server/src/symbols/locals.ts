@@ -2,6 +2,7 @@ import {
     FunctionArgument,
     LocalSymbolInformation,
     TwigBlock,
+    TwigImport,
     TwigMacro,
     TwigVariable,
 } from './types';
@@ -68,11 +69,24 @@ function toMacro(node: SyntaxNode): TwigMacro {
     };
 }
 
+function toImport(node: SyntaxNode): TwigImport {
+    const pathNode = node.childForFieldName('expr')!;
+    const aliasNode = node.childForFieldName('variable')!;
+
+    return {
+        name: aliasNode.text,
+        path: getStringNodeValue(pathNode),
+        range: getNodeRange(node),
+        nameRange: getNodeRange(aliasNode),
+    };
+}
+
 export function collectLocals(tree: IWalkable | null): LocalSymbolInformation {
     const localSymbols: LocalSymbolInformation = {
         variable: [],
         macro: [],
         block: [],
+        imports: [],
     };
 
     if (!tree) {
@@ -91,6 +105,10 @@ export function collectLocals(tree: IWalkable | null): LocalSymbolInformation {
                     localSymbols.extends = getStringNodeValue(exprNode);
                 }
 
+                continue;
+            case 'import':
+                const twigImport = toImport(cursor.currentNode());
+                localSymbols.imports.push(twigImport);
                 continue;
             case 'block':
                 const block = toBlock(cursor.currentNode());

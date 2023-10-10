@@ -28,5 +28,6 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Comp
         ...scopedVariables,
         ...macroses.flatMap(x => x.args),
         ...document.locals.variable,
+        ...document.locals.imports,
     ].map(toCompletionItem);
 }
