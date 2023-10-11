@@ -1,25 +1,30 @@
 name: Deploy Extension
 
 on:
+  workflow_dispatch: ~
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: pnpm/action-setup@v2.4.0
+        with:
+          version: 8
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
+            - args: [--global, "@vscode/vsce"]
+
+      - uses: actions/setup-node@v3
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v2.4.0
-      - run: pnpm install --dir ./packages/vscode
-      - run: pnpm run build
+          cache: 'pnpm'
 
-      - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          packagePath: ./packages/vscode
-          registryUrl: https://marketplace.visualstudio.com
+      - run: pnpm run build --publish
