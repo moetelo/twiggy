@@ -40,6 +40,11 @@
           "default": true,
           "markdownDescription": "Insert spaces inside of `{{ | }}` and `{% | %}`."
         },
+        "twiggy.inlayHintsEnabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Show inlay hints."
+        },
         "twiggy.phpBinConsoleCommand": {
           "type": "string",
           "markdownDescription": "Shell command that will be used for PHP command execution. \n\ne.g. `php bin/console` \n\nSee: https://symfony.com/doc/current/templates.html#inspecting-twig-information"

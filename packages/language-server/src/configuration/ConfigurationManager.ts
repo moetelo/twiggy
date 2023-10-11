@@ -21,6 +21,7 @@ export class ConfigurationManager {
     async onDidChangeConfiguration({ settings }: DidChangeConfigurationParams) {
         const config: LanguageServerSettings | undefined = settings?.[this.configurationSection];
 
+        this.server.inlayHintProvider.isEnabled = config?.inlayHintsEnabled ?? true;
         this.server.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
 
         const phpBinConsoleCommand = config?.phpBinConsoleCommand?.trim();

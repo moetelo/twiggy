@@ -23,6 +23,7 @@ import {
 } from './commands/ExecuteCommandProvider';
 import { initializeParser } from './utils/parser';
 import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesInsertionProvider';
+import { InlayHintProvider } from './inlayHints/InlayHintProvider';
 
 export class Server {
     readonly connection: Connection;
@@ -34,6 +35,7 @@ export class Server {
     readonly definitionProvider: DefinitionProvider;
     readonly completionProvider: CompletionProvider;
     readonly bracketSpacesInsertionProvider: BracketSpacesInsertionProvider;
+    readonly inlayHintProvider: InlayHintProvider;
 
     constructor(connection: Connection) {
         this.connection = connection;
@@ -45,6 +47,7 @@ export class Server {
         this.completionProvider = new CompletionProvider(this);
         this.definitionProvider = new DefinitionProvider(this);
         this.bracketSpacesInsertionProvider =new BracketSpacesInsertionProvider(this);
+        this.inlayHintProvider = new InlayHintProvider(this);
         new ExecuteCommandProvider(this);
 
         connection.onInitialize(async (initializeParams: InitializeParams) => {
@@ -69,6 +72,7 @@ export class Server {
                     legend: semanticTokensLegend,
                     full: true,
                 },
+                inlayHintProvider: true,
                 executeCommandProvider: {
                     commands: Object.values(Command),
                 },
