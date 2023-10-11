@@ -12,7 +12,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 20
-      - run: npm install --workspaces=false --prefix packages/vscode
+      - uses: pnpm/action-setup@v2.4.0
+      - run: pnpm install --dir ./packages/vscode
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
