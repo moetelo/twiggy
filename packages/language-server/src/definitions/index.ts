@@ -2,11 +2,10 @@ import {
     Connection,
     Definition,
     DefinitionParams,
-    DocumentUri,
     Range,
 } from 'vscode-languageserver';
 import { Server } from '../server';
-import { findNodeByPosition } from '../utils/node';
+import { findNodeByPosition, getNodeRange } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,
@@ -15,25 +14,12 @@ import {
 import { Document } from '../documents';
 import { getStringNodeValue } from '../utils/node';
 import { rangeContainsPosition, pointToPosition } from '../utils/position';
-import { TemplatePathMapping } from '../utils/symfony/twigConfig';
-import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
-import { fileStat } from '../utils/files/fileStat';
-import * as path from 'path';
+import { parseFunctionCall } from '../utils/node/parseFunctionCall';
+import { positionsEqual } from '../utils/position/comparePositions';
 
 export type onDefinitionHandlerReturn = ReturnType<
     Parameters<Connection['onDefinition']>[0]
 >;
-
-const isFunctionCall = (
-    node: SyntaxNode | null,
-    functionName: string,
-): boolean => {
-    return (
-        !!node &&
-        node.type === 'call_expression' &&
-        node.childForFieldName('name')?.text === functionName
-    );
-};
 
 const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
     if (node.type !== 'string' || !node.parent) {
@@ -51,18 +37,27 @@ const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
     const isInsideFunctionCall =
         node.parent?.type === 'arguments' &&
         templateUsingFunctions.some((func) =>
-            isFunctionCall(node.parent!.parent, func),
+            parseFunctionCall(node.parent!.parent)?.name === func,
         );
 
     return isInsideFunctionCall;
 };
 
-const isIdentifierOf = (type: 'block' | 'macro', node: SyntaxNode): boolean => {
-    if (!node.parent || node.parent.type !== type) {
+const isBlockIdentifier = (node: SyntaxNode): boolean => {
+    if (!node.parent) {
         return false;
     }
 
-    return node.type === 'identifier';
+    if (node.parent.type === 'block' && node.type === 'identifier') {
+        return true;
+    }
+
+    if (node.parent.parent?.type === 'call_expression') {
+        const call = parseFunctionCall(node.parent.parent);
+        return !!call && node.type === 'string' && call.name === 'block' && !call.object;
+    }
+
+    return false;
 };
 
 export class DefinitionProvider {
@@ -105,27 +100,23 @@ export class DefinitionProvider {
             };
         }
 
-        if (isIdentifierOf('block', cursorNode)) {
-            const blockName = cursorNode.text;
+        if (isBlockIdentifier(cursorNode)) {
+            const blockName = cursorNode.type === 'string'
+                ? getStringNodeValue(cursorNode)
+                : cursorNode.text;
 
-            let extendedDocument: Document | undefined =
-                await this.getExtendedTemplate(document);
+            let extendedDocument: Document | undefined = document;
             while (extendedDocument) {
                 await extendedDocument.ensureParsed();
-                const symbol = extendedDocument.getSymbolByName(
-                    blockName,
-                    'block',
-                );
-                if (!symbol) {
-                    extendedDocument = await this.getExtendedTemplate(
-                        extendedDocument,
-                    );
+                const blockSymbol = extendedDocument.getBlock(blockName);
+                if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
+                    extendedDocument = await this.getExtendedTemplate(extendedDocument);
                     continue;
                 }
 
                 return {
                     uri: extendedDocument.uri,
-                    range: symbol.nameRange,
+                    range: blockSymbol.nameRange,
                 };
             }
 

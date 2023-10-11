@@ -1,7 +1,7 @@
 import { InlayHint, InlayHintKind, InlayHintParams } from 'vscode-languageserver';
 import { Server } from '../server';
 import { PreOrderCursorIterator } from '../utils/node';
-import { pointToPosition } from '../utils/position';
+import { parseFunctionCall } from '../utils/node/parseFunctionCall';
 
 export class InlayHintProvider {
     readonly server: Server;
@@ -31,26 +31,21 @@ export class InlayHintProvider {
             if (node.nodeType === 'call_expression') {
                 const currentNode = node.currentNode();
 
-                const argNodes = currentNode.childForFieldName('arguments')?.namedChildren;
-                if (!argNodes?.length) continue;
+                const calledFunc = parseFunctionCall(currentNode);
+                if (!calledFunc || !calledFunc.object || !calledFunc.args.length) return;
 
-                const calledFunc = currentNode.childForFieldName('name')!.text;
-                if (!calledFunc.includes('.')) continue;
-
-                const [ importName, funcName ] = calledFunc.split('.');
-
-                const importedDocument = await this.server.documentCache.resolveImport(document, importName);
+                const importedDocument = await this.server.documentCache.resolveImport(document, calledFunc.object);
                 if (!importedDocument) return;
 
                 await importedDocument.ensureParsed();
 
-                const macro = importedDocument.locals.macro.find(macro => macro.name === funcName);
+                const macro = importedDocument.locals.macro.find(macro => macro.name === calledFunc.name);
                 if (!macro) return;
 
-                const hints = argNodes
+                const hints = calledFunc.args
                     .slice(0, macro.args.length)
                     .map((arg, i): InlayHint => ({
-                        position: pointToPosition(arg.startPosition),
+                        position: arg.range.start,
                         label: `${macro.args[i].name}:`,
                         kind: InlayHintKind.Parameter,
                         paddingRight: true,

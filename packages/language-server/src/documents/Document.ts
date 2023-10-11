@@ -76,17 +76,12 @@ export class Document {
         this.setText(text);
     }
 
-    getSymbolByName(
-        name: string,
-        symbolType: Exclude<keyof LocalSymbolInformation, 'extends'>,
-    ): LocalSymbol | undefined {
-        const symbol = this.locals[symbolType].find((s) => s.name === name);
+    getBlock(name: string): LocalSymbol | undefined {
+        const symbol = this.locals.block.find((s) => s.name === name);
         if (symbol) return symbol;
 
-        if (symbolType === 'block') {
-            return this.locals.block
-                .flatMap((b) => b.symbols.block)
-                .find((s) => s.name === name);
-        }
+        return this.locals.block
+            .flatMap((b) => b.symbols.block)
+            .find((s) => s.name === name);
     }
 }
