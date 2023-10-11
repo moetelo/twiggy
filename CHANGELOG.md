@@ -1,3 +1,7 @@
+## v0.5.5 (2023-10-11)
+
+* Support Go to Definition for `block('blockname')`.
+
 ## v0.5.4 (2023-10-11)
 
 * Show inlay hints for macro calls.
