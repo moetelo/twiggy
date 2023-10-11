@@ -6,16 +6,13 @@
   "scripts": {
     "build": "tree-sitter generate",
     "build-wasm": "tree-sitter build-wasm",
-    "test": "tree-sitter test",
-    "release": "release-it"
+    "test": "tree-sitter test"
   },
   "license": "Mozilla Public License 2.0",
   "dependencies": {
     "nan": "^2.17.0"
   },
   "devDependencies": {
-    "@release-it-plugins/lerna-changelog": "^6.0.0",
-    "release-it": "^16.1.2",
     "tree-sitter-cli": "^0.20.8"
   },
   "files": [

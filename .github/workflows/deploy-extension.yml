@@ -1,8 +1,9 @@
 name: Deploy Extension
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   deploy:
@@ -14,6 +15,8 @@ jobs:
           node-version: 20
       - uses: pnpm/action-setup@v2.4.0
       - run: pnpm install --dir ./packages/vscode
+      - run: pnpm run build
+
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
