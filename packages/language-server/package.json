@@ -1,6 +1,6 @@
 {
   "name": "twig-language-server",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
   "main": "dist/index.js",

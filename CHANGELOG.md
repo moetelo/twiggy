@@ -1,3 +1,6 @@
+## v0.5.6 (2023-10-13)
+* Add indentation rules.
+
 ## v0.5.5 (2023-10-11)
 
 * Support Go to Definition for `block('blockname')`.
