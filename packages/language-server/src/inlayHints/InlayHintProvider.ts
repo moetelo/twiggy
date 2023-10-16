@@ -32,15 +32,15 @@ export class InlayHintProvider {
                 const currentNode = node.currentNode();
 
                 const calledFunc = parseFunctionCall(currentNode);
-                if (!calledFunc || !calledFunc.object || !calledFunc.args.length) return;
+                if (!calledFunc || !calledFunc.object || !calledFunc.args.length) continue;
 
                 const importedDocument = await this.server.documentCache.resolveImport(document, calledFunc.object);
-                if (!importedDocument) return;
+                if (!importedDocument) continue;
 
                 await importedDocument.ensureParsed();
 
                 const macro = importedDocument.locals.macro.find(macro => macro.name === calledFunc.name);
-                if (!macro) return;
+                if (!macro) continue;
 
                 const hints = calledFunc.args
                     .slice(0, macro.args.length)
