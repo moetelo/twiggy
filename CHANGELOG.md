@@ -1,3 +1,6 @@
+## v0.5.7 (2023-10-16)
+* Fix extension error on `{% import _self as alias %}`.
+
 ## v0.5.6 (2023-10-13)
 * Add indentation rules.
 
