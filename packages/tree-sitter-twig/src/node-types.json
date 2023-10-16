@@ -872,7 +872,7 @@
         "required": true,
         "types": [
           {
-            "type": "string",
+            "type": "variable",
             "named": true
           }
         ]
@@ -1227,11 +1227,6 @@
         ]
       }
     }
-  },
-  {
-    "type": "string",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "subscript_expression",
@@ -1678,6 +1673,10 @@
   {
     "type": "same as",
     "named": false
+  },
+  {
+    "type": "string",
+    "named": true
   },
   {
     "type": "string",

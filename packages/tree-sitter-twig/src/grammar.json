@@ -1078,7 +1078,7 @@
               "name": "identifier"
             },
             "named": true,
-            "value": "string"
+            "value": "variable"
           }
         },
         {
