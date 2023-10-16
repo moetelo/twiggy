@@ -23,6 +23,18 @@ export function findNodeByPosition(
             }
         }
 
+        // node is the last child of its parent
+        // or there are no more siblings at the same level after it
+        if (
+            !node.nextSibling
+            && (
+                !node.parent?.parent?.nextSibling
+                || !findNodeByPosition(node.parent.parent.nextSibling, position)
+            )
+        ) {
+            return node;
+        }
+
         return;
     }
 
