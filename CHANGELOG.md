@@ -1,3 +1,10 @@
+## v0.5.9 (2023-10-17)
+* Add annotations for `{% endblock %}` and `{% endmacro %}` (configurable via extension settings).
+* Add documentation for completions resolved via `twiggy.phpBinConsoleCommand`.
+* Fix named argument highlighting.
+* Fix completion in `{% if | %}`.
+* Fix inlay hints for macros after the one that was not found.
+
 ## v0.5.8 (2023-10-16)
 * Snippets.
 * Keyword completion.
