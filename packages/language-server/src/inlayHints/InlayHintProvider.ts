@@ -1,11 +1,31 @@
 import { InlayHint, InlayHintKind, InlayHintParams } from 'vscode-languageserver';
 import { Server } from '../server';
-import { PreOrderCursorIterator } from '../utils/node';
+import { PreOrderCursorIterator, getNodeRange } from '../utils/node';
 import { parseFunctionCall } from '../utils/node/parseFunctionCall';
+import { SyntaxNode } from 'web-tree-sitter';
+import { InlayHintSettings } from '../configuration/LanguageServerSettings';
+
+const toInlayHint = (node: SyntaxNode): InlayHint => {
+    const range = getNodeRange(node);
+    const nameNode = node.childForFieldName('name')!;
+
+    return {
+        position: range.end,
+        label: `{% ${node.type} ${nameNode.text} %}`,
+        paddingLeft: true,
+        kind: InlayHintKind.Type,
+    };
+};
 
 export class InlayHintProvider {
+    static readonly defaultSettings: InlayHintSettings = {
+        macro: true,
+        block: true,
+        macroArguments: true,
+    };
+
     readonly server: Server;
-    isEnabled = true;
+    settings = InlayHintProvider.defaultSettings;
 
     constructor(server: Server) {
         this.server = server;
@@ -16,7 +36,8 @@ export class InlayHintProvider {
     }
 
     async onInlayHint(params: InlayHintParams): Promise<InlayHint[] | undefined> {
-        if (!this.isEnabled) return;
+        const { block, macro, macroArguments } = this.settings;
+        if (!block && !macro && !macroArguments) return;
 
         const document = this.server.documentCache.get(params.textDocument.uri);
 
@@ -28,7 +49,7 @@ export class InlayHintProvider {
 
         const nodes = new PreOrderCursorIterator(document.tree.walk());
         for (const node of nodes) {
-            if (node.nodeType === 'call_expression') {
+            if (macroArguments && node.nodeType === 'call_expression') {
                 const currentNode = node.currentNode();
 
                 const calledFunc = parseFunctionCall(currentNode);
@@ -52,6 +73,14 @@ export class InlayHintProvider {
                     }));
 
                 inlayHints.push(...hints);
+            }
+
+            if (
+                (block && node.nodeType === 'block' || macro && node.nodeType === 'macro')
+                && node.startPosition.row !== node.endPosition.row
+            ) {
+                const hint = toInlayHint(node.currentNode());
+                inlayHints.push(hint);
             }
         }
 

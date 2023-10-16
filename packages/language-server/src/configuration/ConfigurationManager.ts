@@ -2,6 +2,7 @@ import { DidChangeConfigurationNotification, DidChangeConfigurationParams } from
 import { Server } from '../server';
 import { LanguageServerSettings } from './LanguageServerSettings';
 import { TemplatePathMapping, getTemplatePathMappingsFromSymfony } from '../utils/symfony/twigConfig';
+import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -21,7 +22,7 @@ export class ConfigurationManager {
     async onDidChangeConfiguration({ settings }: DidChangeConfigurationParams) {
         const config: LanguageServerSettings | undefined = settings?.[this.configurationSection];
 
-        this.server.inlayHintProvider.isEnabled = config?.inlayHintsEnabled ?? true;
+        this.server.inlayHintProvider.settings = config?.inlayHints ?? InlayHintProvider.defaultSettings;
         this.server.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
 
         const phpBinConsoleCommand = config?.phpBinConsoleCommand?.trim();

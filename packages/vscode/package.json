@@ -40,10 +40,20 @@
           "default": true,
           "markdownDescription": "Insert spaces inside of `{{ | }}` and `{% | %}`."
         },
-        "twiggy.inlayHintsEnabled": {
+        "twiggy.inlayHints.macroArguments": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Show inlay hints."
+          "markdownDescription": "Inlay hints for macro arguments."
+        },
+        "twiggy.inlayHints.macro": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Inlay hints for `{% endmacro %}`."
+        },
+        "twiggy.inlayHints.block": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Inlay hints for `{% endblock %}`."
         },
         "twiggy.phpBinConsoleCommand": {
           "type": "string",
