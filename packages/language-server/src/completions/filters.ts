@@ -27,13 +27,8 @@ export function filters(cursorNode: SyntaxNode, filters: TwigFunctionLike[]): Co
         );
 
         return [
-            ...completions.filter(
-                (comp) =>
-                    !completionsPhp.find(
-                        (compPhp) => compPhp.label === comp.label,
-                    ),
-            ),
-            ...completionsPhp,
+            ...completions,
+            ...completionsPhp.filter((comp) => !completions.find((item) => item.label === comp.label)),
         ];
     }
 

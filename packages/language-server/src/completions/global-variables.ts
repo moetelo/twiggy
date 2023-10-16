@@ -23,8 +23,8 @@ export function globalVariables(cursorNode: SyntaxNode, globals: TwigVariable[])
         }));
 
         return [
-            ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
-            ...completionsPhp,
+            ...completions,
+            ...completionsPhp.filter(comp => !completions.find(item => item.label === comp.label)),
         ];
     }
 

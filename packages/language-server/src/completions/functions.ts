@@ -31,8 +31,8 @@ export function functions(cursorNode: SyntaxNode, functions: TwigFunctionLike[])
         }));
 
         return [
-            ...completions.filter(comp => !completionsPhp.find(compPhp => compPhp.label === comp.label)),
-            ...completionsPhp,
+            ...completions,
+            ...completionsPhp.filter(comp => !completions.find(item => item.label === comp.label)),
         ];
     }
 
