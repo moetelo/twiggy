@@ -1,9 +1,8 @@
 import {
     MarkupKind,
-    ParameterInformation,
-    MarkupContent,
     CompletionItem,
     CompletionItemKind,
+    SignatureInformation,
 } from 'vscode-languageserver';
 
 export const twigGlobalVariables = [
@@ -105,12 +104,13 @@ export const twigTests = [
     },
 ];
 
+type TwigFunctionReturnType = 'string' | 'array' | 'mixed' | 'int' | 'float' | 'false' | '\\DateTimeInterface';
+
 type TwigFunctionCompletionItem = {
     label: string;
-    documentation?: MarkupContent;
-    parameters?: ParameterInformation[];
-    return?: string;
-};
+    createSnippet?: true,
+    return?: TwigFunctionReturnType | `${TwigFunctionReturnType}|${TwigFunctionReturnType}`,
+} & Partial<CompletionItem & SignatureInformation>;
 
 export const twigFunctions: TwigFunctionCompletionItem[] = [
     {
@@ -281,6 +281,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
     },
     {
         label: 'dump',
+        createSnippet: true,
         documentation: {
             kind: MarkupKind.Markdown,
             value: [
@@ -299,6 +300,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
     },
     {
         label: 'include',
+        createSnippet: true,
         documentation: {
             kind: MarkupKind.Markdown,
             value: ['Renders a template.'].join('\n'),
@@ -391,6 +393,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                 label: 'string $template',
             },
         ],
+        return: 'string',
     },
     {
         label: 'html_classes',
@@ -415,6 +418,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                 "When a template uses inheritance, it's possible to render the contents of the parent block when overriding a block by using the `parent` function",
             ].join('\n'),
         },
+        return: 'string',
     },
     {
         label: 'country_timezones',
@@ -544,6 +548,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                     'An optional name of the template to be used in error messages',
             },
         ],
+        return: 'string',
     },
     {
         label: 'render',
@@ -555,6 +560,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                 label: 'array options = []',
             },
         ],
+        return: 'string',
     },
     {
         label: 'render_esi',
@@ -566,6 +572,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                 label: 'array options = []',
             },
         ],
+        return: 'string',
     },
     {
         label: 'fragment_uri',
@@ -583,6 +590,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                 label: 'boolean sign = true',
             },
         ],
+        return: 'string',
     },
     {
         label: 'controller',
@@ -597,6 +605,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                 label: 'array query = []',
             },
         ],
+        return: 'mixed',
     },
     {
         label: 'asset',
@@ -608,6 +617,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
                 label: 'string|null packageName = null',
             },
         ],
+        return: 'string',
     },
     {
         label: 'asset_version',

@@ -9,7 +9,7 @@ import { TwigFunctionLike } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/node';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 
-const commonCompletionItem: Partial<CompletionItem> = {
+export const commonCompletionItem: Partial<CompletionItem> = {
     kind: CompletionItemKind.Function,
     insertTextFormat: InsertTextFormat.Snippet,
     command: triggerParameterHints,

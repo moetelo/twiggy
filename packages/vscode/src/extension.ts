@@ -16,6 +16,7 @@ import {
   ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
+import { unwrapCompletionArray } from './utils/unwrapCompletionArray';
 
 const outputChannel = window.createOutputChannel('Twig Language Server');
 const clients = new Map<string, LanguageClient>();
@@ -94,21 +95,27 @@ async function addWorkspaceFolder(
       ) {
         const originalUri = document.uri.toString(true);
         const isInsideHtmlRegion = await commands.executeCommand<boolean>(Command.IsInsideHtmlRegion, originalUri, position);
+        const result = await unwrapCompletionArray(next(document, position, context, token));
 
         if (!isInsideHtmlRegion) {
-          return await next(document, position, context, token);
+          return result;
         }
 
         virtualDocumentContents.set(originalUri, document.getText());
 
         const encodedUri = encodeURIComponent(originalUri);
         const vdocUri = Uri.parse(`embedded-content://html/${encodedUri}.html`);
-        return await commands.executeCommand<CompletionList>(
+        const htmlCompletions = await commands.executeCommand<CompletionList>(
           'vscode.executeCompletionItemProvider',
           vdocUri,
           position,
           context.triggerCharacter,
         );
+
+        return [
+          ...await unwrapCompletionArray(htmlCompletions),
+          ...result,
+        ];
       },
     },
   };

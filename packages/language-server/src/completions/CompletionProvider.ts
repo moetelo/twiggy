@@ -10,6 +10,7 @@ import { forLoop } from './for-loop';
 import { TwigDebugInfo, getSectionsFromPhpDebugTwig } from './debug-twig';
 import { TemplatePathMapping } from '../utils/symfony/twigConfig';
 import { variableProperties } from './variableProperties';
+import { snippets } from './snippets';
 
 export class CompletionProvider {
   server: Server;
@@ -54,6 +55,7 @@ export class CompletionProvider {
     }
 
     return [
+      ...snippets(cursorNode),
       ...localVariables(document, cursorNode),
       ...forLoop(cursorNode),
       ...globalVariables(cursorNode, this.twigInfo?.Globals || []),
