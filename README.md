@@ -13,7 +13,8 @@ This is a fork of [kaermorchen/twig-language-server (Modern Twig)](https://githu
 ## Completion
 ![Completion](https://github.com/moetelo/twiggy/assets/17011936/b5a7b411-b7c3-4411-b4bb-c3a244dc71f6)
 
-> Note: completion for user-defined functions and filters works if you set `twiggy.phpBinConsoleCommand` setting in VS Code.
+> **Note**
+> Completion for user-defined functions and filters works if you set `twiggy.phpBinConsoleCommand` setting in VS Code.
 
 ## Inlay hints
 ![inlay hints](https://github.com/moetelo/twiggy/assets/17011936/ae833425-06e9-4c55-84d2-47b152bae51a)
