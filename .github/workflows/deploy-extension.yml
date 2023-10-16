@@ -14,6 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Restore cached `tree-sitter-twig.wasm`.
+        id: cache-tree-sitter-twig
+        uses: actions/cache/restore@v3
+        with:
+          path: ./packages/tree-sitter-twig/tree-sitter-twig.wasm
+          key: ${{ runner.os }}-${{ hashFiles('./packages/tree-sitter-twig/(bindings|corpus|quieries|src)/**/*', './packages/tree-sitter-twig/(grammar.js|package.json)') }}
+
       - uses: pnpm/action-setup@v2.4.0
         with:
           version: 8
@@ -28,3 +36,9 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm run build --publish
+
+      - name: Cache `tree-sitter-twig.wasm`.
+        uses: actions/cache/save@v3
+        with:
+          path: ./packages/tree-sitter-twig/tree-sitter-twig.wasm
+          key: ${{ steps.cache-tree-sitter-twig.outputs.cache-primary-key }}
