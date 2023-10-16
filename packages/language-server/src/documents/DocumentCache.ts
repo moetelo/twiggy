@@ -59,6 +59,8 @@ export class DocumentCache {
         const twigImport = document.locals.imports.find(imp => imp.name === variableName);
         if (!twigImport) return;
 
+        if (!twigImport.path) return document;
+
         return await this.resolveByTwigPath(twigImport.path)!;
     }
 

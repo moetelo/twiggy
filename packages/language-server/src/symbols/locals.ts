@@ -69,13 +69,21 @@ function toMacro(node: SyntaxNode): TwigMacro {
     };
 }
 
+function resolveImportPath(pathNode: SyntaxNode) {
+    if (pathNode.type === 'string') {
+        return getStringNodeValue(pathNode);
+    }
+
+    return undefined;
+}
+
 function toImport(node: SyntaxNode): TwigImport {
     const pathNode = node.childForFieldName('expr')!;
     const aliasNode = node.childForFieldName('variable')!;
 
     return {
         name: aliasNode.text,
-        path: getStringNodeValue(pathNode),
+        path: resolveImportPath(pathNode),
         range: getNodeRange(node),
         nameRange: getNodeRange(aliasNode),
     };

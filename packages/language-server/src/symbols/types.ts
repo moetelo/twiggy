@@ -25,7 +25,7 @@ export interface TwigBlock extends LocalSymbol {
 }
 
 export interface TwigImport extends LocalSymbol {
-    path: string;
+    path?: string;
 }
 
 export type LocalSymbolInformation = {
