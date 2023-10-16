@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { twigGlobalVariables } from '../common';
+import { twigGlobalVariables } from '../staticCompletionInfo';
 import { TwigVariable } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/node';
 

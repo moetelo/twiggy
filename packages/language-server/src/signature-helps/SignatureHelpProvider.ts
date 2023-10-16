@@ -2,7 +2,7 @@ import { SignatureHelp, SignatureHelpParams, SignatureInformation } from 'vscode
 import { Server } from '../server';
 import { findNodeByPosition } from '../utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
-import { twigFunctionsSignatureInformation } from '../common';
+import { twigFunctionsSignatureInformation } from './staticSignatureInformation';
 import { Document } from '../documents';
 
 export class SignatureHelpProvider {

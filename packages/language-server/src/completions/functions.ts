@@ -1,11 +1,10 @@
 import {
-  Command,
   CompletionItem,
   CompletionItemKind,
   InsertTextFormat,
 } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { twigFunctions } from '../common';
+import { twigFunctions } from '../staticCompletionInfo';
 import { TwigFunctionLike } from './debug-twig';
 import { isEmptyEmbedded } from '../utils/node';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';

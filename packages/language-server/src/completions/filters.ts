@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { twigFilters } from '../common';
+import { twigFilters } from '../staticCompletionInfo';
 import { TwigFunctionLike } from './debug-twig';
 
 const commonCompletionItem: Partial<CompletionItem> = {

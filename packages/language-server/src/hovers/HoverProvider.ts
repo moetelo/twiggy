@@ -1,4 +1,4 @@
-import { Connection, HoverParams } from 'vscode-languageserver';
+import { HoverParams } from 'vscode-languageserver';
 import { Server } from '../server';
 import { findNodeByPosition } from '../utils/node';
 import { globalVariables } from './global-variables';
@@ -6,10 +6,6 @@ import { localVariables } from './local-variables';
 import { forLoop } from './for-loop';
 import { functions } from './functions';
 import { filters } from './filters';
-
-export type onHoverHandlerReturn = ReturnType<
-  Parameters<Connection['onHover']>[0]
->;
 
 export class HoverProvider {
   server: Server;

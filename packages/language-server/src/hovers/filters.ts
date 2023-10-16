@@ -1,22 +1,22 @@
 import { SyntaxNode } from 'web-tree-sitter';
-import { onHoverHandlerReturn } from './HoverProvider';
-import { twigFilters } from '../common';
+import { twigFilters } from '../staticCompletionInfo';
+import { Hover } from 'vscode-languageserver';
 
-export function filters(cursorNode: SyntaxNode): onHoverHandlerReturn {
-  if (
-    (cursorNode.type === 'variable' || cursorNode.type === 'function') &&
-    cursorNode.previousSibling?.text === '|'
-  ) {
-    for (const item of twigFilters) {
-      if (item.label === cursorNode.text) {
-        if (item.documentation) {
-          return {
-            contents: item.documentation,
-          };
-        } else {
-          return;
-        }
-      }
+const nodeTypes = [ 'variable', 'function' ];
+
+export function filters(cursorNode: SyntaxNode): Hover | undefined {
+    if (
+        !nodeTypes.includes(cursorNode.type)
+        && cursorNode.previousSibling?.text !== '|'
+    ) {
+        return;
     }
-  }
+
+    const filter = twigFilters.find(item => item.label === cursorNode.text);
+
+    if (!filter?.documentation) return;
+
+    return {
+        contents: filter.documentation,
+    };
 }

@@ -1,19 +1,17 @@
 import { SyntaxNode } from 'web-tree-sitter';
-import { onHoverHandlerReturn } from './HoverProvider';
-import { twigFunctions } from '../common';
+import { twigFunctions } from '../staticCompletionInfo';
+import { Hover } from 'vscode-languageserver';
 
-export function functions(cursorNode: SyntaxNode): onHoverHandlerReturn {
-  if (cursorNode.type === 'variable' || cursorNode.type === 'function') {
-    for (const item of twigFunctions) {
-      if (item.label === cursorNode.text) {
-        if (item.documentation) {
-          return {
-            contents: item.documentation,
-          };
-        } else {
-          return;
-        }
-      }
-    }
-  }
+const nodeTypes = [ 'variable', 'function' ];
+
+export function functions(cursorNode: SyntaxNode): Hover | undefined {
+    if (!nodeTypes.includes(cursorNode.type)) return;
+
+    const variable = twigFunctions.find(item => item.label === cursorNode.text);
+
+    if (!variable?.documentation) return;
+
+    return {
+        contents: variable.documentation,
+    };
 }

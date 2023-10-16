@@ -1,6 +1,6 @@
 import { Command, CompletionItem, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { forLoopProperties } from '../common';
+import { forLoopProperties } from '../staticCompletionInfo';
 import { Document, DocumentCache } from '../documents';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 
