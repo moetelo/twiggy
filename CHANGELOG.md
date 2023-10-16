@@ -1,3 +1,7 @@
+## v0.5.8 (2023-10-16)
+* Snippets.
+* Keyword completion.
+
 ## v0.5.7 (2023-10-16)
 * Fix extension error on `{% import _self as alias %}`.
 
