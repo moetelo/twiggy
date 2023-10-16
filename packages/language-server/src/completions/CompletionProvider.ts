@@ -11,6 +11,7 @@ import { TwigDebugInfo, getSectionsFromPhpDebugTwig } from './debug-twig';
 import { TemplatePathMapping } from '../utils/symfony/twigConfig';
 import { variableProperties } from './variableProperties';
 import { snippets } from './snippets';
+import { keywords } from './keywords';
 
 export class CompletionProvider {
   server: Server;
@@ -56,6 +57,7 @@ export class CompletionProvider {
 
     return [
       ...snippets(cursorNode),
+      ...keywords(cursorNode),
       ...localVariables(document, cursorNode),
       ...forLoop(cursorNode),
       ...globalVariables(cursorNode, this.twigInfo?.Globals || []),

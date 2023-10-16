@@ -774,6 +774,86 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
     },
 ];
 
+type KeywordCompletionItem = {
+    label: string,
+    body?: string[],
+}
+
+export const twigKeywords: KeywordCompletionItem[] = [
+    { label: 'as' },
+    { label: 'cache' },
+    { label: 'flush' },
+    { label: 'from' },
+    { label: 'import' },
+    { label: 'include' },
+    { label: 'sandbox' },
+    { label: 'use' },
+    { label: 'verbatim' },
+    { label: 'with' },
+    { label: 'endwith' },
+    { label: 'endapply' },
+    { label: 'endblock' },
+    { label: 'endif' },
+    { label: 'endfor' },
+    { label: 'endmacro' },
+    { label: 'endcache' },
+    { label: 'endsandbox' },
+    { label: 'endset' },
+    { label: 'endverbatim' },
+    {
+        label: 'apply',
+        body: [
+            '{% apply $1 %}',
+            '\t$2',
+            '{% endapply %}',
+        ],
+    },
+    {
+        label: 'block',
+        body: [
+            '{% block $1 %}',
+            '\t$2',
+            '{% endblock %}',
+        ],
+    },
+    {
+        label: 'if',
+        body: [
+            '{% if $1 %}',
+            '\t$2',
+            '{% endif %}',
+        ],
+    },
+    {
+        label: 'extends',
+        body: [
+            "{% extends '$1' %}",
+        ],
+    },
+    {
+        label: 'for',
+        body: [
+            '{% for $1 in $1s %}',
+            '\t$2',
+            '{% endfor %}',
+        ],
+    },
+    {
+        label: 'macro',
+        body: [
+            '{% macro $1($2) %}',
+            '\t$3',
+            '{% endmacro %}',
+        ],
+    },
+    {
+        label: 'set',
+        body: [
+            '{% set $1 = $2 %}',
+        ],
+    },
+];
+
 export const twigFilters: TwigFunctionCompletionItem[] = [
     {
         label: 'date',
