@@ -7,9 +7,9 @@ export interface TwigDebugJsonOutput {
     tests: string[];
 }
 
-const toFunctionLike = ([identifier, args]: [string, string[]]): TwigFunctionLike => ({
+const toFunctionLike = ([identifier, args]: [string, string[] | null]): TwigFunctionLike => ({
     identifier,
-    arguments: args.map((arg) => {
+    arguments: (args || []).map((arg) => {
         const [identifier, defaultValue] = arg.trim().split('=');
         return {
             identifier,
