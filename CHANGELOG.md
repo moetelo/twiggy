@@ -1,3 +1,8 @@
+## v0.5.10 (2023-10-19)
+* Use unique command names for each workspace folder. (Issue #3)
+* Default function args from debug:twig to an empty array. (Issue #3)
+* Allow setting twiggy.phpBinConsoleCommand per workspace folder.
+
 ## v0.5.9 (2023-10-17)
 * Add annotations for `{% endblock %}` and `{% endmacro %}` (configurable via extension settings).
 * Add documentation for completions resolved via `twiggy.phpBinConsoleCommand`.
