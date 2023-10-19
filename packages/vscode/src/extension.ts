@@ -74,6 +74,8 @@ async function addWorkspaceFolder(
     },
   });
 
+  const workspaceUri = workspaceFolder.uri.toString(true);
+
   const clientOptions: LanguageClientOptions = {
     workspaceFolder,
     outputChannel,
@@ -94,7 +96,13 @@ async function addWorkspaceFolder(
         next,
       ) {
         const originalUri = document.uri.toString(true);
-        const isInsideHtmlRegion = await commands.executeCommand<boolean>(Command.IsInsideHtmlRegion, originalUri, position);
+
+        const isInsideHtmlRegionCommand = `${Command.IsInsideHtmlRegion}(${workspaceUri})`;
+        const isInsideHtmlRegion = await commands.executeCommand<boolean>(
+          isInsideHtmlRegionCommand,
+          originalUri,
+          position,
+        );
         const result = await unwrapCompletionArray(next(document, position, context, token));
 
         if (!isInsideHtmlRegion) {
@@ -121,8 +129,8 @@ async function addWorkspaceFolder(
   };
 
   const client = new LanguageClient(
-    'twig-language-server',
-    'Twig Language Server',
+    'twig-language-server ' + workspaceUri,
+    'Twig Language Server ' + workspaceUri,
     serverOptions,
     clientOptions
   );

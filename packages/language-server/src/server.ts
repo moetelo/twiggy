@@ -74,7 +74,9 @@ export class Server {
                 },
                 inlayHintProvider: true,
                 executeCommandProvider: {
-                    commands: Object.values(Command),
+                    commands: [
+                        `${Command.IsInsideHtmlRegion}(${this.workspaceFolder.uri})`,
+                    ],
                 },
             };
 

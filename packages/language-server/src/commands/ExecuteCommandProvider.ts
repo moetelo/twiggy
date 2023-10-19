@@ -22,7 +22,8 @@ export class ExecuteCommandProvider {
     }
 
     onExecuteCommand(params: ExecuteCommandParams) {
-        const command = commands.get(params.command as Command);
+        const [ commandName ] = params.command.split('(');
+        const command = commands.get(commandName as Command);
 
         if (!command || !params.arguments) {
             return;
