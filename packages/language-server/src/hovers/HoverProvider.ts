@@ -8,36 +8,44 @@ import { filters } from './filters';
 import { DocumentCache } from '../documents';
 
 export class HoverProvider {
-  constructor(
-    private readonly connection: Connection,
-    private readonly documentCache: DocumentCache,
-  ) {
-    this.connection.onHover(this.onHover.bind(this));
-  }
-
-  async onHover(params: HoverParams) {
-    const uri = params.textDocument.uri;
-    const document = this.documentCache.get(uri);
-
-    if (!document) {
-      return;
+    constructor(
+        private readonly connection: Connection,
+        private readonly documentCache: DocumentCache,
+    ) {
+        this.connection.onHover(this.onHover.bind(this));
     }
 
-    const cursorNode = findNodeByPosition(document.tree.rootNode, params.position);
+    async onHover(params: HoverParams) {
+        const uri = params.textDocument.uri;
+        const document = this.documentCache.get(uri);
 
-    if (!cursorNode) {
-      return;
+        if (!document) {
+            return;
+        }
+
+        const cursorNode = findNodeByPosition(
+            document.tree.rootNode,
+            params.position,
+        );
+
+        if (!cursorNode) {
+            return;
+        }
+
+        const hovers = [
+            globalVariables,
+            localVariables,
+            functions,
+            filters,
+            forLoop,
+        ];
+
+        for (const fn of hovers) {
+            const result = fn(cursorNode);
+
+            if (result) {
+                return result;
+            }
+        }
     }
-
-    let result;
-    let hovers = [globalVariables, localVariables, functions, filters, forLoop];
-
-    for (const fn of hovers) {
-      if ((result = fn(cursorNode))) {
-        break;
-      }
-    }
-
-    return result;
-  }
 }
