@@ -20,7 +20,7 @@
         ["'", "'"],
         ["\"", "\""]
     ],
-    "wordPattern": "((?<={%\\s+\\w+\\s+)([\"'].+?[\"'])|(\\w+)|([^'\"();{}%$<>/.,=|\\- ]+))",
+    "wordPattern": "((?<=\\{%\\s+\\w+\\s+)([\"'].+?[\"'])|(?<=\\{\\{\\s*(include|source)\\()([\"'].+?[\"'])|(\\w+)|([^'\"();{}%$<>/.,=|\\- ]+))",
     "indentationRules": {
         "increaseIndentPattern": "(<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|keygen|link|menuitem|meta|param|source|track|wbr)\\b|[^>]*\\/>)([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*<\\/\\1>)|<!--(?!.*-->)|\\{[^}\"']*|^\\s*\\{%\\s+?(block|if|macro|for|else).+?%\\})$",
         "decreaseIndentPattern": "^(\\s*(<\\/[-_\\.A-Za-z0-9]+\\b[^>]*>|-->|\\})|\\{%\\s+?(endblock|endif|endmacro|endfor).+?%\\})"
