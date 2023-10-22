@@ -2,7 +2,7 @@ import { DidChangeConfigurationNotification, DidChangeConfigurationParams } from
 import { Server } from '../server';
 import { LanguageServerSettings } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
-import { TemplatePathMapping, getSectionsFromPhpDebugTwig } from '../completions/debug-twig';
+import { TemplatePathMapping, generateDebugTwigCommand, getSectionsFromPhpDebugTwig } from '../completions/debug-twig';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -26,20 +26,28 @@ export class ConfigurationManager {
         this.server.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
 
         const phpBinConsoleCommand = config?.phpBinConsoleCommand?.trim();
+        const debugTwigCommand = generateDebugTwigCommand(phpBinConsoleCommand);
 
-        const twigInfo = phpBinConsoleCommand
-            ? await getSectionsFromPhpDebugTwig(phpBinConsoleCommand)
+        const twigInfo = debugTwigCommand
+            ? await getSectionsFromPhpDebugTwig(debugTwigCommand)
             : undefined;
 
         if (twigInfo) {
-            console.info('Twig info initialized.');
+            console.info(`Collected information from the output of '${debugTwigCommand}'.`);
             console.info(
-                `Detected ${twigInfo.Functions.length} functions, ${twigInfo.Filters.length} filters and ${twigInfo.Globals.length} globals.`,
+                `Detected ${twigInfo.Functions.length} functions, ${twigInfo.Filters.length} filters,`
+                + ` ${twigInfo.Globals.length} globals and ${twigInfo.LoaderPaths.length} loader paths.`,
             );
-            console.info('Loader paths:');
-            console.info(twigInfo.LoaderPaths.map(({ namespace, directory }) => `  ${namespace} => ${directory}`).join('\n'));
+        } else if (!debugTwigCommand) {
+            console.info(
+                'The `twiggy.phpBinConsoleCommand` setting is empty.'
+                + ' If your project uses Symfony, please set it in the extension settings for better language server features.',
+            );
         } else {
-            console.error('Twig info not initialized.');
+            console.error(
+                `Could not collect any information from the output of the '${debugTwigCommand}'.`
+                + ` Either the project doesn't use Symfony or the command is not correct.`,
+            );
         }
 
         this.server.completionProvider.twigInfo = twigInfo;

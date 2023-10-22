@@ -35,16 +35,10 @@ const toTemplateMappings = ([namespaceRaw, directories]: [string, string[]]): Te
     }));
 };
 
-export const parseSections = (stdout: string): TwigDebugInfo => {
-    const output: TwigDebugJsonOutput = JSON.parse(stdout);
-
-    const sections: TwigDebugInfo = {
-        Filters: Object.entries(output.filters).map(toFunctionLike),
-        Functions: Object.entries(output.functions).map(toFunctionLike),
-        Globals: Object.entries(output.globals).map(toTwigVariable),
-        LoaderPaths: Object.entries(output.loader_paths).flatMap(toTemplateMappings),
-        Tests: output.tests,
-    };
-
-    return sections;
-};
+export const parseSections = (output: TwigDebugJsonOutput): TwigDebugInfo => ({
+    Filters: Object.entries(output.filters).map(toFunctionLike),
+    Functions: Object.entries(output.functions).map(toFunctionLike),
+    Globals: Object.entries(output.globals).map(toTwigVariable),
+    LoaderPaths: Object.entries(output.loader_paths).flatMap(toTemplateMappings),
+    Tests: output.tests,
+});

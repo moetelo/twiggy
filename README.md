@@ -21,8 +21,8 @@ This is a fork of [kaermorchen/twig-language-server (Modern Twig)](https://githu
 
 # Setup
 1. In VS Code, open Command Palette (`Ctrl+P`), type `ext install moetelo.twiggy` and press `Enter`.
-1. Set `twiggy.phpBinConsoleCommand` in your VS Code settings.
-1. Check the extension output (`Twig Language Server`) for errors. If you've opened a Symfony project and everything is ok, you should see line `Twig info initialized`.
+1. For Symfony project, set `twiggy.phpBinConsoleCommand` in the VS Code settings.
+1. Check the extension output (`Twig Language Server`) for errors.
 
 [File an issue](https://github.com/moetelo/twiggy/issues/new) if you have any problems or the feature you want is missing.
 

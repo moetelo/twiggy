@@ -1,14 +1,27 @@
 export * from './types';
 
 import { exec } from '../../utils/exec';
-import { parseSections } from './parse-sections';
+import { TwigDebugJsonOutput, parseSections } from './parse-sections';
 
-export async function getSectionsFromPhpDebugTwig(phpBinConsoleCommand: string) {
-    const { stdout, stderr } = await exec(phpBinConsoleCommand + ' debug:twig --format json').catch((err) => err);
+export function generateDebugTwigCommand(phpBinConsoleCommand: string | undefined): string {
+    if (!phpBinConsoleCommand) return '';
+
+    return phpBinConsoleCommand + ' debug:twig --format json';
+}
+
+export async function getSectionsFromPhpDebugTwig(debugTwigCommand: string) {
+    const { stdout, stderr } = await exec(debugTwigCommand);
 
     if (stderr) {
+        console.error(stderr);
         return undefined;
     }
 
-    return parseSections(stdout);
+    try {
+        const output: TwigDebugJsonOutput = JSON.parse(stdout);
+        return parseSections(output);
+    } catch (e) {
+        console.error(e);
+        return undefined;
+    }
 }
