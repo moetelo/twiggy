@@ -1,7 +1,12 @@
+## v0.6.0 (2023-10-22)
+* Collect loader paths from `debug:twig` command.
+* Better logging for `twigInfo`.
+* Fix extension crashing on Win10.
+
 ## v0.5.10 (2023-10-19)
 * Use unique command names for each workspace folder. (Issue #3)
-* Default function args from debug:twig to an empty array. (Issue #3)
-* Allow setting twiggy.phpBinConsoleCommand per workspace folder.
+* Default function args from `debug:twig` to an empty array. (Issue #3)
+* Allow setting `twiggy.phpBinConsoleCommand` per workspace folder.
 
 ## v0.5.9 (2023-10-17)
 * Add annotations for `{% endblock %}` and `{% endmacro %}` (configurable via extension settings).
