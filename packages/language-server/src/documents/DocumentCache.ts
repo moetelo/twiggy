@@ -3,7 +3,7 @@ import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
 import * as path from 'path';
 import { fileStat } from '../utils/files/fileStat';
-import { TemplatePathMapping } from '../utils/symfony/twigConfig';
+import { TemplatePathMapping } from '../completions/debug-twig';
 
 export class DocumentCache {
     templateMappings: TemplatePathMapping[] = [];

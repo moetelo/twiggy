@@ -7,8 +7,7 @@ import { localVariables } from './local-variables';
 import { functions } from './functions';
 import { filters } from './filters';
 import { forLoop } from './for-loop';
-import { TwigDebugInfo, getSectionsFromPhpDebugTwig } from './debug-twig';
-import { TemplatePathMapping } from '../utils/symfony/twigConfig';
+import { TwigDebugInfo } from './debug-twig';
 import { variableProperties } from './variableProperties';
 import { snippets } from './snippets';
 import { keywords } from './keywords';
@@ -16,29 +15,12 @@ import { keywords } from './keywords';
 export class CompletionProvider {
   server: Server;
   twigInfo?: TwigDebugInfo;
-  templateMappings: TemplatePathMapping[] = [];
 
   constructor(server: Server) {
     this.server = server;
 
     this.server.connection.onCompletion(this.onCompletion.bind(this));
     this.server.connection.onCompletionResolve(item => item);
-  }
-
-  async initializeGlobalsFromCommand(phpBinConsoleCommand: string | undefined) {
-    this.twigInfo = phpBinConsoleCommand
-      ? await getSectionsFromPhpDebugTwig(phpBinConsoleCommand)
-      : undefined;
-
-    if (this.twigInfo) {
-      console.info(
-        'Twig info initialized. '
-        + `Detected ${this.twigInfo.Functions.length} functions, `
-        + `${this.twigInfo.Filters.length} filters and ${this.twigInfo.Globals.length} globals.`
-      );
-    } else {
-      console.error('Twig info not initialized.');
-    }
   }
 
   async onCompletion(params: CompletionParams) {
@@ -67,7 +49,7 @@ export class CompletionProvider {
       ...await templatePaths(
         cursorNode,
         this.server.workspaceFolder.uri,
-        this.templateMappings,
+        this.twigInfo?.LoaderPaths || [],
       ),
     ];
   }

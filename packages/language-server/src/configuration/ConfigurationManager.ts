@@ -1,8 +1,8 @@
 import { DidChangeConfigurationNotification, DidChangeConfigurationParams } from 'vscode-languageserver';
 import { Server } from '../server';
 import { LanguageServerSettings } from './LanguageServerSettings';
-import { TemplatePathMapping, getTemplatePathMappingsFromSymfony } from '../utils/symfony/twigConfig';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
+import { TemplatePathMapping, getSectionsFromPhpDebugTwig } from '../completions/debug-twig';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -26,13 +26,23 @@ export class ConfigurationManager {
         this.server.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
 
         const phpBinConsoleCommand = config?.phpBinConsoleCommand?.trim();
-        await this.server.completionProvider.initializeGlobalsFromCommand(phpBinConsoleCommand);
 
-        const mappings = phpBinConsoleCommand
-            ? await getTemplatePathMappingsFromSymfony(phpBinConsoleCommand)
-            : this.defaultMappings;
+        const twigInfo = phpBinConsoleCommand
+            ? await getSectionsFromPhpDebugTwig(phpBinConsoleCommand)
+            : undefined;
 
-        this.server.documentCache.templateMappings = mappings;
-        this.server.completionProvider.templateMappings = mappings;
+        if (twigInfo) {
+            console.info('Twig info initialized.');
+            console.info(
+                `Detected ${twigInfo.Functions.length} functions, ${twigInfo.Filters.length} filters and ${twigInfo.Globals.length} globals.`,
+            );
+            console.info('Loader paths:');
+            console.info(twigInfo.LoaderPaths.map(({ namespace, directory }) => `  ${namespace} => ${directory}`).join('\n'));
+        } else {
+            console.error('Twig info not initialized.');
+        }
+
+        this.server.completionProvider.twigInfo = twigInfo;
+        this.server.documentCache.templateMappings = twigInfo?.LoaderPaths || [];
     }
 }

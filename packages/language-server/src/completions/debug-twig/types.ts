@@ -13,9 +13,17 @@ export type TwigVariable = {
   value: string;
 };
 
+export type TemplateNamespace = `@${string}` | '';
+
+export type TemplatePathMapping = {
+    directory: string;
+    namespace: TemplateNamespace;
+};
+
 export type TwigDebugInfo = {
   Filters: TwigFunctionLike[];
   Functions: TwigFunctionLike[];
   Globals: TwigVariable[];
+  LoaderPaths: TemplatePathMapping[],
   Tests: string[];
 };
