@@ -1,6 +1,6 @@
-import { DocumentSymbol, DocumentSymbolParams, SymbolKind } from 'vscode-languageserver';
-import { Server } from '../server';
+import { Connection, DocumentSymbol, DocumentSymbolParams, SymbolKind } from 'vscode-languageserver';
 import { LocalSymbolInformation } from './types';
+import { DocumentCache } from '../documents';
 
 const mapLocalsToSymbols = (locals: LocalSymbolInformation): DocumentSymbol[] => {
   return [
@@ -28,17 +28,16 @@ const mapLocalsToSymbols = (locals: LocalSymbolInformation): DocumentSymbol[] =>
 };
 
 export class SymbolProvider {
-  server: Server;
-
-  constructor(server: Server) {
-    this.server = server;
-
-    this.server.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
+  constructor(
+    private readonly connection: Connection,
+    private readonly documentCache: DocumentCache,
+  ) {
+    this.connection.onDocumentSymbol(this.onDocumentSymbol.bind(this));
   }
 
   async onDocumentSymbol(params: DocumentSymbolParams): Promise<DocumentSymbol[]> {
     const uri = params.textDocument.uri;
-    const document = this.server.documentCache.get(uri);
+    const document = this.documentCache.get(uri);
 
     if (!document) {
       return [];

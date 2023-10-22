@@ -1,24 +1,23 @@
-import { HoverParams } from 'vscode-languageserver';
-import { Server } from '../server';
+import { Connection, HoverParams } from 'vscode-languageserver';
 import { findNodeByPosition } from '../utils/node';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
 import { forLoop } from './for-loop';
 import { functions } from './functions';
 import { filters } from './filters';
+import { DocumentCache } from '../documents';
 
 export class HoverProvider {
-  server: Server;
-
-  constructor(server: Server) {
-    this.server = server;
-
-    this.server.connection.onHover(this.onHover.bind(this));
+  constructor(
+    private readonly connection: Connection,
+    private readonly documentCache: DocumentCache,
+  ) {
+    this.connection.onHover(this.onHover.bind(this));
   }
 
   async onHover(params: HoverParams) {
     const uri = params.textDocument.uri;
-    const document = this.server.documentCache.get(uri);
+    const document = this.documentCache.get(uri);
 
     if (!document) {
       return;

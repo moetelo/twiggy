@@ -4,14 +4,13 @@ import {
     DefinitionParams,
     Range,
 } from 'vscode-languageserver';
-import { Server } from '../server';
 import { findNodeByPosition, getNodeRange } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,
     templateUsingStatements,
 } from '../constants/template-usage';
-import { Document } from '../documents';
+import { Document, DocumentCache } from '../documents';
 import { getStringNodeValue } from '../utils/node';
 import { rangeContainsPosition, pointToPosition } from '../utils/position';
 import { parseFunctionCall } from '../utils/node/parseFunctionCall';
@@ -61,18 +60,18 @@ const isBlockIdentifier = (node: SyntaxNode): boolean => {
 };
 
 export class DefinitionProvider {
-    server: Server;
 
-    constructor(server: Server) {
-        this.server = server;
-
-        this.server.connection.onDefinition(this.onDefinition.bind(this));
+    constructor(
+        private readonly connection: Connection,
+        private readonly documentCache: DocumentCache,
+    ) {
+        this.connection.onDefinition(this.onDefinition.bind(this));
     }
 
     async onDefinition(
         params: DefinitionParams,
     ): Promise<Definition | undefined> {
-        const document = this.server.documentCache.get(params.textDocument.uri);
+        const document = this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return;
@@ -88,7 +87,7 @@ export class DefinitionProvider {
         }
 
         if (isPathInsideTemplateEmbedding(cursorNode)) {
-            const document = await this.server.documentCache.resolveByTwigPath(
+            const document = await this.documentCache.resolveByTwigPath(
                 getStringNodeValue(cursorNode),
             );
 
@@ -155,7 +154,7 @@ export class DefinitionProvider {
             const macroName = cursorNode.text;
             const importName = cursorNode.parent!.firstChild!.text;
 
-            const importedDocument = await this.server.documentCache.resolveImport(document, importName);
+            const importedDocument = await this.documentCache.resolveImport(document, importName);
             if (!importedDocument) return;
 
             await importedDocument.ensureParsed();
@@ -175,6 +174,6 @@ export class DefinitionProvider {
             return undefined;
         }
 
-        return await this.server.documentCache.resolveByTwigPath(document.locals.extends);
+        return await this.documentCache.resolveByTwigPath(document.locals.extends);
     }
 }

@@ -1,9 +1,9 @@
-import { InlayHint, InlayHintKind, InlayHintParams } from 'vscode-languageserver';
-import { Server } from '../server';
+import { Connection, InlayHint, InlayHintKind, InlayHintParams } from 'vscode-languageserver';
 import { PreOrderCursorIterator, getNodeRange } from '../utils/node';
 import { parseFunctionCall } from '../utils/node/parseFunctionCall';
 import { SyntaxNode } from 'web-tree-sitter';
 import { InlayHintSettings } from '../configuration/LanguageServerSettings';
+import { DocumentCache } from '../documents';
 
 const toInlayHint = (node: SyntaxNode): InlayHint => {
     const range = getNodeRange(node);
@@ -24,13 +24,13 @@ export class InlayHintProvider {
         macroArguments: true,
     };
 
-    readonly server: Server;
     settings = InlayHintProvider.defaultSettings;
 
-    constructor(server: Server) {
-        this.server = server;
-
-        this.server.connection.languages.inlayHint.on(
+    constructor(
+        connection: Connection,
+        private readonly documentCache: DocumentCache,
+    ) {
+        connection.languages.inlayHint.on(
             this.onInlayHint.bind(this),
         );
     }
@@ -39,7 +39,7 @@ export class InlayHintProvider {
         const { block, macro, macroArguments } = this.settings;
         if (!block && !macro && !macroArguments) return;
 
-        const document = this.server.documentCache.get(params.textDocument.uri);
+        const document = this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return;
@@ -55,7 +55,7 @@ export class InlayHintProvider {
                 const calledFunc = parseFunctionCall(currentNode);
                 if (!calledFunc || !calledFunc.object || !calledFunc.args.length) continue;
 
-                const importedDocument = await this.server.documentCache.resolveImport(document, calledFunc.object);
+                const importedDocument = await this.documentCache.resolveImport(document, calledFunc.object);
                 if (!importedDocument) continue;
 
                 await importedDocument.ensureParsed();

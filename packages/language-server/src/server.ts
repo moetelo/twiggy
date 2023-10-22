@@ -26,36 +26,42 @@ import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesIn
 import { InlayHintProvider } from './inlayHints/InlayHintProvider';
 
 export class Server {
-    readonly connection: Connection;
     readonly documents = new TextDocuments(TextDocument);
     documentCache!: DocumentCache;
     workspaceFolder!: WorkspaceFolder;
     clientCapabilities!: ClientCapabilities;
 
-    readonly definitionProvider: DefinitionProvider;
-    readonly completionProvider: CompletionProvider;
-    readonly bracketSpacesInsertionProvider: BracketSpacesInsertionProvider;
-    readonly inlayHintProvider: InlayHintProvider;
+    definitionProvider!: DefinitionProvider;
+    completionProvider!: CompletionProvider;
+    bracketSpacesInsertionProvider!: BracketSpacesInsertionProvider;
+    inlayHintProvider!: InlayHintProvider;
 
     constructor(connection: Connection) {
-        this.connection = connection;
-
-        new SemanticTokensProvider(this);
-        new SymbolProvider(this);
-        new HoverProvider(this);
-        new SignatureHelpProvider(this);
-        this.completionProvider = new CompletionProvider(this);
-        this.definitionProvider = new DefinitionProvider(this);
-        this.bracketSpacesInsertionProvider =new BracketSpacesInsertionProvider(this);
-        this.inlayHintProvider = new InlayHintProvider(this);
-        new ExecuteCommandProvider(this);
-
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
             this.clientCapabilities = initializeParams.capabilities;
 
-            this.documentCache = new DocumentCache(this.workspaceFolder);
+            const documentCache = new DocumentCache(this.workspaceFolder);
+            this.documentCache = documentCache;
+
             await initializeParser();
+
+            new SemanticTokensProvider(connection, documentCache);
+            new SymbolProvider(connection, documentCache);
+            new HoverProvider(connection, documentCache);
+            new SignatureHelpProvider(connection, documentCache);
+            this.definitionProvider = new DefinitionProvider(connection, documentCache);
+            this.completionProvider = new CompletionProvider(
+                connection,
+                documentCache,
+                this.workspaceFolder,
+            );
+            this.inlayHintProvider = new InlayHintProvider(connection, documentCache);
+            new ExecuteCommandProvider(connection, documentCache);
+            this.bracketSpacesInsertionProvider = new BracketSpacesInsertionProvider(
+                connection,
+                this.documents,
+            );
 
             const capabilities: ServerCapabilities = {
                 hoverProvider: true,
@@ -80,12 +86,20 @@ export class Server {
                 },
             };
 
-            return { capabilities };
+            return {
+                capabilities,
+            };
         });
 
-        this.connection.onInitialized(async () => {
+        connection.onInitialized(async () => {
             if (this.clientCapabilities.workspace?.didChangeConfiguration) {
-                new ConfigurationManager(this);
+                new ConfigurationManager(
+                    connection,
+                    this.inlayHintProvider,
+                    this.bracketSpacesInsertionProvider,
+                    this.completionProvider,
+                    this.documentCache,
+                );
             }
         });
 

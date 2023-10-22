@@ -1,6 +1,6 @@
-import { DocumentUri, ExecuteCommandParams, Position } from 'vscode-languageserver';
-import { Server } from '../server';
+import { Connection, DocumentUri, ExecuteCommandParams, Position } from 'vscode-languageserver';
 import { isInsideHtmlRegion } from '../utils/node';
+import { DocumentCache } from '../documents';
 
 export enum Command {
     IsInsideHtmlRegion = 'twiggy.is-inside-html-region',
@@ -11,12 +11,11 @@ const commands = new Map([
 ]);
 
 export class ExecuteCommandProvider {
-    server: Server;
-
-    constructor(server: Server) {
-        this.server = server;
-
-        this.server.connection.onExecuteCommand(
+    constructor(
+        connection: Connection,
+        private readonly documentCache: DocumentCache,
+    ) {
+        connection.onExecuteCommand(
             this.onExecuteCommand.bind(this)
         );
     }
@@ -30,7 +29,7 @@ export class ExecuteCommandProvider {
         }
 
         const [uri, position] = params.arguments as [DocumentUri, Position];
-        const document = this.server.documentCache.get(uri);
+        const document = this.documentCache.get(uri);
 
         if (!document) {
             return;

@@ -1,8 +1,10 @@
-import { DidChangeConfigurationNotification, DidChangeConfigurationParams } from 'vscode-languageserver';
-import { Server } from '../server';
+import { Connection, DidChangeConfigurationNotification, DidChangeConfigurationParams } from 'vscode-languageserver';
 import { LanguageServerSettings } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
 import { TemplatePathMapping, generateDebugTwigCommand, getSectionsFromPhpDebugTwig } from '../completions/debug-twig';
+import { DocumentCache } from '../documents';
+import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
+import { CompletionProvider } from '../completions/CompletionProvider';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -10,20 +12,22 @@ export class ConfigurationManager {
         { namespace: '', directory: 'templates' },
     ];
 
-    server: Server;
-
-    constructor(server: Server) {
-        this.server = server;
-
-        this.server.connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
-        this.server.connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
+    constructor(
+        connection: Connection,
+        private readonly inlayHintProvider: InlayHintProvider,
+        private readonly bracketSpacesInsertionProvider: BracketSpacesInsertionProvider,
+        private readonly completionProvider: CompletionProvider,
+        private readonly documentCache: DocumentCache,
+    ) {
+        connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
+        connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
     }
 
     async onDidChangeConfiguration({ settings }: DidChangeConfigurationParams) {
         const config: LanguageServerSettings | undefined = settings?.[this.configurationSection];
 
-        this.server.inlayHintProvider.settings = config?.inlayHints ?? InlayHintProvider.defaultSettings;
-        this.server.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
+        this.inlayHintProvider.settings = config?.inlayHints ?? InlayHintProvider.defaultSettings;
+        this.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
 
         const phpBinConsoleCommand = config?.phpBinConsoleCommand?.trim();
         const debugTwigCommand = generateDebugTwigCommand(phpBinConsoleCommand);
@@ -50,7 +54,7 @@ export class ConfigurationManager {
             );
         }
 
-        this.server.completionProvider.twigInfo = twigInfo;
-        this.server.documentCache.templateMappings = twigInfo?.LoaderPaths || [];
+        this.completionProvider.twigInfo = twigInfo;
+        this.documentCache.templateMappings = twigInfo?.LoaderPaths || [];
     }
 }

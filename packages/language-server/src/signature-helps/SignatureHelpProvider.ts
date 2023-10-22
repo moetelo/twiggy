@@ -1,17 +1,15 @@
-import { SignatureHelp, SignatureHelpParams, SignatureInformation } from 'vscode-languageserver';
-import { Server } from '../server';
+import { Connection, SignatureHelp, SignatureHelpParams, SignatureInformation } from 'vscode-languageserver';
 import { findNodeByPosition } from '../utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctionsSignatureInformation } from './staticSignatureInformation';
-import { Document } from '../documents';
+import { Document, DocumentCache } from '../documents';
 
 export class SignatureHelpProvider {
-    server: Server;
-
-    constructor(server: Server) {
-        this.server = server;
-
-        this.server.connection.onSignatureHelp(
+    constructor(
+        connection: Connection,
+        private readonly documentCache: DocumentCache,
+    ) {
+        connection.onSignatureHelp(
             this.provideSignatureHelp.bind(this),
         );
     }
@@ -19,7 +17,7 @@ export class SignatureHelpProvider {
     async provideSignatureHelp(
         params: SignatureHelpParams,
     ): Promise<SignatureHelp | undefined> {
-        const document = this.server.documentCache.get(params.textDocument.uri);
+        const document = this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return undefined;
@@ -70,7 +68,7 @@ export class SignatureHelpProvider {
         if (functionName.includes('.')) {
             const [ importName, macroName ] = functionName.split('.');
 
-            const importedDocument = await this.server.documentCache.resolveImport(document, importName);
+            const importedDocument = await this.documentCache.resolveImport(document, importName);
             if (!importedDocument) return;
 
             await importedDocument.ensureParsed();

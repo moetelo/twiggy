@@ -1,8 +1,8 @@
+import { Connection, TextDocuments } from 'vscode-languageserver';
 import { AutoInsertRequest } from '../customRequests/AutoInsertRequest';
-import { Server } from '../server';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 export class BracketSpacesInsertionProvider {
-    readonly server: Server;
     isEnabled = true;
 
     readonly changeTriggers = new Map([
@@ -10,16 +10,17 @@ export class BracketSpacesInsertionProvider {
         ['{}', '{{}}'],
     ]);
 
-    constructor(server: Server) {
-        this.server = server;
-
-        this.server.connection.onRequest(AutoInsertRequest.type, this.onAutoInsert.bind(this));
+    constructor(
+        connection: Connection,
+        private readonly documents: TextDocuments<TextDocument>,
+    ) {
+        connection.onRequest(AutoInsertRequest.type, this.onAutoInsert.bind(this));
     }
 
     async onAutoInsert({ textDocument, options }: AutoInsertRequest.ParamsType): Promise<AutoInsertRequest.ResponseType> {
         if (!this.isEnabled) return;
 
-        const document = this.server.documents.get(textDocument.uri);
+        const document = this.documents.get(textDocument.uri);
 
         if (!document) return;
 
