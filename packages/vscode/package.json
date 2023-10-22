@@ -76,13 +76,49 @@
         "configuration": "./languages/twig.configuration.json"
       }
     ],
+    "semanticTokenTypes": [
+      {
+        "id": "embedded_begin",
+        "superType": "embedded_delimiter",
+        "description": "Begin of embedded"
+      },
+      {
+        "id": "embedded_end",
+        "superType": "embedded_delimiter",
+        "description": "End of embedded"
+      },
+      {
+        "id": "null",
+        "superType": "constant",
+        "description": "null or none"
+      },
+      {
+        "id": "boolean",
+        "superType": "constant",
+        "description": "true or false"
+      }
+    ],
+    "configurationDefaults": {
+      "editor.semanticTokenColorCustomizations": {
+        "enabled": true,
+        "rules": {
+          "embedded_delimiter": {
+            "foreground": "#777777"
+          }
+        }
+      }
+    },
     "grammars": [
       {
         "language": "twig",
         "scopeName": "text.html.twig",
-        "path": "./syntaxes/twig.tmLanguage.json",
+        "path": "./syntaxes/html.tmLanguage.json",
         "embeddedLanguages": {
-          "text.html.derivative": "html"
+          "text.html": "html",
+          "source.twig": "twig",
+          "source.js": "javascript",
+          "source.json": "json",
+          "source.css": "css"
         }
       }
     ]

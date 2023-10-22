@@ -1,0 +1,45 @@
+{
+    "name": "twig",
+    "scopeName": "text.html.twig",
+    "injections": {
+        "text.html.twig - (meta.embedded | meta.tag), L:((text.html.twig meta.tag) - meta.embedded.block.twig), L:(source.js - meta.embedded.block.twig), L:(source.css - meta.embedded.block.twig)": {
+            "patterns": [
+                {
+                    "include": "#twig-tag"
+                }
+            ]
+        }
+    },
+    "patterns": [
+        {
+            "include": "text.html.derivative"
+        }
+    ],
+    "repository": {
+        "twig-tag": {
+            "patterns": [
+                {
+                    "begin": "\\{(\\{|\\%|\\#)",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "punctuation.section.embedded.begin.twig"
+                        }
+                    },
+                    "end": "(\\}|\\%|\\#)\\}",
+                    "endCaptures": {
+                        "0": {
+                            "name": "punctuation.section.embedded.end.twig"
+                        }
+                    },
+                    "name": "meta.embedded.block.twig",
+                    "contentName": "source.twig",
+                    "patterns": [
+                        {
+                            "include": "source.twig"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
