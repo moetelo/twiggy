@@ -1,3 +1,7 @@
+## v0.6.1 (2023-10-23)
+* Fix `wordPattern` for `include` and `source`.
+* Fix syntax highlighting for strings and dictionary literals.
+
 ## v0.6.0 (2023-10-22)
 * Collect loader paths from `debug:twig` command.
 * Better logging for `twigInfo`.
