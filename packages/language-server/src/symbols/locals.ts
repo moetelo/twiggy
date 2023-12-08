@@ -130,6 +130,21 @@ export function collectLocals(tree: IWalkable | null): LocalSymbolInformation {
                 const macro = toMacro(cursor.currentNode());
                 localSymbols.macro.push(macro);
                 continue;
+
+            case 'if':
+            case 'elseif':
+            case 'else':
+                cursor.gotoFirstChild();
+                continue;
+
+            case 'source_elements':
+                const sourceElementsLocals = collectLocals(cursor.currentNode());
+                localSymbols.variable.push(...sourceElementsLocals.variable);
+                localSymbols.macro.push(...sourceElementsLocals.macro);
+                localSymbols.block.push(...sourceElementsLocals.block);
+                localSymbols.imports.push(...sourceElementsLocals.imports);
+                cursor.gotoParent();
+                continue;
         }
     } while (cursor.gotoNextSibling());
 
