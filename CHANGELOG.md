@@ -1,3 +1,7 @@
+## v0.6.2 (2023-12-08)
+* Add completion for macroses inside of other macroses.
+* Add completion for variables defined inside of `if` block contents.
+
 ## v0.6.1 (2023-10-23)
 * Fix `wordPattern` for `include` and `source`.
 * Fix syntax highlighting for strings and dictionary literals.
