@@ -3,8 +3,9 @@ import { readFile } from 'fs/promises';
 import { DocumentUri } from 'vscode-languageserver';
 import Parser from 'web-tree-sitter';
 import { collectLocals } from '../symbols/locals';
-import { LocalSymbol, LocalSymbolInformation } from '../symbols/types';
+import { LocalSymbolInformation, TwigBlock, TwigMacro } from '../symbols/types';
 import { documentUriToFsPath } from '../utils/uri';
+import { pointToPosition, rangeContainsPosition } from '../utils/position';
 
 class NoTextError extends Error {
     get message() {
@@ -76,12 +77,21 @@ export class Document {
         this.setText(text);
     }
 
-    getBlock(name: string): LocalSymbol | undefined {
+    getBlock(name: string): TwigBlock | undefined {
         const symbol = this.locals.block.find((s) => s.name === name);
         if (symbol) return symbol;
 
         return this.locals.block
             .flatMap((b) => b.symbols.block)
             .find((s) => s.name === name);
+    }
+
+    getScopeAt(point: Parser.Point): TwigBlock | TwigMacro | undefined {
+        const scopes = [
+            ...this.locals.macro,
+            ...this.locals.block,
+        ];
+
+        return scopes.find((scope) => rangeContainsPosition(scope.range, pointToPosition(point)));
     }
 }
