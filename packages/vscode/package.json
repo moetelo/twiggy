@@ -129,7 +129,7 @@
     "typescript": "^5.1.3"
   },
   "dependencies": {
-    "twig-language-server": "workspace:*",
+    "twiggy-language-server": "workspace:*",
     "vscode-languageclient": "^9.0.0"
   }
 }

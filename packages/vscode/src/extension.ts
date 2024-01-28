@@ -1,4 +1,4 @@
-import { Command } from 'twig-language-server/src/commands/ExecuteCommandProvider';
+import { Command } from 'twiggy-language-server/src/commands/ExecuteCommandProvider';
 import {
   workspace,
   ExtensionContext,
@@ -129,7 +129,7 @@ async function addWorkspaceFolder(
   };
 
   const client = new LanguageClient(
-    'twig-language-server ' + workspaceUri,
+    'twiggy-language-server ' + workspaceUri,
     'Twig Language Server ' + workspaceUri,
     serverOptions,
     clientOptions

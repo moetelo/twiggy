@@ -52,7 +52,7 @@ importers:
 
   packages/vscode:
     dependencies:
-      twig-language-server:
+      twiggy-language-server:
         specifier: workspace:*
         version: link:../language-server
       vscode-languageclient:

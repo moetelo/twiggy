@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import type { BaseLanguageClient } from 'vscode-languageclient';
-import { AutoInsertRequest } from 'twig-language-server/src/customRequests/AutoInsertRequest';
+import { AutoInsertRequest } from 'twiggy-language-server/src/customRequests/AutoInsertRequest';
 
 export async function activate(
 	clients: BaseLanguageClient[],
