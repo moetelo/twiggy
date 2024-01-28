@@ -7,6 +7,7 @@ export const templateUsingFunctions = [
 export const templateUsingStatements = [
   'import',
   'from',
+  'embed',
   'include',
   'extends',
   'use',
