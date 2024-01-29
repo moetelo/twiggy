@@ -1,3 +1,6 @@
+## v0.6.3 (2024-01-29)
+* Support Go to Definition for `embed` statement.
+
 ## v0.6.2 (2023-12-08)
 * Add completion for macroses inside of other macroses.
 * Add completion for variables defined inside of `if` block contents.
