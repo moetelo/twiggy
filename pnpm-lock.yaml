@@ -17,9 +17,6 @@ importers:
       glob:
         specifier: ^10.3.10
         version: 10.3.10
-      tree-sitter-twig:
-        specifier: workspace:*
-        version: link:../tree-sitter-twig
       vscode-languageserver:
         specifier: ^8.1.0
         version: 8.1.0
