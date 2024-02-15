@@ -1,8 +1,7 @@
-import { Range, TextEdit } from 'vscode-languageserver';
-import * as proto from 'vscode-languageserver-protocol';
+import { Range, TextDocumentPositionParams, TextEdit } from 'vscode-languageserver';
 
 export namespace AutoInsertRequest {
-	export type ParamsType = proto.TextDocumentPositionParams & {
+	export type ParamsType = TextDocumentPositionParams & {
 		options: {
 			lastChange: {
 				range: Range;

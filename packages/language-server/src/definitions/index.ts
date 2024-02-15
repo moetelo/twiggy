@@ -16,10 +16,6 @@ import { rangeContainsPosition, pointToPosition } from '../utils/position';
 import { parseFunctionCall } from '../utils/node/parseFunctionCall';
 import { positionsEqual } from '../utils/position/comparePositions';
 
-export type onDefinitionHandlerReturn = ReturnType<
-    Parameters<Connection['onDefinition']>[0]
->;
-
 const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
     if (node.type !== 'string' || !node.parent) {
         return false;

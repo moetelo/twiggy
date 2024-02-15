@@ -1,6 +1,6 @@
 import { Range } from 'vscode-languageserver/node';
 
-export interface LocalSymbol {
+interface LocalSymbol {
     name: string;
     nameRange: Range;
 
