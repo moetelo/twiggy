@@ -58,10 +58,10 @@ async function buildProduction(options) {
         });
     }
 
-    if (isNpm) {
-        await cp('./dist', '../language-server/dist', { recursive: true });
-        await rm('../language-server/dist/extension.js');
+    await cp('./dist', '../language-server/dist', { recursive: true });
+    await rm('../language-server/dist/extension.js');
 
+    if (isNpm) {
         spawnSync('npm', ['publish'], {
             stdio: 'inherit',
             cwd: '../language-server',
