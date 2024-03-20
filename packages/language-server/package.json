@@ -9,7 +9,9 @@
     "url": "git+https://github.com/moetelo/twiggy.git",
     "directory": "packages/language-server"
   },
-  "bin": "bin/server.js",
+  "bin": {
+    "twiggy-language-server": "bin/server.js"
+  },
   "files": [
     "dist/",
     "bin/",

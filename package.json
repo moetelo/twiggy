@@ -1,7 +1,10 @@
 {
   "name": "twiggy-root",
   "version": "0.6.3",
-  "repository": "https://github.com/moetelo/twiggy",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moetelo/twiggy.git"
+  },
   "private": true,
   "scripts": {
     "build": "pnpm run --dir ./packages/vscode build",
