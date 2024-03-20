@@ -3,15 +3,16 @@
   "version": "0.6.6",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
-  "main": "dist/index.js",
+  "main": "dist/server.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/moetelo/twiggy.git",
     "directory": "packages/language-server"
   },
-  "bin": "./dist/server.js",
+  "bin": "bin/server.js",
   "files": [
     "dist/",
+    "bin/",
     "LICENSE",
     "README.md"
   ],
