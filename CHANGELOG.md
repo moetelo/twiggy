@@ -1,3 +1,6 @@
+## v0.6.8 (2024-03-20)
+* Remap console calls to connection console calls (@niksy)
+
 ## v0.6.3 (2024-01-29)
 * Support Go to Definition for `embed` statement.
 
