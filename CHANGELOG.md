@@ -1,3 +1,7 @@
+## v0.6.9 (2024-03-21)
+* Fix twig info discovery failing when XDebug errors to `stderr`.\
+    https://github.com/moetelo/twiggy/issues/6
+
 ## v0.6.8 (2024-03-20)
 * Remap console calls to connection console calls (@niksy)
 
