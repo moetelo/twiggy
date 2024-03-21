@@ -47,7 +47,7 @@ jobs:
       - name: pnpm publish
         run: |
             npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
-            pnpm publish
+            pnpm publish --no-git-checks
         working-directory: ./packages/language-server
 
       - name: Cache `tree-sitter-twig.wasm`.
