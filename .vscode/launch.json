@@ -25,7 +25,16 @@
       "outFiles": [
         "${workspaceRoot}/packages/vscode/dist/*",
       ]
-    }
+    },
+    {
+        "type": "node",
+        "request": "attach",
+        "name": "Attach to Server",
+        "address": "127.0.0.1",
+        "sourceMaps": true,
+        "smartStep": true,
+        "port": 9229,
+    },
   ],
   "compounds": [
     {
