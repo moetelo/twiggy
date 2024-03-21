@@ -9,7 +9,6 @@ import path from 'path';
 const isPublish = process.argv.includes('--publish');
 const isPackage = process.argv.includes('--package');
 const isDev = process.argv.includes('--dev');
-const isNpm = process.argv.includes('--npm');
 
 const treeSitterWasmPath = path.resolve('../language-server/node_modules/web-tree-sitter/tree-sitter.wasm');
 const grammarWasmRelativePath = path.resolve('../tree-sitter-twig/tree-sitter-twig.wasm');
@@ -35,6 +34,7 @@ const buildOptions = {
     assetNames: 'assets/[name]-[hash].[ext]',
 };
 
+
 /**
  * @param {esbuild.BuildOptions} options
  */
@@ -45,6 +45,9 @@ async function buildProduction(options) {
             'process.env.NODE_ENV': '"production"',
         },
     }).catch(() => process.exit(1));
+
+    await cp('./dist', '../language-server/dist', { recursive: true });
+    await rm('../language-server/dist/extension.js');
 
     const vsceCommand = isPublish
         ? 'publish'
@@ -57,17 +60,8 @@ async function buildProduction(options) {
             stdio: 'inherit',
         });
     }
-
-    await cp('./dist', '../language-server/dist', { recursive: true });
-    await rm('../language-server/dist/extension.js');
-
-    if (isNpm) {
-        spawnSync('npm', ['publish'], {
-            stdio: 'inherit',
-            cwd: '../language-server',
-        });
-    }
 }
+
 
 /**
  * @param {esbuild.BuildOptions} options
@@ -147,4 +141,3 @@ async function main() {
 }
 
 main();
-

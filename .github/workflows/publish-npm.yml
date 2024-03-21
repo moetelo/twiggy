@@ -7,7 +7,7 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 env:
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_PAT }}
+  NPM_TOKEN: ${{ secrets.NPM_PAT }}
 
 jobs:
   deploy:
@@ -36,12 +36,19 @@ jobs:
             - recursive: true
               args: [--frozen-lockfile, --strict-peer-dependencies]
 
+
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'pnpm'
 
-      - run: pnpm run build --npm
+      - run: pnpm build
+
+      - name: pnpm publish
+        run: |
+            npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
+            pnpm publish
+        working-directory: ./packages/language-server
 
       - name: Cache `tree-sitter-twig.wasm`.
         uses: actions/cache/save@v3
