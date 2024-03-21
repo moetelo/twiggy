@@ -1,5 +1,4 @@
 import {
-    ClientCapabilities,
     Connection,
     InitializeParams,
     ServerCapabilities,
@@ -29,7 +28,6 @@ export class Server {
     readonly documents = new TextDocuments(TextDocument);
     documentCache!: DocumentCache;
     workspaceFolder!: WorkspaceFolder;
-    clientCapabilities!: ClientCapabilities;
 
     definitionProvider!: DefinitionProvider;
     completionProvider!: CompletionProvider;
@@ -39,7 +37,6 @@ export class Server {
     constructor(connection: Connection) {
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
-            this.clientCapabilities = initializeParams.capabilities;
 
             const documentCache = new DocumentCache(this.workspaceFolder);
             this.documentCache = documentCache;
@@ -92,15 +89,13 @@ export class Server {
         });
 
         connection.onInitialized(async () => {
-            if (this.clientCapabilities.workspace?.didChangeConfiguration) {
-                new ConfigurationManager(
-                    connection,
-                    this.inlayHintProvider,
-                    this.bracketSpacesInsertionProvider,
-                    this.completionProvider,
-                    this.documentCache,
-                );
-            }
+            new ConfigurationManager(
+                connection,
+                this.inlayHintProvider,
+                this.bracketSpacesInsertionProvider,
+                this.completionProvider,
+                this.documentCache,
+            );
         });
 
         this.documents.onDidChangeContent(async ({ document }) => {
