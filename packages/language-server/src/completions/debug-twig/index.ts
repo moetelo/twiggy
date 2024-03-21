@@ -14,7 +14,6 @@ export async function getSectionsFromPhpDebugTwig(debugTwigCommand: string) {
 
     if (stderr) {
         console.error(stderr);
-        return undefined;
     }
 
     try {
