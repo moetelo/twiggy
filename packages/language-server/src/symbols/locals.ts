@@ -6,7 +6,6 @@ import {
     TwigMacro,
     TwigVariable,
 } from './types';
-import { IWalkable } from '../types/IWalkable';
 import { getNodeRange, getStringNodeValue } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 
@@ -89,7 +88,7 @@ function toImport(node: SyntaxNode): TwigImport {
     };
 }
 
-export function collectLocals(tree: IWalkable | null): LocalSymbolInformation {
+export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
     const localSymbols: LocalSymbolInformation = {
         variable: [],
         macro: [],

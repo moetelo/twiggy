@@ -64,7 +64,7 @@ export class Document {
         this.#text = text;
 
         this.#tree = parser.parse(this.#text);
-        this.#locals = collectLocals(this.#tree);
+        this.#locals = collectLocals(this.#tree.rootNode);
     }
 
     async ensureParsed(): Promise<void> {
