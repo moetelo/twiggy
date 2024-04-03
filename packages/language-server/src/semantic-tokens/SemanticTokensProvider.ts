@@ -3,6 +3,7 @@ import {
     SemanticTokens,
     SemanticTokensBuilder,
     Connection,
+    SemanticTokenTypes,
 } from 'vscode-languageserver';
 import { PreOrderCursorIterator } from '../utils/node';
 import { pointToPosition } from '../utils/position';
@@ -14,14 +15,14 @@ const tokenTypes = new Map<string, number>(
     semanticTokensLegend.tokenTypes.map((v, i) => [v, i]),
 );
 
-const functionTokenType = tokenTypes.get('function')!;
+const methodTokenType = tokenTypes.get(SemanticTokenTypes.method)!;
 
 const resolveTokenType = (node: TreeCursor) => {
     if (
         node.nodeType === 'property' &&
         node.currentNode().parent!.nextSibling?.type === 'arguments'
     ) {
-        return functionTokenType;
+        return methodTokenType;
     }
 
     return tokenTypes.get(node.nodeType);
