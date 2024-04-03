@@ -1,3 +1,8 @@
+## v0.7.0 (2024-04-04)
+* Complete routes from `bin/console debug:router` command.
+* Better `colorizedBracketPairs`
+* Use `method` token type in semantic tokenization.
+
 ## v0.6.9 (2024-03-21)
 * Fix twig info discovery failing when XDebug errors to `stderr`.\
     https://github.com/moetelo/twiggy/issues/6
