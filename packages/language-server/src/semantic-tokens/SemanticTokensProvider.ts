@@ -11,8 +11,8 @@ import { semanticTokensLegend } from './tokens-provider';
 import { TreeCursor } from 'web-tree-sitter';
 import { DocumentCache } from '../documents';
 
-const tokenTypes = new Map<string, number>(
-    semanticTokensLegend.tokenTypes.map((v, i) => [v, i]),
+const tokenTypes = new Map(
+    semanticTokensLegend.tokenTypes.map((tokenType, index) => [tokenType, index]),
 );
 
 const methodTokenType = tokenTypes.get(SemanticTokenTypes.method)!;

@@ -1,17 +1,18 @@
-import { SemanticTokensLegend } from 'vscode-languageserver';
+import { SemanticTokenTypes, SemanticTokensLegend } from 'vscode-languageserver';
 
 export const semanticTokensLegend: SemanticTokensLegend = {
   tokenTypes: [
-    'parameter',
-    'variable',
-    'property',
-    'function',
-    'method',
-    'keyword',
-    'comment',
-    'string',
-    'number',
-    'operator',
+    SemanticTokenTypes.parameter,
+    SemanticTokenTypes.variable,
+    SemanticTokenTypes.property,
+    SemanticTokenTypes.function,
+    SemanticTokenTypes.method,
+    SemanticTokenTypes.keyword,
+    SemanticTokenTypes.comment,
+    SemanticTokenTypes.string,
+    SemanticTokenTypes.number,
+    SemanticTokenTypes.operator,
+    SemanticTokenTypes.macro,
     'embedded_begin',
     'embedded_end',
     'null',
