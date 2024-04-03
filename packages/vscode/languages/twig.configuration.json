@@ -20,6 +20,11 @@
         ["'", "'"],
         ["\"", "\""]
     ],
+    "colorizedBracketPairs": [
+        ["(", ")"],
+        ["[", "]"],
+        ["{", "}"]
+    ],
     "wordPattern": "((?<=\\{%\\s+\\w+\\s+)([\"'].+?[\"'])|(?<=\\{\\{\\s*(include|source)\\()([\"'].+?[\"'])|([A-Za-z:_-]+)|([^'\"();{}%$<>/.,=|\\- ]+))",
     "indentationRules": {
         "increaseIndentPattern": "(<(?!\\?|(?:area|base|br|col|frame|hr|html|img|input|keygen|link|menuitem|meta|param|source|track|wbr)\\b|[^>]*\\/>)([-_\\.A-Za-z0-9]+)(?=\\s|>)\\b[^>]*>(?!.*<\\/\\1>)|<!--(?!.*-->)|\\{[^}\"']*|^\\s*\\{%\\s+?(block|if|macro|for|else).+?%\\})$",
