@@ -1,15 +1,13 @@
 export * from './types';
 
 import { exec } from '../../utils/exec';
-import { TwigDebugJsonOutput, parseSections } from './parse-sections';
+import { TwigDebugJsonOutput, parseDebugTwigOutput } from './parseDebugTwigOutput';
+import { TwigDebugRouterOutput } from './routes';
 
-export function generateDebugTwigCommand(phpBinConsoleCommand: string | undefined): string {
-    if (!phpBinConsoleCommand) return '';
+const runSymfonyCommand = async <TResult>(phpBinConsoleCommand: string | undefined, command: string): Promise<TResult | undefined> => {
+    if (!phpBinConsoleCommand) return undefined;
 
-    return phpBinConsoleCommand + ' debug:twig --format json';
-}
-
-export async function getSectionsFromPhpDebugTwig(debugTwigCommand: string) {
+    const debugTwigCommand = `${phpBinConsoleCommand} ${command} --format json`;
     const { stdout, stderr } = await exec(debugTwigCommand);
 
     if (stderr) {
@@ -17,10 +15,20 @@ export async function getSectionsFromPhpDebugTwig(debugTwigCommand: string) {
     }
 
     try {
-        const output: TwigDebugJsonOutput = JSON.parse(stdout);
-        return parseSections(output);
+        return JSON.parse(stdout) as TResult;
     } catch (e) {
         console.error(e);
         return undefined;
     }
-}
+};
+
+export const getSectionsFromSymfonyDebugTwig = async (phpBinConsoleCommand: string | undefined) => {
+    const output = await runSymfonyCommand<TwigDebugJsonOutput>(phpBinConsoleCommand, 'debug:twig');
+    if (!output) return;
+
+    return parseDebugTwigOutput(output);
+};
+
+export const getRoutesFromSymfonyDebugRouter = async (phpBinConsoleCommand: string | undefined) => {
+    return await runSymfonyCommand<TwigDebugRouterOutput>(phpBinConsoleCommand, 'debug:router');
+};

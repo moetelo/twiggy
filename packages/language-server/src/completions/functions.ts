@@ -1,7 +1,7 @@
 import {
-  CompletionItem,
-  CompletionItemKind,
-  InsertTextFormat,
+    CompletionItem,
+    CompletionItemKind,
+    InsertTextFormat,
 } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../staticCompletionInfo';

@@ -1,7 +1,11 @@
 import { Connection, DidChangeConfigurationNotification, DidChangeConfigurationParams } from 'vscode-languageserver';
 import { LanguageServerSettings } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
-import { TemplatePathMapping, generateDebugTwigCommand, getSectionsFromPhpDebugTwig } from '../completions/debug-twig';
+import {
+    TemplatePathMapping,
+    getRoutesFromSymfonyDebugRouter,
+    getSectionsFromSymfonyDebugTwig,
+} from '../completions/debug-twig';
 import { DocumentCache } from '../documents';
 import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
 import { CompletionProvider } from '../completions/CompletionProvider';
@@ -30,31 +34,32 @@ export class ConfigurationManager {
         this.bracketSpacesInsertionProvider.isEnabled = config?.autoInsertSpaces ?? true;
 
         const phpBinConsoleCommand = config?.phpBinConsoleCommand?.trim();
-        const debugTwigCommand = generateDebugTwigCommand(phpBinConsoleCommand);
+        const debugTwigResult = await getSectionsFromSymfonyDebugTwig(phpBinConsoleCommand);
+        const debugRouterResult = await getRoutesFromSymfonyDebugRouter(phpBinConsoleCommand);
 
-        const twigInfo = debugTwigCommand
-            ? await getSectionsFromPhpDebugTwig(debugTwigCommand)
-            : undefined;
-
-        if (twigInfo) {
-            console.info(`Collected information from the output of '${debugTwigCommand}'.`);
+        if (debugTwigResult) {
+            console.info(`Collected information from the output of Symfony.`);
             console.info(
-                `Detected ${twigInfo.Functions.length} functions, ${twigInfo.Filters.length} filters,`
-                + ` ${twigInfo.Globals.length} globals and ${twigInfo.LoaderPaths.length} loader paths.`,
+                `Detected ${debugTwigResult.Functions.length} functions, ${debugTwigResult.Filters.length} filters,`
+                + ` ${debugTwigResult.Globals.length} globals and ${debugTwigResult.LoaderPaths.length} loader paths.`,
             );
-        } else if (!debugTwigCommand) {
+        } else if (!phpBinConsoleCommand) {
             console.info(
                 'The `twiggy.phpBinConsoleCommand` setting is empty.'
                 + ' If your project uses Symfony, please set it in the extension settings for better language server features.',
             );
         } else {
             console.error(
-                `Could not collect any information from the output of the '${debugTwigCommand}'.`
+                `Could not collect any information from the output of Symfony.`
                 + ` Either the project doesn't use Symfony or the command is not correct.`,
             );
         }
 
-        this.completionProvider.twigInfo = twigInfo;
-        this.documentCache.templateMappings = twigInfo?.LoaderPaths || [];
+        this.completionProvider.twigInfo = debugTwigResult;
+        this.completionProvider.symfonyPathNames = debugRouterResult
+            ? Object.keys(debugRouterResult)
+            : [];
+
+        this.documentCache.templateMappings = debugTwigResult?.LoaderPaths || [];
     }
 }
