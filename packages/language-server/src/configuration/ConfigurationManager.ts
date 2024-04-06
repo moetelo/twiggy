@@ -2,16 +2,18 @@ import {
     Connection,
     DidChangeConfigurationNotification,
     DidChangeConfigurationParams,
+    WorkspaceFolder,
 } from 'vscode-languageserver';
-import { LanguageServerSettings } from './LanguageServerSettings';
+import { LanguageServerSettings, PhpFramework } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
 import { TemplatePathMapping, TwigEnvironment } from '../twigEnvironment/types';
 import { DocumentCache } from '../documents';
 import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
 import { CompletionProvider } from '../completions/CompletionProvider';
-import * as symfony from '../twigEnvironment/symfony';
 import { fileStat } from '../utils/files/fileStat';
 import { SignatureHelpProvider } from '../signature-helps/SignatureHelpProvider';
+import { getRoutes, getTwigEnvironment } from '../twigEnvironment';
+import { documentUriToFsPath } from '../utils/uri';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -24,6 +26,7 @@ export class ConfigurationManager {
         inlayHints: InlayHintProvider.defaultSettings,
         phpExecutable: 'php',
         symfonyConsolePath: './bin/console',
+        framework: PhpFramework.Symfony,
     };
 
     constructor(
@@ -33,6 +36,7 @@ export class ConfigurationManager {
         private readonly completionProvider: CompletionProvider,
         private readonly signatureHelpProvider: SignatureHelpProvider,
         private readonly documentCache: DocumentCache,
+        private readonly workspaceFolder: WorkspaceFolder,
     ) {
         connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
         connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
@@ -44,28 +48,42 @@ export class ConfigurationManager {
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
 
+        this.applySettings(undefined, []);
+
         if (config.phpBinConsoleCommand) {
             console.warn('`twiggy.phpBinConsoleCommand` does not work anymore. Use `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` instead.');
         }
 
-        if (!config.phpExecutable || !config.symfonyConsolePath) {
-            this.applySettings(undefined, []);
-            console.warn('`twiggy.phpExecutable` or `twiggy.symfonyConsolePath` not configured. Some features will be disabled.');
+        if (!config.framework) {
+            console.warn('`twiggy.framework` is required. Ignore this if your framework is not supported.');
             return;
         }
 
-        if (!await fileStat(config.symfonyConsolePath)) {
-            this.applySettings(undefined, []);
+        if (!config.phpExecutable) {
+            console.warn('`twiggy.phpExecutable` is not configured. Some features will be disabled.');
+            return;
+        }
+
+        if (
+            config.framework === PhpFramework.Symfony
+            && (!config.symfonyConsolePath || !await fileStat(config.symfonyConsolePath))
+        ) {
             console.warn(
                 `Symfony console file not found at ${config.symfonyConsolePath}.\n`
-                + 'For Symfony project, set `twiggy.phpExecutable` and `twiggy.symfonyConsolePath`.\n'
-                + 'Ignore this warning if you are not using Symfony.');
+                + 'For Symfony project, set `twiggy.phpExecutable` and `twiggy.symfonyConsolePath`.');
             return;
         }
 
-        const twigEnvironment = await symfony.getTwigEnvironment(config.phpExecutable, config.symfonyConsolePath);
-        const routeNameToPath = await symfony.getRoutes(config.phpExecutable, config.symfonyConsolePath);
-        const routeNames = routeNameToPath ? Object.keys(routeNameToPath) : [];
+        const twigEnvironmentArgs = {
+            phpExecutable: config.phpExecutable,
+            symfonyConsolePath: config.symfonyConsolePath,
+            workspaceDirectory: documentUriToFsPath(this.workspaceFolder.uri),
+            framework: config.framework,
+        };
+
+        const twigEnvironment = await getTwigEnvironment(twigEnvironmentArgs);
+        const routeNameToPath = await getRoutes(twigEnvironmentArgs);
+        const routeNames = Object.keys(routeNameToPath);
 
         if (twigEnvironment) {
             console.info(

@@ -1,0 +1,38 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+namespace Twiggy;
+
+[, $TWIGGY_UTILS_DIR, $WORKSPACE_DIR, $APP_KERNEL_NAME] = $argv;
+
+require_once $TWIGGY_UTILS_DIR . DIRECTORY_SEPARATOR . 'getTwigMetadata.php';
+
+$VENDOR_PATH = $WORKSPACE_DIR . DIRECTORY_SEPARATOR . 'vendor';
+
+require_once $VENDOR_PATH . DIRECTORY_SEPARATOR . 'autoload.php';
+
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+class_alias($APP_KERNEL_NAME, 'Twiggy\DynamicKernel');
+
+class TwiggyCliKernel extends DynamicKernel implements CompilerPassInterface
+{
+    public function process(ContainerBuilder $container): void
+    {
+        $container->getDefinition('twig')->setPublic(true);
+    }
+
+    public function getTwig(): \Twig\Environment
+    {
+        return $this->getContainer()->get('twig');
+    }
+}
+
+$kernel = new TwiggyCliKernel('dev', true);
+$kernel->boot();
+
+$twig = $kernel->getTwig();
+$twigMetadata = \Twiggy\getTwigMetadata($twig, 'symfony');
+echo json_encode($twigMetadata, JSON_PRETTY_PRINT) . PHP_EOL;

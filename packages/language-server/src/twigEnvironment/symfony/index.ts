@@ -14,7 +14,7 @@ const runSymfonyCommand = async <TResult>(
     }
 
     if (!stdout) {
-        return;
+        return undefined;
     }
 
     try {
@@ -35,5 +35,6 @@ export const getTwigEnvironment = async (phpExecutable: string, symfonyConsolePa
 export type RouteNameToPathRecord = Record<string, { path: string }>;
 
 export const getRoutes = async (phpExecutable: string, symfonyConsolePath: string) => {
-    return await runSymfonyCommand<RouteNameToPathRecord>(phpExecutable, symfonyConsolePath, 'debug:router');
+    return await runSymfonyCommand<RouteNameToPathRecord>(phpExecutable, symfonyConsolePath, 'debug:router')
+        || {};
 };

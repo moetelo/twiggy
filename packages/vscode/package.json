@@ -67,6 +67,15 @@
           "default": "php",
           "markdownDescription": "Points to the PHP executable."
         },
+        "twiggy.framework": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "symfony",
+            "craft"
+          ],
+          "markdownDescription": "Framework to use."
+        },
         "twiggy.symfonyConsolePath": {
           "type": "string",
           "scope": "resource",

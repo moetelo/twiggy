@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+namespace Twiggy;
+
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'getTwigMetadata.php';
+
+[, $WORKSPACE_DIR] = $argv;
+
+$VENDOR_PATH = $WORKSPACE_DIR . DIRECTORY_SEPARATOR . 'vendor';
+
+require_once $WORKSPACE_DIR . '/bootstrap.php';
+
+// TODO: This doesn't disable the error handler.
+const YII_ENABLE_ERROR_HANDLER = false;
+
+/** @var craft\web\Application $app */
+$app = require $VENDOR_PATH . '/craftcms/cms/bootstrap/web.php';
+
+$view = $app->getView();
+$twig = $view->getTwig();
+$templateRoots = $view->getSiteTemplateRoots();
+
+$twigMetadata = \Twiggy\getTwigMetadata($twig, 'craft');
+
+echo json_encode($twigMetadata, JSON_PRETTY_PRINT) . PHP_EOL;

@@ -12,6 +12,7 @@ const isDev = process.argv.includes('--dev');
 
 const treeSitterWasmPath = path.resolve('../language-server/node_modules/web-tree-sitter/tree-sitter.wasm');
 const grammarWasmRelativePath = path.resolve('../tree-sitter-twig/tree-sitter-twig.wasm');
+const phpUtilsPath = path.resolve('../language-server/phpUtils');
 
 /**
  * @type {esbuild.BuildOptions}
@@ -122,16 +123,18 @@ async function main() {
     await rm('../language-server/dist', { force: true, recursive: true });
 
     const grammarWasmExists = await stat(grammarWasmRelativePath).then(() => true).catch(() => false);
-    console.log({ grammarWasmExists });
+    console.info({ grammarWasmExists });
 
     if (!grammarWasmExists) {
-        console.log('Building wasm grammar. This may take a while.');
+        console.info('Building wasm grammar. This may take a while.');
         execSync('pnpm --workspace-root run build-grammar-wasm', { stdio: 'inherit' })
     }
 
     // Include wasm grammar
     await cp(treeSitterWasmPath, './dist/tree-sitter.wasm');
     await cp(grammarWasmRelativePath, './dist/tree-sitter-twig.wasm');
+
+    await cp(phpUtilsPath, './dist/phpUtils', { recursive: true });
 
     if (!isDev) {
         await buildProduction(buildOptions);

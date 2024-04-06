@@ -97,6 +97,7 @@ export class Server {
                 this.completionProvider,
                 this.signatureHelpProvider,
                 this.documentCache,
+                this.workspaceFolder,
             );
         });
 
