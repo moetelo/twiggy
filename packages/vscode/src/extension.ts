@@ -18,7 +18,7 @@ import {
 } from 'vscode-languageclient/node';
 import { unwrapCompletionArray } from './utils/unwrapCompletionArray';
 
-const outputChannel = window.createOutputChannel('Twig Language Server');
+const outputChannel = window.createOutputChannel('Twiggy Language Server');
 const clients = new Map<string, LanguageClient>();
 
 export function activate(context: ExtensionContext) {
@@ -130,7 +130,7 @@ async function addWorkspaceFolder(
 
   const client = new LanguageClient(
     'twiggy-language-server ' + workspaceUri,
-    'Twig Language Server ' + workspaceUri,
+    'Twiggy Language Server ' + workspaceUri,
     serverOptions,
     clientOptions
   );

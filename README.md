@@ -13,26 +13,27 @@ This is a fork of [kaermorchen/twig-language-server (Modern Twig)](https://githu
 ## Completion
 ![Completion](https://github.com/moetelo/twiggy/assets/17011936/b5a7b411-b7c3-4411-b4bb-c3a244dc71f6)
 
-> **Note**
-> Completion for user-defined functions and filters works if you set `twiggy.phpBinConsoleCommand` setting in VS Code.
+> [!TIP]
+> For better completion in Symfony, configure `twiggy.phpExecutable` and `twiggy.symfonyConsolePath`.
 
 ## Inlay hints
 ![inlay hints](https://github.com/moetelo/twiggy/assets/17011936/ae833425-06e9-4c55-84d2-47b152bae51a)
 
 # Setup
-1. In VS Code, open Command Palette (`Ctrl+P`), type `ext install moetelo.twiggy` and press `Enter`.
-1. For Symfony project, set `twiggy.phpBinConsoleCommand` in the VS Code settings.
-1. Check the extension output (`Twig Language Server`) for errors.
+## VS Code
+1. Open Command Palette (`Ctrl+P`), type `ext install moetelo.twiggy` and press `Enter`.
+1. For Symfony project, set `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` in the VS Code settings.
+1. Check the extension output (`Twiggy Language Server`) for errors.
 
-[File an issue](https://github.com/moetelo/twiggy/issues/new) if you have any problems or the feature you want is missing.
+[Submit new issue](https://github.com/moetelo/twiggy/issues/new) if you have any problems or the feature you want is missing.
 
 
-## Development
+# Development
 1. Install [pnpm](https://pnpm.io/installation).
 1. `pnpm install` in the project dir.
 1. Press F5 in VS Code to start debugging.
 
 #### Monorepo
-- [Twig Language Server](packages/language-server/)
+- [Twiggy Language Server](packages/language-server/)
 - [VSCode Twig extension](packages/vscode/)
 - [tree-sitter-twig](packages/tree-sitter-twig/)

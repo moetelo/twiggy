@@ -6,16 +6,17 @@ import { localVariables } from './local-variables';
 import { functions } from './functions';
 import { filters } from './filters';
 import { forLoop } from './for-loop';
-import { TwigEnvironment } from '../twigEnvironment/types';
+import { TemplatePathMapping, TwigEnvironment } from '../twigEnvironment/types';
 import { variableProperties } from './variableProperties';
 import { snippets } from './snippets';
 import { keywords } from './keywords';
 import { DocumentCache } from '../documents';
-import { symfonyPathNames } from './symfonyPaths';
+import { symfonyRouteNames } from './routes';
 
 export class CompletionProvider {
-    twigInfo?: TwigEnvironment;
-    symfonyPathNames: string[] = [];
+    twigEnvironment?: TwigEnvironment;
+    templateMappings: TemplatePathMapping[] = [];
+    symfonyRouteNames: string[] = [];
 
     constructor(
         private readonly connection: Connection,
@@ -45,15 +46,15 @@ export class CompletionProvider {
             ...keywords(cursorNode),
             ...localVariables(document, cursorNode),
             ...forLoop(cursorNode),
-            ...globalVariables(cursorNode, this.twigInfo?.Globals || []),
-            ...functions(cursorNode, this.twigInfo?.Functions || []),
-            ...filters(cursorNode, this.twigInfo?.Filters || []),
-            ...symfonyPathNames(cursorNode, this.symfonyPathNames),
+            ...globalVariables(cursorNode, this.twigEnvironment?.Globals || []),
+            ...functions(cursorNode, this.twigEnvironment?.Functions || []),
+            ...filters(cursorNode, this.twigEnvironment?.Filters || []),
+            ...symfonyRouteNames(cursorNode, this.symfonyRouteNames),
             ...await variableProperties(document, this.documentCache, cursorNode),
             ...await templatePaths(
                 cursorNode,
                 this.workspaceFolder.uri,
-                this.twigInfo?.LoaderPaths || [],
+                this.templateMappings,
             ),
         ];
     }

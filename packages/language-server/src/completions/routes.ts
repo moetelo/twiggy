@@ -17,11 +17,11 @@ const isInStringInsideOfPathCall = (cursorNode: SyntaxNode): boolean => {
         && cursorNode.parent.parent!.childForFieldName('name')?.text === 'path';
 }
 
-export function symfonyPathNames(cursorNode: SyntaxNode, pathNames: string[]): CompletionItem[] {
+export function symfonyRouteNames(cursorNode: SyntaxNode, routeNames: string[]): CompletionItem[] {
     if (isInStringInsideOfPathCall(cursorNode)) {
-        const completions: CompletionItem[] = pathNames.map((pathName) => ({
+        const completions: CompletionItem[] = routeNames.map((routeName) => ({
             ...commonCompletionItem,
-            label: pathName,
+            label: routeName,
         }));
 
         return completions;

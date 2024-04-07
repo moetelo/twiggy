@@ -4,9 +4,9 @@ import {
     TwigEnvironment,
     TwigFunctionLike,
     TwigVariable,
-} from '../../twigEnvironment/types';
+} from '../types';
 
-export interface TwigDebugJsonOutput {
+export interface SymfonyTwigDebugJsonOutput {
     functions: Record<string, string[]>;
     filters: Record<string, string[]>;
     globals: Record<string, any>;
@@ -41,7 +41,7 @@ const toTemplateMappings = ([namespaceRaw, directories]: [string, string[]]): Te
     }));
 };
 
-export const parseDebugTwigOutput = (output: TwigDebugJsonOutput): TwigEnvironment => ({
+export const parseDebugTwigOutput = (output: SymfonyTwigDebugJsonOutput): TwigEnvironment => ({
     Filters: Object.entries(output.filters).map(toFunctionLike),
     Functions: Object.entries(output.functions).map(toFunctionLike),
     Globals: Object.entries(output.globals).map(toTwigVariable),

@@ -57,8 +57,21 @@
         },
         "twiggy.phpBinConsoleCommand": {
           "type": "string",
+          "markdownDeprecationMessage": "Use `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` instead.",
           "scope": "resource",
           "markdownDescription": "Shell command that will be used for PHP command execution. \n\ne.g. `php bin/console` \n\nSee: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
+        },
+        "twiggy.phpExecutable": {
+          "type": "string",
+          "scope": "resource",
+          "default": "php",
+          "markdownDescription": "Points to the PHP executable."
+        },
+        "twiggy.symfonyConsolePath": {
+          "type": "string",
+          "scope": "resource",
+          "default": "bin/console",
+          "markdownDescription": "Path to the Symfony console. See: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
         }
       }
     },
