@@ -1,7 +1,8 @@
 import { promisify } from 'node:util';
+import { exec as execCb } from 'node:child_process';
+
+export const execPromisified = promisify(execCb);
 
 export const exec = (cmd: string): Promise<{ stdout: string, stderr: string }> => {
-    const execPromiseFunc: (cmd: string) => Promise<{ stdout: string; stderr: string }> = promisify(require('node:child_process').exec);
-
-    return execPromiseFunc(cmd).catch((err) => ({ stdout: '', stderr: err as string }))
+    return execPromisified(cmd).catch((err) => ({ stdout: '', stderr: err.message }))
 };
