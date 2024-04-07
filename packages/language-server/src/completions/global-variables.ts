@@ -1,7 +1,7 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigGlobalVariables } from '../staticCompletionInfo';
-import { TwigVariable } from './debug-twig';
+import { TwigVariable } from '../twigEnvironment/types';
 import { isEmptyEmbedded } from '../utils/node';
 
 const commonCompletionItem: Partial<CompletionItem> = {

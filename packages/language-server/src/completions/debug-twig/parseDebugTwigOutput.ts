@@ -1,4 +1,10 @@
-import { TemplateNamespace, TemplatePathMapping, TwigDebugInfo, TwigFunctionLike, TwigVariable } from './types';
+import {
+    TemplateNamespace,
+    TemplatePathMapping,
+    TwigEnvironment,
+    TwigFunctionLike,
+    TwigVariable,
+} from '../../twigEnvironment/types';
 
 export interface TwigDebugJsonOutput {
     functions: Record<string, string[]>;
@@ -35,7 +41,7 @@ const toTemplateMappings = ([namespaceRaw, directories]: [string, string[]]): Te
     }));
 };
 
-export const parseDebugTwigOutput = (output: TwigDebugJsonOutput): TwigDebugInfo => ({
+export const parseDebugTwigOutput = (output: TwigDebugJsonOutput): TwigEnvironment => ({
     Filters: Object.entries(output.filters).map(toFunctionLike),
     Functions: Object.entries(output.functions).map(toFunctionLike),
     Globals: Object.entries(output.globals).map(toTwigVariable),

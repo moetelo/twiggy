@@ -6,7 +6,7 @@ import {
     templateUsingStatements,
 } from '../constants/template-usage';
 import getTwigFiles from '../utils/getTwigFiles';
-import { TemplatePathMapping } from './debug-twig';
+import { TemplatePathMapping } from '../twigEnvironment/types';
 import { documentUriToFsPath } from '../utils/uri';
 
 export async function templatePaths(

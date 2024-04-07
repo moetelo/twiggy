@@ -6,7 +6,7 @@ import { localVariables } from './local-variables';
 import { functions } from './functions';
 import { filters } from './filters';
 import { forLoop } from './for-loop';
-import { TwigDebugInfo } from './debug-twig';
+import { TwigEnvironment } from '../twigEnvironment/types';
 import { variableProperties } from './variableProperties';
 import { snippets } from './snippets';
 import { keywords } from './keywords';
@@ -14,7 +14,7 @@ import { DocumentCache } from '../documents';
 import { symfonyPathNames } from './symfonyPaths';
 
 export class CompletionProvider {
-    twigInfo?: TwigDebugInfo;
+    twigInfo?: TwigEnvironment;
     symfonyPathNames: string[] = [];
 
     constructor(

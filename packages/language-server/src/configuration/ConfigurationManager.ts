@@ -1,8 +1,8 @@
 import { Connection, DidChangeConfigurationNotification, DidChangeConfigurationParams } from 'vscode-languageserver';
 import { LanguageServerSettings } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
+import { TemplatePathMapping } from '../twigEnvironment/types';
 import {
-    TemplatePathMapping,
     getRoutesFromSymfonyDebugRouter,
     getSectionsFromSymfonyDebugTwig,
 } from '../completions/debug-twig';

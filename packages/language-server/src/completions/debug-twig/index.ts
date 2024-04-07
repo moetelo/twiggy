@@ -1,5 +1,3 @@
-export * from './types';
-
 import { exec } from '../../utils/exec';
 import { TwigDebugJsonOutput, parseDebugTwigOutput } from './parseDebugTwigOutput';
 import { TwigDebugRouterOutput } from './routes';

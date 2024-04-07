@@ -5,7 +5,7 @@ import {
 } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../staticCompletionInfo';
-import { TwigFunctionLike } from './debug-twig';
+import { TwigFunctionLike } from '../twigEnvironment/types';
 import { isEmptyEmbedded } from '../utils/node';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 
