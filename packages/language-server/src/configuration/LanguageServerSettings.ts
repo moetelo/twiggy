@@ -4,6 +4,11 @@ export type InlayHintSettings = {
     block: boolean,
 };
 
+export const enum PhpFramework {
+    Symfony = 'symfony',
+    Craft = 'craft',
+}
+
 export type LanguageServerSettings = {
     autoInsertSpaces: boolean,
     inlayHints: InlayHintSettings,
@@ -13,6 +18,8 @@ export type LanguageServerSettings = {
      * Used only for warning.
      * */
     phpBinConsoleCommand?: string,
+
+    framework?: PhpFramework,
     phpExecutable: string,
     symfonyConsolePath: string,
 };

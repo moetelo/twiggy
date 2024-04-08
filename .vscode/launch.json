@@ -35,6 +35,12 @@
         "smartStep": true,
         "port": 9229,
     },
+    {
+        "name": "Listen for XDebug",
+        "type": "php",
+        "request": "launch",
+        "port": 9003,
+    },
   ],
   "compounds": [
     {
