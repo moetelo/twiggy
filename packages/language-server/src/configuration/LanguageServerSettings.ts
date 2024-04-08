@@ -5,6 +5,7 @@ export type InlayHintSettings = {
 };
 
 export const enum PhpFramework {
+    Ignore = 'ignore',
     Symfony = 'symfony',
     Craft = 'craft',
 }

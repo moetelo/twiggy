@@ -72,7 +72,8 @@
           "scope": "resource",
           "enum": [
             "symfony",
-            "craft"
+            "craft",
+            "ignore"
           ],
           "markdownDescription": "Framework to use."
         },

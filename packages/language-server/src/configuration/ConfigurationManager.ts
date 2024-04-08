@@ -54,8 +54,12 @@ export class ConfigurationManager {
             console.warn('`twiggy.phpBinConsoleCommand` does not work anymore. Use `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` instead.');
         }
 
+        if (config.framework === PhpFramework.Ignore) {
+            return;
+        }
+
         if (!config.framework) {
-            console.warn('`twiggy.framework` is required. Ignore this if your framework is not supported.');
+            console.warn('`twiggy.framework` is required.');
             return;
         }
 

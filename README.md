@@ -1,5 +1,5 @@
 <p>
-  <h1 align="center">Twiggy</h1>
+    <h1 align="center">Twiggy</h1>
 </p>
 
 VSCode Marketplace: [Twiggy](https://marketplace.visualstudio.com/items?itemName=moetelo.twiggy)
@@ -14,7 +14,7 @@ This is a fork of [kaermorchen/twig-language-server (Modern Twig)](https://githu
 ![Completion](https://github.com/moetelo/twiggy/assets/17011936/b5a7b411-b7c3-4411-b4bb-c3a244dc71f6)
 
 > [!TIP]
-> For better completion in Symfony, configure `twiggy.phpExecutable` and `twiggy.symfonyConsolePath`.
+> For better completion in Symfony or Craft CMS, configure `twiggy.framework` and follow the extension output (`Twiggy Language Server`).
 
 ## Inlay hints
 ![inlay hints](https://github.com/moetelo/twiggy/assets/17011936/ae833425-06e9-4c55-84d2-47b152bae51a)
