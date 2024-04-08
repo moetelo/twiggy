@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Twiggy;
 
+define('YII_ENABLE_ERROR_HANDLER', false);
+define('YII_ENABLE_EXCEPTION_HANDLER', false);
+
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'getTwigMetadata.php';
 
 [, $WORKSPACE_DIR] = $argv;
@@ -12,10 +15,7 @@ $VENDOR_PATH = $WORKSPACE_DIR . DIRECTORY_SEPARATOR . 'vendor';
 
 require_once $WORKSPACE_DIR . '/bootstrap.php';
 
-// TODO: This doesn't disable the error handler.
-const YII_ENABLE_ERROR_HANDLER = false;
-
-/** @var craft\web\Application $app */
+/** @var \craft\web\Application $app */
 $app = require $VENDOR_PATH . '/craftcms/cms/bootstrap/web.php';
 
 $view = $app->getView();

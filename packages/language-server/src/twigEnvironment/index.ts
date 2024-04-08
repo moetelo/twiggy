@@ -3,6 +3,7 @@ import { getPhpVersion } from './phpVersion';
 import * as symfony from './symfony';
 import * as craft from './craft';
 import { PhpFramework } from '../configuration/LanguageServerSettings';
+import { isProcessError } from '../utils/exec';
 
 
 export type GetTwigEnvironmentArgs = {
@@ -38,6 +39,11 @@ export const getTwigEnvironment = async (args: GetTwigEnvironmentArgs): Promise<
             return await craft.getTwigEnvironment(phpExecutable, workspaceDirectory);
         } catch (error) {
             console.error('Error while getting Twig environment:\n' + (error as Error).message);
+
+            if (isProcessError(error)) {
+                console.error(error.stdout + error.stderr);
+            }
+
             return undefined;
         }
     }
