@@ -1,3 +1,12 @@
+## v0.8.0 (2024-04-08)
+* Provide Twig environment for Craft. \
+    https://github.com/moetelo/twiggy/issues/10 \
+    Thanks to @marcusgaius for suggestions and testing.
+* Provide signature information for Twig environment functions (e.g. functions/filters collected from Symfony console).
+* Provide default settings and mappings.
+* Remove `twiggy.phpBinConsoleCommand` in favor of `twiggy.phpExecutable` and `twiggy.symfonyConsolePath`.
+* Add a VS Code message to explain what needs to be configured.
+
 ## v0.7.0 (2024-04-04)
 * Complete routes from `bin/console debug:router` command.
 * Better `colorizedBracketPairs`

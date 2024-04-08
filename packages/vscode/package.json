@@ -4,7 +4,7 @@
   "description": "Twig language support for VS Code",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "engines": {
     "vscode": "^1.74.0"
   },
