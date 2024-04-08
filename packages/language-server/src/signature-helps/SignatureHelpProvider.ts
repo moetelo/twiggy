@@ -3,8 +3,11 @@ import { findNodeByPosition } from '../utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctionsSignatureInformation } from './staticSignatureInformation';
 import { Document, DocumentCache } from '../documents';
+import { TwigEnvironment, TwigFunctionLike } from '../twigEnvironment/types';
 
 export class SignatureHelpProvider {
+    signatureCache: Map<string, SignatureInformation> = new Map();
+
     constructor(
         connection: Connection,
         private readonly documentCache: DocumentCache,
@@ -12,6 +15,20 @@ export class SignatureHelpProvider {
         connection.onSignatureHelp(
             this.provideSignatureHelp.bind(this),
         );
+    }
+
+    initialize(twigEnvironment: TwigEnvironment | undefined) {
+        this.signatureCache.clear();
+
+        if (!twigEnvironment) return;
+
+        for (const fun of twigEnvironment.Functions) {
+            this.signatureCache.set(fun.identifier, this.mapToSignatureInformation(fun));
+        }
+
+        for (const fun of twigEnvironment.Filters) {
+            this.signatureCache.set(fun.identifier, this.mapToSignatureInformation(fun));
+        }
     }
 
     async provideSignatureHelp(
@@ -60,10 +77,26 @@ export class SignatureHelpProvider {
         } as SignatureHelp;
     }
 
+    mapToSignatureInformation(item: TwigFunctionLike): SignatureInformation {
+        const paramsStr = item.arguments
+            .map(({ identifier, defaultValue }) => defaultValue ? `${identifier} = ${defaultValue}` : identifier)
+            .join(', ');
+
+        return {
+            label: `${item.identifier}(${paramsStr})`,
+            parameters: item.arguments.map(arg => ({
+                label: arg.identifier,
+            })),
+        };
+    }
+
+
     async getSignatureInformation(document: Document, functionName: string): Promise<SignatureInformation | undefined> {
         const twigHardcodedSignature = twigFunctionsSignatureInformation.get(functionName);
-
         if (twigHardcodedSignature) return twigHardcodedSignature;
+
+        const twigEnvironmentSignature = this.signatureCache.get(functionName);
+        if (twigEnvironmentSignature) return twigEnvironmentSignature;
 
         if (functionName.includes('.')) {
             const [ importName, macroName ] = functionName.split('.');
@@ -85,5 +118,7 @@ export class SignatureHelpProvider {
                 parameters: macro.args.map(arg => ({ label: arg.name })),
             };
         }
+
+        return undefined;
     }
 }

@@ -33,6 +33,7 @@ export class Server {
     completionProvider!: CompletionProvider;
     bracketSpacesInsertionProvider!: BracketSpacesInsertionProvider;
     inlayHintProvider!: InlayHintProvider;
+    signatureHelpProvider!: SignatureHelpProvider;
 
     constructor(connection: Connection) {
         connection.onInitialize(async (initializeParams: InitializeParams) => {
@@ -46,7 +47,7 @@ export class Server {
             new SemanticTokensProvider(connection, documentCache);
             new SymbolProvider(connection, documentCache);
             new HoverProvider(connection, documentCache);
-            new SignatureHelpProvider(connection, documentCache);
+            this.signatureHelpProvider = new SignatureHelpProvider(connection, documentCache);
             this.definitionProvider = new DefinitionProvider(connection, documentCache);
             this.completionProvider = new CompletionProvider(
                 connection,
@@ -94,6 +95,7 @@ export class Server {
                 this.inlayHintProvider,
                 this.bracketSpacesInsertionProvider,
                 this.completionProvider,
+                this.signatureHelpProvider,
                 this.documentCache,
             );
         });

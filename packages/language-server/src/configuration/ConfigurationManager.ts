@@ -11,6 +11,7 @@ import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesI
 import { CompletionProvider } from '../completions/CompletionProvider';
 import * as symfony from '../twigEnvironment/symfony';
 import { fileStat } from '../utils/files/fileStat';
+import { SignatureHelpProvider } from '../signature-helps/SignatureHelpProvider';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -30,6 +31,7 @@ export class ConfigurationManager {
         private readonly inlayHintProvider: InlayHintProvider,
         private readonly bracketSpacesInsertionProvider: BracketSpacesInsertionProvider,
         private readonly completionProvider: CompletionProvider,
+        private readonly signatureHelpProvider: SignatureHelpProvider,
         private readonly documentCache: DocumentCache,
     ) {
         connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
@@ -92,6 +94,8 @@ export class ConfigurationManager {
         this.completionProvider.twigEnvironment = twigEnvironment;
         this.completionProvider.templateMappings = templateMappings;
         this.completionProvider.symfonyRouteNames = symfonyRouteNames;
+
+        this.signatureHelpProvider.initialize(twigEnvironment);
 
         this.documentCache.templateMappings = templateMappings?.length
             ? templateMappings
