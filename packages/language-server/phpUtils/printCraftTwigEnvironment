@@ -23,5 +23,6 @@ $twig = $view->getTwig();
 $templateRoots = $view->getSiteTemplateRoots();
 
 $twigMetadata = \Twiggy\getTwigMetadata($twig, 'craft');
+$twigMetadata['loader_paths'] = $view->getSiteTemplateRoots();
 
 echo json_encode($twigMetadata, JSON_PRETTY_PRINT) . PHP_EOL;
