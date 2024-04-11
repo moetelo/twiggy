@@ -6,7 +6,7 @@ import { localVariables } from './local-variables';
 import { functions } from './functions';
 import { filters } from './filters';
 import { forLoop } from './for-loop';
-import { TemplatePathMapping, TwigEnvironment } from '../twigEnvironment/types';
+import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment';
 import { variableProperties } from './variableProperties';
 import { snippets } from './snippets';
 import { keywords } from './keywords';
@@ -14,9 +14,8 @@ import { DocumentCache } from '../documents';
 import { symfonyRouteNames } from './routes';
 
 export class CompletionProvider {
-    twigEnvironment?: TwigEnvironment;
-    templateMappings: TemplatePathMapping[] = [];
-    symfonyRouteNames: string[] = [];
+    #symfonyRouteNames: string[] = [];
+    #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
 
     constructor(
         private readonly connection: Connection,
@@ -25,6 +24,11 @@ export class CompletionProvider {
     ) {
         this.connection.onCompletion(this.onCompletion.bind(this));
         this.connection.onCompletionResolve(item => item);
+    }
+
+    refresh(environment: IFrameworkTwigEnvironment) {
+        this.#environment = environment;
+        this.#symfonyRouteNames = Object.keys(environment.routes);
     }
 
     async onCompletion(params: CompletionParams) {
@@ -41,20 +45,22 @@ export class CompletionProvider {
             return;
         }
 
+        const { environment } = this.#environment;
+
         return [
             ...snippets(cursorNode),
             ...keywords(cursorNode),
             ...localVariables(document, cursorNode),
             ...forLoop(cursorNode),
-            ...globalVariables(cursorNode, this.twigEnvironment?.Globals || []),
-            ...functions(cursorNode, this.twigEnvironment?.Functions || []),
-            ...filters(cursorNode, this.twigEnvironment?.Filters || []),
-            ...symfonyRouteNames(cursorNode, this.symfonyRouteNames),
+            ...globalVariables(cursorNode, environment?.Globals || []),
+            ...functions(cursorNode, environment?.Functions || []),
+            ...filters(cursorNode, environment?.Filters || []),
+            ...symfonyRouteNames(cursorNode, this.#symfonyRouteNames),
             ...await variableProperties(document, this.documentCache, cursorNode),
             ...await templatePaths(
                 cursorNode,
                 this.workspaceFolder.uri,
-                this.templateMappings,
+                this.#environment.templateMappings,
             ),
         ];
     }

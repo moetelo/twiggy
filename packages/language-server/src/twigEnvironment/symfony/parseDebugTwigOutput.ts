@@ -9,7 +9,7 @@ import {
 export interface SymfonyTwigDebugJsonOutput {
     functions: Record<string, string[]>;
     filters: Record<string, string[]>;
-    globals: Record<string, any>;
+    globals: Record<string, {} | string | number>;
     loader_paths: Record<string, string[]>;
     tests: string[];
 }

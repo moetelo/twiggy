@@ -27,3 +27,5 @@ export type TwigEnvironment = {
     LoaderPaths: TemplatePathMapping[],
     Tests: string[],
 };
+
+export type RouteNameToPathRecord = Record<string, { path: string }>;

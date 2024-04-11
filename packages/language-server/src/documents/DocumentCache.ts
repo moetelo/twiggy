@@ -3,15 +3,19 @@ import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
 import * as path from 'path';
 import { fileStat } from '../utils/files/fileStat';
-import { TemplatePathMapping } from '../twigEnvironment/types';
+import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment';
 
 export class DocumentCache {
-    templateMappings: TemplatePathMapping[] = [];
+    #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
     readonly documents: Map<DocumentUri, Document> = new Map();
     readonly workspaceFolderPath: string;
 
     constructor(workspaceFolder: WorkspaceFolder) {
         this.workspaceFolderPath = documentUriToFsPath(workspaceFolder.uri);
+    }
+
+    configure(frameworkEnvironment: IFrameworkTwigEnvironment) {
+        this.#environment = frameworkEnvironment;
     }
 
     get(documentUri: DocumentUri) {
@@ -32,7 +36,7 @@ export class DocumentCache {
     }
 
     async resolveByTwigPath(pathFromTwig: string) {
-        for (const { namespace, directory } of this.templateMappings) {
+        for (const { namespace, directory } of this.#environment.templateMappings) {
             if (!pathFromTwig.startsWith(namespace)) {
                 continue;
             }

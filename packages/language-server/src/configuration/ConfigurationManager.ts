@@ -6,20 +6,21 @@ import {
 } from 'vscode-languageserver';
 import { LanguageServerSettings, PhpFramework } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
-import { TemplatePathMapping, TwigEnvironment } from '../twigEnvironment/types';
 import { DocumentCache } from '../documents';
 import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
 import { CompletionProvider } from '../completions/CompletionProvider';
-import { fileStat } from '../utils/files/fileStat';
 import { SignatureHelpProvider } from '../signature-helps/SignatureHelpProvider';
-import { getRoutes, getTwigEnvironment } from '../twigEnvironment';
 import { documentUriToFsPath } from '../utils/uri';
+import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import {
+    IFrameworkTwigEnvironment,
+    SymfonyTwigEnvironment,
+    CraftTwigEnvironment,
+    EmptyEnvironment,
+} from '../twigEnvironment';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
-    readonly defaultMappings: TemplatePathMapping[] = [
-        { namespace: '', directory: 'templates' },
-    ];
 
     readonly defaultSettings: LanguageServerSettings = {
         autoInsertSpaces: true,
@@ -48,7 +49,7 @@ export class ConfigurationManager {
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
 
-        this.applySettings(undefined, []);
+        this.applySettings(EmptyEnvironment);
 
         if (config.phpBinConsoleCommand) {
             console.warn('`twiggy.phpBinConsoleCommand` does not work anymore. Use `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` instead.');
@@ -63,64 +64,25 @@ export class ConfigurationManager {
             return;
         }
 
-        if (!config.phpExecutable) {
-            console.warn('`twiggy.phpExecutable` is not configured. Some features will be disabled.');
-            return;
-        }
+        const workspaceDirectory = documentUriToFsPath(this.workspaceFolder.uri);
 
-        if (
-            config.framework === PhpFramework.Symfony
-            && (!config.symfonyConsolePath || !await fileStat(config.symfonyConsolePath))
-        ) {
-            console.warn(
-                `Symfony console file not found at ${config.symfonyConsolePath}.\n`
-                + 'For Symfony project, set `twiggy.phpExecutable` and `twiggy.symfonyConsolePath`.');
-            return;
-        }
+        const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
 
-        const twigEnvironmentArgs = {
-            phpExecutable: config.phpExecutable,
+        const twigEnvironment = config.framework === PhpFramework.Symfony
+            ? new SymfonyTwigEnvironment(phpExecutor)
+            : new CraftTwigEnvironment(phpExecutor);
+
+        await twigEnvironment.refresh({
             symfonyConsolePath: config.symfonyConsolePath,
-            workspaceDirectory: documentUriToFsPath(this.workspaceFolder.uri),
-            framework: config.framework,
-        };
+            workspaceDirectory,
+        });
 
-        const twigEnvironment = await getTwigEnvironment(twigEnvironmentArgs);
-        const routeNameToPath = await getRoutes(twigEnvironmentArgs);
-        const routeNames = Object.keys(routeNameToPath);
-
-        if (twigEnvironment) {
-            console.info(
-                `Collected`
-                + ` ${twigEnvironment.Functions.length} functions,`
-                + ` ${twigEnvironment.Filters.length} filters,`
-                + ` ${twigEnvironment.Globals.length} globals and ${twigEnvironment.LoaderPaths.length} loader paths.`,
-            );
-        }
-
-        if (routeNames.length) {
-            console.info(`Collected ${routeNames.length} routes.`);
-        }
-
-        this.applySettings(twigEnvironment, routeNames);
+        this.applySettings(twigEnvironment);
     }
 
-    private applySettings(
-        twigEnvironment: TwigEnvironment | undefined,
-        symfonyRouteNames: string[],
-    ) {
-        const templateMappings = twigEnvironment?.LoaderPaths?.length
-            ? twigEnvironment.LoaderPaths
-            : this.defaultMappings;
-
-        this.completionProvider.twigEnvironment = twigEnvironment;
-        this.completionProvider.templateMappings = templateMappings;
-        this.completionProvider.symfonyRouteNames = symfonyRouteNames;
-
-        this.signatureHelpProvider.initialize(twigEnvironment);
-
-        this.documentCache.templateMappings = templateMappings?.length
-            ? templateMappings
-            : this.defaultMappings;
+    private applySettings(frameworkEnvironment: IFrameworkTwigEnvironment) {
+        this.completionProvider.refresh(frameworkEnvironment);
+        this.signatureHelpProvider.reindex(frameworkEnvironment);
+        this.documentCache.configure(frameworkEnvironment);
     }
 }
