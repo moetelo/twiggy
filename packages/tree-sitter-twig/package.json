@@ -4,8 +4,8 @@
   "description": "Twig grammar for tree-sitter",
   "main": "bindings/node",
   "scripts": {
-    "build": "tree-sitter generate",
-    "build-wasm": "tree-sitter generate && tree-sitter build-wasm",
+    "build": "tree-sitter generate && rm -f ./tree-sitter-twig.wasm",
+    "build-wasm": "pnpm run build && tree-sitter build-wasm",
     "test": "tree-sitter test"
   },
   "license": "Mozilla Public License 2.0",

@@ -1,6 +1,8 @@
 module.exports = grammar({
   name: 'twig',
-  extras: () => [/[\s\p{Zs}\uFEFF\u2060\u200B]/],
+  extras: ($) => [
+    /[\s\p{Zs}\uFEFF\u2060\u200B]/,
+  ],
   supertypes: ($) => [$.expression, $.primary_expression],
   inline: ($) => [$._statement],
   precedences: ($) => [
@@ -21,7 +23,7 @@ module.exports = grammar({
     [$.primary_expression, $.arrow_function],
     [$.primary_expression, $.call_expression],
   ],
-  externals: ($) => [$.content, $.comment],
+  externals: ($) => [$.content],
   rules: {
     template: ($) => repeat($._source_element),
 
@@ -34,6 +36,38 @@ module.exports = grammar({
         $.expression,
         alias(choice('}}', '-}}', '~}}'), 'embedded_end'),
       ),
+
+    comment: $ => seq(
+      alias('{#', 'comment_begin'),
+      choice(
+        $._varCommentInternal,
+        optional($._commentText),
+      ),
+      alias('#}', 'comment_end'),
+    ),
+
+    _varCommentInternal: $ =>
+      seq(
+        alias('@var', 'keyword'),
+        field('variable', alias($.identifier, $.variable)),
+        field('type', $.type),
+      ),
+
+    type: $ =>
+      choice(
+        $.php_identifier,
+        $.php_full_identifier,
+      ),
+
+    php_identifier: $ => /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
+    php_full_identifier: $ => seq(
+      '\\',
+      $.php_identifier,
+      repeat(seq('\\', $.php_identifier)),
+    ),
+
+    // TODO: multiline
+    _commentText: $ => repeat1(choice(/.|\n|\r/)),
 
     _statement_start: ($) =>
       alias(choice('{%', '{%-', '{%~'), 'embedded_begin'),

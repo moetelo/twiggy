@@ -6,6 +6,7 @@ import {
 import { getNodeRange, PreOrderCursorIterator } from '../utils/node';
 import { Document } from '../documents';
 
+// TODO: DiagnosticProvider
 export async function validateTwigDocument(
     connection: Connection,
     { tree, uri }: Document,

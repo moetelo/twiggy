@@ -3,8 +3,9 @@ import {
     Definition,
     DefinitionParams,
     Range,
+    WorkspaceFolder,
 } from 'vscode-languageserver';
-import { findNodeByPosition, getNodeRange } from '../utils/node';
+import { findNodeByPosition, findParentByType, getNodeRange } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,
@@ -15,6 +16,9 @@ import { getStringNodeValue } from '../utils/node';
 import { rangeContainsPosition, pointToPosition } from '../utils/position';
 import { parseFunctionCall } from '../utils/node/parseFunctionCall';
 import { positionsEqual } from '../utils/position/comparePositions';
+import { documentUriToFsPath } from '../utils/uri';
+import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
 
 const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
     if (node.type !== 'string' || !node.parent) {
@@ -56,11 +60,15 @@ const isBlockIdentifier = (node: SyntaxNode): boolean => {
 };
 
 export class DefinitionProvider {
+    workspaceFolderPath: string;
+    phpExecutor: PhpExecutor | null = null;
 
     constructor(
         private readonly connection: Connection,
         private readonly documentCache: DocumentCache,
+        workspaceFolder: WorkspaceFolder,
     ) {
+        this.workspaceFolderPath = documentUriToFsPath(workspaceFolder.uri);
         this.connection.onDefinition(this.onDefinition.bind(this));
     }
 
@@ -161,6 +169,19 @@ export class DefinitionProvider {
             return {
                 uri: importedDocument.uri,
                 range: macro.nameRange,
+            };
+        }
+
+        const closestTypeNode = findParentByType(cursorNode, 'type');
+        if (closestTypeNode) {
+            if (!this.phpExecutor) return;
+
+            const result = await this.phpExecutor.getClassDefinition(closestTypeNode.text);
+            if (!result?.path) return;
+
+            return {
+                uri: result.path,
+                range: getNodeRange(closestTypeNode),
             };
         }
     }

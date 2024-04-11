@@ -12,18 +12,24 @@ import { snippets } from './snippets';
 import { keywords } from './keywords';
 import { DocumentCache } from '../documents';
 import { symfonyRouteNames } from './routes';
+import { phpClasses } from './phpClasses';
+import { documentUriToFsPath } from '../utils/uri';
+import { PhpExecutor } from '../phpInterop/PhpExecutor';
 
 export class CompletionProvider {
     #symfonyRouteNames: string[] = [];
     #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
+    workspaceFolderPath: string;
+    phpExecutor: PhpExecutor | null = null;
 
     constructor(
         private readonly connection: Connection,
         private readonly documentCache: DocumentCache,
-        private readonly workspaceFolder: WorkspaceFolder,
+        workspaceFolder: WorkspaceFolder,
     ) {
         this.connection.onCompletion(this.onCompletion.bind(this));
         this.connection.onCompletionResolve(item => item);
+        this.workspaceFolderPath = documentUriToFsPath(workspaceFolder.uri);
     }
 
     refresh(environment: IFrameworkTwigEnvironment) {
@@ -32,15 +38,12 @@ export class CompletionProvider {
     }
 
     async onCompletion(params: CompletionParams) {
-        const uri = params.textDocument.uri;
-        const document = this.documentCache.get(uri);
-
+        const document = this.documentCache.get(params.textDocument.uri);
         if (!document) {
             return;
         }
 
         const cursorNode = findNodeByPosition(document.tree.rootNode, params.position);
-
         if (!cursorNode) {
             return;
         }
@@ -56,10 +59,11 @@ export class CompletionProvider {
             ...functions(cursorNode, environment?.Functions || []),
             ...filters(cursorNode, environment?.Filters || []),
             ...symfonyRouteNames(cursorNode, this.#symfonyRouteNames),
+            ...await phpClasses(cursorNode, this.phpExecutor),
             ...await variableProperties(document, this.documentCache, cursorNode),
             ...await templatePaths(
                 cursorNode,
-                this.workspaceFolder.uri,
+                this.workspaceFolderPath,
                 this.#environment.templateMappings,
             ),
         ];

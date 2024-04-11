@@ -13,6 +13,7 @@ export const semanticTokensLegend: SemanticTokensLegend = {
     SemanticTokenTypes.number,
     SemanticTokenTypes.operator,
     SemanticTokenTypes.macro,
+    SemanticTokenTypes.type,
     'embedded_begin',
     'embedded_end',
     'null',

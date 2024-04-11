@@ -1,0 +1,39 @@
+==================
+var comment int
+==================
+{# @var someVar int #}
+---
+(template
+  (comment
+    (variable)
+    (type
+      (php_identifier))))
+
+
+==================
+var comment psr4 root namespace
+==================
+{# @var someVar \Foo\Bar #}
+---
+(template
+  (comment
+    (variable)
+    (type
+      (php_full_identifier
+        (php_identifier)
+        (php_identifier)))))
+
+
+==================
+var comment psr4 long
+==================
+{# @var someVar \Foo\Bar\Baz #}
+---
+(template
+  (comment
+    (variable)
+    (type
+      (php_full_identifier
+        (php_identifier)
+        (php_identifier)
+        (php_identifier)))))

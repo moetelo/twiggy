@@ -17,12 +17,22 @@ const tokenTypes = new Map(
 
 const methodTokenType = tokenTypes.get(SemanticTokenTypes.method)!;
 
+const commentNodeTypes = [
+    'comment_begin',
+    'comment_end',
+];
+const commentTokenType = tokenTypes.get(SemanticTokenTypes.comment)!;
+
 const resolveTokenType = (node: TreeCursor) => {
     if (
         node.nodeType === 'property' &&
         node.currentNode().parent!.nextSibling?.type === 'arguments'
     ) {
         return methodTokenType;
+    }
+
+    if (commentNodeTypes.includes(node.nodeType)) {
+        return commentTokenType;
     }
 
     return tokenTypes.get(node.nodeType);
@@ -58,6 +68,13 @@ export class SemanticTokensProvider {
             }
 
             const start = pointToPosition(node.startPosition);
+
+            // Skip var comments, color them later
+            // TODO: Remove `comment` node, alias `comment_text` to comment token?
+            if (node.nodeType === SemanticTokenTypes.comment && node.currentNode().namedChildCount !== 0) {
+                continue;
+            }
+
             const lines = node.nodeText.split('\n');
             let lineNumber = start.line;
             let charNumber = start.character;

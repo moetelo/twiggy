@@ -4,7 +4,6 @@
 
 enum TokenType {
   CONTENT,
-  COMMENT
 };
 
 void *tree_sitter_twig_external_scanner_create() { return NULL; }
@@ -44,28 +43,6 @@ bool tree_sitter_twig_external_scanner_scan(void *payload, TSLexer *lexer, const
   if (has_content) {
     lexer->result_symbol = CONTENT;
     return true;
-  }
-
-  // COMMENT
-  if (lexer->lookahead == '#') {
-    advance(lexer);
-
-    while (lexer->lookahead) {
-      lexer->mark_end(lexer);
-
-      if (lexer->lookahead == '#') {
-        advance(lexer);
-
-        if (lexer->lookahead == '}') {
-          lexer->result_symbol = COMMENT;
-          advance(lexer);
-          lexer->mark_end(lexer);
-          return true;
-        }
-      }
-
-      advance(lexer);
-    }
   }
 
   return false;
