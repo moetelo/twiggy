@@ -441,7 +441,7 @@ Call expression with one named argument
       (function)
       (arguments
         (named_argument
-          (string)
+          (variable)
           (string))))))
 
 ==================
@@ -455,13 +455,13 @@ Call expression with named arguments
       (function)
       (arguments
         (named_argument
-          (string)
+          (variable)
           (number))
         (named_argument
-          (string)
+          (variable)
           (number))
         (named_argument
-          (string)
+          (variable)
           (number))))))
 
 ==================
@@ -477,7 +477,7 @@ Call expression with arguments and named arguments
       (arguments
         (string)
         (named_argument
-          (string)
+          (variable)
           (string))))))
 
 ==================

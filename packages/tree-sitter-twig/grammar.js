@@ -172,7 +172,6 @@ module.exports = grammar({
             field('arguments', $.arguments),
           ),
         ),
-        // TODO: Do we need `call`?
         prec(
           'call',
           seq(
