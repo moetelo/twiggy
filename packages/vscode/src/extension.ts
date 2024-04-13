@@ -1,4 +1,5 @@
 import { Command } from 'twiggy-language-server/src/commands/ExecuteCommandProvider';
+import { PhpFramework } from 'twiggy-language-server/src/configuration/LanguageServerSettings';
 import {
     workspace,
     ExtensionContext,
@@ -43,7 +44,7 @@ export async function activate(context: ExtensionContext) {
         if (result === 'Open settings') {
             await commands.executeCommand('workbench.action.openWorkspaceSettingsFile', 'twiggy.framework');
         } else {
-            await config.update('framework', 'ignore', ConfigurationTarget.Workspace);
+            await config.update('framework', PhpFramework.Ignore, ConfigurationTarget.Workspace);
         }
     }
 }
