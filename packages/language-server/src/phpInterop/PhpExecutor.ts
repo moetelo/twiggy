@@ -1,5 +1,6 @@
 import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
 import { execPromisified, isProcessError } from '../utils/exec';
+import { ReflectedType } from './ReflectedType';
 
 export class PhpExecutor {
     constructor(
@@ -56,20 +57,3 @@ export class PhpExecutor {
         ]);
     }
 }
-
-type ReflectedType = {
-    properties: {
-        name: string,
-        type: string,
-    }[],
-    methods: {
-        name: string,
-        returnType: string,
-        parameters: {
-            name: string,
-            type: string,
-            isOptional: boolean,
-            isVariadic: boolean,
-        }[],
-    }[],
-};
