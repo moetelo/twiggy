@@ -4,7 +4,6 @@ import { TreeCursor } from 'web-tree-sitter';
 const aliasedNodes = new Map([
     ['comment_begin', SemanticTokenTypes.comment],
     ['comment_end', SemanticTokenTypes.comment],
-    ['namespace_name_as_prefix', SemanticTokenTypes.namespace],
     ['php_identifier', SemanticTokenTypes.class],
     ['primitive_type', SemanticTokenTypes.type],
 ]);
