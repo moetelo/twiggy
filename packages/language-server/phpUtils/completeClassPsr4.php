@@ -22,6 +22,7 @@ if (!$NAMESPACE_PSR4) {
     exit(0);
 }
 
+/** @var array<string, true> $classesInNamespace */
 $classesInNamespace = [];
 $namespaceFirstPart = explode('\\', $NAMESPACE_PSR4)[0];
 
@@ -40,9 +41,13 @@ foreach ($prefixesPsr4 as $prefix) {
         }
     }
 
-    $classes = get_declared_classes();
-    $inNamespacePrefix = array_filter($classes, fn($class) => str_starts_with($class, $NAMESPACE_PSR4));
-    array_push($classesInNamespace, ...$inNamespacePrefix);
+    foreach (get_declared_classes() as $class) {
+        if (!str_starts_with($class, $NAMESPACE_PSR4)) {
+            continue;
+        }
+
+        $classesInNamespace[$class] = true;
+    }
 }
 
-echo json_encode($classesInNamespace, JSON_PRETTY_PRINT) . PHP_EOL;
+echo json_encode(array_keys($classesInNamespace), JSON_PRETTY_PRINT) . PHP_EOL;
