@@ -14,15 +14,23 @@ if (str_starts_with($NAMESPACE_PSR4, '\\')) {
     $NAMESPACE_PSR4 = substr($NAMESPACE_PSR4, strlen('\\'));
 }
 
+$prefixesPsr4ToPaths = $loader->getPrefixesPsr4();
+$prefixesPsr4 = array_keys($prefixesPsr4ToPaths);
+
+if (!$NAMESPACE_PSR4) {
+    echo json_encode($prefixesPsr4, JSON_PRETTY_PRINT) . PHP_EOL;
+    exit(0);
+}
+
 $classesInNamespace = [];
 $namespaceFirstPart = explode('\\', $NAMESPACE_PSR4)[0];
 
-foreach (array_keys($loader->getPrefixesPsr4()) as $prefix) {
+foreach ($prefixesPsr4 as $prefix) {
     if (!str_starts_with($prefix, $namespaceFirstPart)) {
         continue;
     }
 
-    $dir = $loader->getPrefixesPsr4()[$prefix][0];
+    $dir = $prefixesPsr4ToPaths[$prefix][0];
     $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
 
     foreach ($iterator as $file) {

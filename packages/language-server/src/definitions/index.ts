@@ -5,7 +5,7 @@ import {
     Range,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import { findNodeByPosition, findParentByType, getNodeRange } from '../utils/node';
+import { findNodeByPosition, getNodeRange } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,
@@ -18,7 +18,7 @@ import { parseFunctionCall } from '../utils/node/parseFunctionCall';
 import { positionsEqual } from '../utils/position/comparePositions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
-import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
+import { findParentByType } from '../utils/node/findParentByType';
 
 const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
     if (node.type !== 'string' || !node.parent) {
@@ -172,16 +172,16 @@ export class DefinitionProvider {
             };
         }
 
-        const closestTypeNode = findParentByType(cursorNode, 'type');
-        if (closestTypeNode) {
+        const typeIdentifierNode = findParentByType(cursorNode, 'qualified_name');
+        if (typeIdentifierNode) {
             if (!this.phpExecutor) return;
 
-            const result = await this.phpExecutor.getClassDefinition(closestTypeNode.text);
+            const result = await this.phpExecutor.getClassDefinition(typeIdentifierNode.text);
             if (!result?.path) return;
 
             return {
                 uri: result.path,
-                range: getNodeRange(closestTypeNode),
+                range: getNodeRange(typeIdentifierNode),
             };
         }
     }

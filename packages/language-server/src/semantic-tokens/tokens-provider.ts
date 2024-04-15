@@ -14,6 +14,8 @@ export const semanticTokensLegend: SemanticTokensLegend = {
     SemanticTokenTypes.operator,
     SemanticTokenTypes.macro,
     SemanticTokenTypes.type,
+    SemanticTokenTypes.namespace,
+    SemanticTokenTypes.class,
     'embedded_begin',
     'embedded_end',
     'null',

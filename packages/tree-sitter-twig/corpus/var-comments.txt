@@ -1,39 +1,105 @@
 ==================
-var comment int
+var declaration: int
 ==================
 {# @var someVar int #}
 ---
 (template
-  (comment
+  (var_declaration
     (variable)
-    (type
-      (php_identifier))))
-
+    (primitive_type)))
 
 ==================
-var comment psr4 root namespace
-==================
-{# @var someVar \Foo\Bar #}
----
-(template
-  (comment
-    (variable)
-    (type
-      (php_full_identifier
-        (php_identifier)
-        (php_identifier)))))
-
-
-==================
-var comment psr4 long
+var declaration: qualified_name
 ==================
 {# @var someVar \Foo\Bar\Baz #}
 ---
 (template
-  (comment
+  (var_declaration
     (variable)
-    (type
-      (php_full_identifier
+    (qualified_name
+      (namespace
         (php_identifier)
+        (php_identifier))
+      (php_identifier))))
+
+==================
+var declaration: union
+==================
+{# @var someVar int | \Foo\Bar #}
+---
+(template
+  (var_declaration
+    (variable)
+    (union_type
+      (primitive_type)
+      (qualified_name
+        (namespace
+          (php_identifier))
+        (php_identifier)))))
+
+
+==================
+var declaration: intersection
+==================
+{# @var someVar int & string #}
+---
+(template
+  (var_declaration
+    (variable)
+    (intersection_type
+      (primitive_type)
+      (primitive_type))))
+
+
+==================
+var declaration: incomplete primitive
+==================
+{# @var someVar str #}
+---
+(template
+  (var_declaration
+    (variable)
+    (incomplete_type)))
+
+==================
+var declaration: incomplete_qualified_name
+==================
+{# @var someVar \App\Something\ #}
+---
+(template
+  (var_declaration
+    (variable)
+    (incomplete_type
+      (namespace
         (php_identifier)
         (php_identifier)))))
+
+==================
+var declaration: incomplete_qualified_name - backslash \
+==================
+{# @var someVar \ #}
+---
+(template
+  (var_declaration
+    (variable)
+    (incomplete_type
+      (namespace))))
+
+
+==================
+var declaration: incomplete_qualified_name in union
+==================
+{# @var someVar \App\SomeClass | \App\ #}
+---
+(template
+  (var_declaration
+    (variable)
+    (union_type
+      (qualified_name
+        (namespace
+          (php_identifier))
+        (php_identifier))
+      (incomplete_type
+        (namespace
+          (php_identifier)))
+    )))

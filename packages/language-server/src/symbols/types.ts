@@ -1,6 +1,6 @@
 import { Range } from 'vscode-languageserver/node';
 
-interface LocalSymbol {
+export interface LocalSymbol {
     name: string;
     nameRange: Range;
 
@@ -8,7 +8,8 @@ interface LocalSymbol {
 }
 
 export interface TwigVariable extends LocalSymbol {
-    value: string;
+    value?: string;
+    type?: string;
 }
 
 export interface FunctionArgument extends LocalSymbol {

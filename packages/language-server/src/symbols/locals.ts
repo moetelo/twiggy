@@ -24,13 +24,11 @@ function toBlock(node: SyntaxNode): TwigBlock {
 function toVariable(node: SyntaxNode): TwigVariable {
     const variableNode = node.childForFieldName('variable')!;
 
-    // TODO: `comment` node. refac later
-    const valueNode = node.childForFieldName('value') || node.childForFieldName('type');
-
     return {
         name: variableNode.text,
         nameRange: getNodeRange(variableNode),
-        value: valueNode!.text,
+        value: node.childForFieldName('value')?.text,
+        type: node.childForFieldName('type')?.text,
         range: getNodeRange(node),
     };
 }
@@ -124,12 +122,8 @@ export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
                 localSymbols.block.push(block);
                 continue;
             case 'set':
-            case 'comment':
-                const node = cursor.currentNode();
-                if (node.namedChildCount === 0) {
-                    continue;
-                }
-                const variable = toVariable(node);
+            case 'var_declaration':
+                const variable = toVariable(cursor.currentNode());
                 localSymbols.variable.push(variable);
                 continue;
             case 'macro':

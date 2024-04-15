@@ -1,20 +1,37 @@
 import { SyntaxNode } from 'web-tree-sitter';
-import { collectLocals } from '../symbols/locals';
-import { closestByPredicate } from '../utils/node';
 import { Hover } from 'vscode-languageserver';
+import { Document } from '../documents';
+import { pointToPosition } from '../utils/position';
+import { TwigVariable } from '../symbols/types';
 
-export function localVariables(cursorNode: SyntaxNode): Hover | undefined {
-    if (cursorNode.type !== 'variable') return;
+export function localVariables(document: Document, cursorNode: SyntaxNode): Hover | undefined {
+    if (cursorNode.type !== 'variable') return undefined;
 
-    const templateFragmentNode = closestByPredicate(cursorNode, node =>
-        ['macro', 'block', 'template'].includes(node.type),
+    const locals = document.getLocalsAt(
+        pointToPosition(cursorNode.startPosition),
     );
-    const bodyNode = templateFragmentNode?.childForFieldName('body') || templateFragmentNode;
-    const locals = collectLocals(bodyNode);
 
-    const result = locals.variable.find(({ name }) => name === cursorNode.text);
+    const result: TwigVariable | undefined = locals.find(({ name }) => name === cursorNode.text);
 
-    if (!result) return;
+    if (!result) return undefined;
 
-    return { contents: result.value };
+    if (result.type) {
+        return {
+            contents: {
+                kind: 'markdown',
+                value: `**${result.name}**: ${result.type}`,
+            },
+        };
+    }
+
+    if (result.value) {
+        return {
+            contents: {
+                kind: 'markdown',
+                value: `**${result.name}** = ${result.value}`,
+            },
+        };
+    }
+
+    return undefined;
 }

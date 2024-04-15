@@ -71,7 +71,7 @@ export class Server {
                 documentSymbolProvider: true,
                 completionProvider: {
                     resolveProvider: true,
-                    triggerCharacters: ['"', "'", '|', '.', '{'],
+                    triggerCharacters: ['"', "'", '|', '.', '{', '\\'],
                 },
                 signatureHelpProvider: {
                     triggerCharacters: ['(', ','],

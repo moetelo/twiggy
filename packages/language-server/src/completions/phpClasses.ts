@@ -1,11 +1,12 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { findParentByType } from '../utils/node';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import { primitives } from '../phpInterop/primitives';
+import { closestByPredicate } from '../utils/node';
 
 type VarVariable = {
-    fullClassName: string;
-    className: string;
+    fullClassName: string,
+    className: string,
 };
 
 const toCompletionItem = (variable: VarVariable): CompletionItem => ({
@@ -13,18 +14,32 @@ const toCompletionItem = (variable: VarVariable): CompletionItem => ({
     kind: CompletionItemKind.Class,
     detail: variable.className,
     insertText: variable.fullClassName,
-})
+});
+
+const primitiveCompletions = primitives.map(
+    primitive => toCompletionItem({ fullClassName: primitive, className: primitive }),
+);
+
+const typeNodes = new Set([
+    'primitive_type',
+    'qualified_name',
+    'incomplete_type',
+]);
+
+// `\Foo|Bar & | #}`
+// `|` is a cursor
+const isAtTheEndOfVarDeclaration = (node: SyntaxNode) => node.type === 'comment_end' && node.parent!.type === 'var_declaration';
 
 export async function phpClasses(
     node: SyntaxNode,
     phpExecutor: PhpExecutor | null,
 ): Promise<CompletionItem[]> {
-    if (!phpExecutor) return [];
+    const typeNode = closestByPredicate(node, (n) => typeNodes.has(n.type))
+    if (!typeNode && !isAtTheEndOfVarDeclaration(node)) return [];
 
-    const closestTypeNode = findParentByType(node, 'type');
-    if (!closestTypeNode) return [];
+    if (!phpExecutor) return primitiveCompletions;
 
-    const classNames = await phpExecutor.getClassCompletion(closestTypeNode.text);
+    const classNames = await phpExecutor.getClassCompletion(typeNode?.text || '');
     const classes = classNames.map(fullClassName => {
         fullClassName = '\\' + fullClassName;
         const parts = fullClassName.split('\\');
@@ -32,7 +47,8 @@ export async function phpClasses(
         return toCompletionItem({ fullClassName, className });
     });
 
-    console.log(classNames.slice(0, 10));
-
-    return classes;
+    return [
+        ...primitiveCompletions,
+        ...classes,
+    ];
 }

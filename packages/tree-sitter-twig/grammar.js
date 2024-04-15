@@ -1,3 +1,6 @@
+/// <reference types="tree-sitter-cli/dsl" />
+// @ts-check
+
 module.exports = grammar({
   name: 'twig',
   extras: ($) => [
@@ -22,13 +25,19 @@ module.exports = grammar({
     [$.primary_expression, $._property_name, $.arrow_function],
     [$.primary_expression, $.arrow_function],
     [$.primary_expression, $.call_expression],
+
+    [$._type, $.union_type, $.intersection_type, $.disjunctive_normal_form_type],
+    [$.union_type, $.disjunctive_normal_form_type],
+    [$.intersection_type],
+    [$.namespace],
+    [$._namespace_name],
   ],
   externals: ($) => [$.content],
   rules: {
     template: ($) => repeat($._source_element),
 
     _source_element: ($) =>
-      choice($._statement, $.output, $.comment, $.content),
+      choice($._statement, $.output, $.comment, $.var_declaration, $.content),
 
     output: ($) =>
       seq(
@@ -39,35 +48,91 @@ module.exports = grammar({
 
     comment: $ => seq(
       alias('{#', 'comment_begin'),
-      choice(
-        $._varCommentInternal,
-        optional($._commentText),
+      optional(
+        repeat1(/.|\n|\r/),
       ),
       alias('#}', 'comment_end'),
     ),
 
-    _varCommentInternal: $ =>
+    // var_declaration
+
+    var_declaration: $ => seq(
+      alias('{#', 'comment_begin'),
       seq(
         alias('@var', 'keyword'),
         field('variable', alias($.identifier, $.variable)),
-        field('type', $.type),
+        field('type', optional($._type)),
       ),
-
-    type: $ =>
-      choice(
-        $.php_identifier,
-        $.php_full_identifier,
-      ),
-
-    php_identifier: $ => /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
-    php_full_identifier: $ => seq(
-      '\\',
-      $.php_identifier,
-      repeat(seq('\\', $.php_identifier)),
+      alias('#}', 'comment_end'),
     ),
 
-    // TODO: multiline
-    _commentText: $ => repeat1(choice(/.|\n|\r/)),
+    _type: $ => choice(
+      $._types,
+      $.union_type,
+      $.intersection_type,
+      $.disjunctive_normal_form_type,
+    ),
+
+    _types: $ => choice(
+      $.optional_type,
+      $.qualified_name,
+      $.primitive_type,
+      $.incomplete_type,
+    ),
+
+    incomplete_type: $ => choice(
+      $._incomplete_primitive_type,
+      $._incomplete_qualified_name,
+    ),
+
+    _incomplete_primitive_type: $ => /[a-z]+/,
+    primitive_type: _ => choice(
+      'array',
+      keyword('callable'), // not legal in property types
+      'iterable',
+      'bool',
+      'float',
+      'int',
+      'string',
+      'void',
+      'mixed',
+      'false',
+      'null',
+      'true',
+    ),
+
+    optional_type: $ => seq(
+      '?',
+      choice(
+        $.qualified_name,
+        $.primitive_type,
+      ),
+    ),
+
+    _incomplete_qualified_name: $ => $.namespace,
+    qualified_name: $ => seq(
+      $.namespace,
+      $.php_identifier,
+    ),
+
+    namespace: $ => choice(
+      '\\',
+      seq(optional('\\'), $._namespace_name, '\\'),
+    ),
+
+    _namespace_name: $ => seq($.php_identifier, repeat(seq('\\', $.php_identifier))),
+    php_identifier: $ => /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
+
+    union_type: $ => pipeSep1($._types),
+
+    intersection_type: $ => ampSep1($._types),
+
+    disjunctive_normal_form_type: $ => prec.dynamic(-1, pipeSep1(choice(
+      seq('(', $.intersection_type, ')'),
+      $._types,
+    ))),
+
+
 
     _statement_start: ($) =>
       alias(choice('{%', '{%-', '{%~'), 'embedded_begin'),
@@ -236,11 +301,11 @@ module.exports = grammar({
       prec.left(
         'unary',
         choice(
-          ...[
+          .../** @type {const} */ ([
             ['+', 500],
             ['-', 500],
             ['not', 50],
-          ].map(([operator, precedence]) =>
+          ]).map(([operator, precedence]) =>
             prec.left(
               precedence,
               seq(field('operator', operator), field('argument', $.expression)),
@@ -249,9 +314,8 @@ module.exports = grammar({
         ),
       ),
 
-    binary_expression: ($) =>
-      choice(
-        ...[
+    binary_expression: ($) => choice(
+        .../** @type {const} */ ([
           ['or', 10],
           ['and', 15],
           ['b-or', 16],
@@ -283,7 +347,7 @@ module.exports = grammar({
           ['is not', 100],
           ['**', 200, 'right'],
           ['??', 300, 'right'],
-        ].map(([operator, precedence, associativity = 'left']) =>
+        ]).map(([operator, precedence, associativity = 'left']) =>
           prec[associativity](
             precedence,
             seq(
@@ -336,7 +400,7 @@ module.exports = grammar({
         $,
         alias('set', 'keyword'),
         commaSep1(field('variable', alias($.identifier, $.variable))),
-        '=',
+        token('='),
         commaSep1(field('value', $.expression)),
       ),
 
@@ -390,7 +454,7 @@ module.exports = grammar({
         $,
         alias('cache', 'keyword'),
         field('key', $.expression),
-        ' ',
+        token(' '),
         optional(field('expiration', $.call_expression)),
         source_elements($),
         alias('endcache', 'keyword'),
@@ -567,10 +631,16 @@ module.exports = grammar({
   },
 });
 
+/**
+ * @param {Rule} rule
+ */
 function commaSep1(rule) {
   return seq(rule, repeat(seq(',', rule)), optional(','));
 }
 
+/**
+ * @param {Rule} rule
+ */
 function commaSep(rule) {
   return optional(commaSep1(rule));
 }
@@ -591,6 +661,42 @@ function source_elements($, fieldName = 'body') {
   );
 }
 
+/**
+ * @param {Rule[]} args
+ */
 function statement($, ...args) {
   return seq($._statement_start, ...args, $._statement_stop);
+}
+
+/**
+ * Creates a rule to match one or more of the rules separated by a pipe
+ *
+ * @param {Rule} rule
+ *
+ * @return {SeqRule}
+ */
+function pipeSep1(rule) {
+  return seq(rule, repeat(seq('|', rule)));
+}
+
+/**
+ * Creates a rule to  match one or more of the rules separated by an ampersand
+ *
+ * @param {Rule} rule
+ *
+ * @return {SeqRule}
+ */
+function ampSep1(rule) {
+  return seq(rule, repeat(seq(token('&'), rule)));
+}
+
+
+/**
+ * @param {string} word
+ * @param {boolean} aliasAsWord
+ *
+ * @return {Rule|AliasRule}
+ */
+function keyword(word, aliasAsWord = true) {
+  return aliasAsWord ? alias(word, word) : token(word);
 }

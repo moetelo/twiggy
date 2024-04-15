@@ -1,9 +1,9 @@
 import { parser } from '../utils/parser';
 import { readFile } from 'fs/promises';
-import { DocumentUri } from 'vscode-languageserver';
+import { DocumentUri, Position } from 'vscode-languageserver';
 import Parser from 'web-tree-sitter';
 import { collectLocals } from '../symbols/locals';
-import { LocalSymbolInformation, TwigBlock, TwigMacro } from '../symbols/types';
+import { LocalSymbol, LocalSymbolInformation, TwigBlock, TwigMacro } from '../symbols/types';
 import { documentUriToFsPath } from '../utils/uri';
 import { pointToPosition, rangeContainsPosition } from '../utils/position';
 
@@ -93,5 +93,19 @@ export class Document {
         ];
 
         return scopes.find((scope) => rangeContainsPosition(scope.range, pointToPosition(point)));
+    }
+
+    getLocalsAt(cursorPosition: Position): LocalSymbol[] {
+        const blocks = this.locals.block.filter(x => rangeContainsPosition(x.range, cursorPosition));
+        const macroses = this.locals.macro.filter(x => rangeContainsPosition(x.range, cursorPosition));
+
+        const scopedVariables = [ ...macroses, ...blocks ].flatMap(x => x.symbols.variable);
+
+        return [
+            ...scopedVariables,
+            ...macroses.flatMap(x => x.args),
+            ...this.locals.variable,
+            ...this.locals.imports,
+        ];
     }
 }
