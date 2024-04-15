@@ -19,20 +19,14 @@ $refClass = new \ReflectionClass($INSTANCE_CLASS);
 $properties = $refClass->getProperties(\ReflectionProperty::IS_PUBLIC);
 $methods = $refClass->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-// $parameters = $method->getParameters();
-// $method->parameters = [];
-// foreach ($parameters as $parameter) {
-//     $method->parameters[] = [
-//         'name' => $parameter->getName(),
-//         'type' => $parameter->getType()?->getName(),
-//         'isOptional' => $parameter->isOptional(),
-//         'isVariadic' => $parameter->isVariadic(),
-//     ];
-// }
+const GETTER_PREFIX = 'get';
+function getPropertyName(string $getterName): string
+{
+    return lcfirst(
+        substr($getterName, strlen(GETTER_PREFIX)),
+    );
+}
 
-
-
-// add getters to $properties
 $completionProperties = [];
 $completionMethods = [];
 foreach ($methods as $method) {
@@ -45,14 +39,28 @@ foreach ($methods as $method) {
         continue;
     }
 
-    if (!str_starts_with($methodName, 'get')) {
-        continue;
+    $parameters = $method->getParameters();
+
+    if (str_starts_with($methodName, GETTER_PREFIX) && count($parameters) === 0) {
+        $propertyName = getPropertyName($methodName);
+        $completionProperties[] = [
+            'name' => $propertyName,
+            'type' => $method->getReturnType()?->getName() ?? '',
+        ];
     }
 
-    $propertyName = lcfirst(substr($methodName, 3));
-    $completionProperties[] = [
-        'name' => $propertyName,
-        'type' => $method->getReturnType()?->getName(),
+    $completionMethods[] = [
+        'name' => $methodName,
+        'parameters' => array_map(
+            fn(\ReflectionParameter $parameter) => [
+                'name' => $parameter->getName(),
+                'type' => $parameter->getType()?->getName() ?? '',
+                'isOptional' => $parameter->isOptional(),
+                'isVariadic' => $parameter->isVariadic(),
+            ],
+            $parameters,
+        ),
+        'returnType' => $method->getReturnType()?->getName() ?? '',
     ];
 }
 

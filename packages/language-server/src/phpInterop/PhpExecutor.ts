@@ -47,4 +47,29 @@ export class PhpExecutor {
             `'${className}'`,
         ]) || [];
     }
+
+
+    async completeInstanceProperties(className: string) {
+        return await this.call<ReflectedType>(PhpUtilPath.completeInstanceProperties, [
+            this._workspaceDirectory,
+            `'${className}'`,
+        ]);
+    }
 }
+
+type ReflectedType = {
+    properties: {
+        name: string,
+        type: string,
+    }[],
+    methods: {
+        name: string,
+        returnType: string,
+        parameters: {
+            name: string,
+            type: string,
+            isOptional: boolean,
+            isVariadic: boolean,
+        }[],
+    }[],
+};
