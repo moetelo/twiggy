@@ -32,20 +32,10 @@ export class HoverProvider {
             return;
         }
 
-        const hovers = [
-            globalVariables,
-            localVariables,
-            functions,
-            filters,
-            forLoop,
-        ];
-
-        for (const fn of hovers) {
-            const result = fn(cursorNode);
-
-            if (result) {
-                return result;
-            }
-        }
+        return globalVariables(cursorNode)
+            || localVariables(document, cursorNode)
+            || functions(cursorNode)
+            || filters(cursorNode)
+            || forLoop(cursorNode);
     }
 }

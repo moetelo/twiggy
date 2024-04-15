@@ -1,0 +1,16 @@
+export const primitives = [
+    'int',
+    'float',
+    'string',
+    'bool',
+    'array',
+    'object',
+    'callable',
+    'iterable',
+    'null',
+    'void',
+    'true',
+    'false',
+    'mixed',
+    'never',
+];

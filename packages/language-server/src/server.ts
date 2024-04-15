@@ -48,7 +48,11 @@ export class Server {
             new SymbolProvider(connection, documentCache);
             new HoverProvider(connection, documentCache);
             this.signatureHelpProvider = new SignatureHelpProvider(connection, documentCache);
-            this.definitionProvider = new DefinitionProvider(connection, documentCache);
+            this.definitionProvider = new DefinitionProvider(
+                connection,
+                documentCache,
+                this.workspaceFolder,
+            );
             this.completionProvider = new CompletionProvider(
                 connection,
                 documentCache,
@@ -67,7 +71,7 @@ export class Server {
                 documentSymbolProvider: true,
                 completionProvider: {
                     resolveProvider: true,
-                    triggerCharacters: ['"', "'", '|', '.', '{'],
+                    triggerCharacters: ['"', "'", '|', '.', '{', '\\'],
                 },
                 signatureHelpProvider: {
                     triggerCharacters: ['(', ','],
@@ -92,6 +96,7 @@ export class Server {
         connection.onInitialized(async () => {
             new ConfigurationManager(
                 connection,
+                this.definitionProvider,
                 this.inlayHintProvider,
                 this.bracketSpacesInsertionProvider,
                 this.completionProvider,

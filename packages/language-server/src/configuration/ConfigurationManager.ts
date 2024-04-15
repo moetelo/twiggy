@@ -10,6 +10,7 @@ import { DocumentCache } from '../documents';
 import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
 import { CompletionProvider } from '../completions/CompletionProvider';
 import { SignatureHelpProvider } from '../signature-helps/SignatureHelpProvider';
+import { DefinitionProvider } from '../definitions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import {
@@ -32,6 +33,7 @@ export class ConfigurationManager {
 
     constructor(
         connection: Connection,
+        private readonly definitionProvider: DefinitionProvider,
         private readonly inlayHintProvider: InlayHintProvider,
         private readonly bracketSpacesInsertionProvider: BracketSpacesInsertionProvider,
         private readonly completionProvider: CompletionProvider,
@@ -49,7 +51,7 @@ export class ConfigurationManager {
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
 
-        this.applySettings(EmptyEnvironment);
+        this.applySettings(EmptyEnvironment, null);
 
         if (config.phpBinConsoleCommand) {
             console.warn('`twiggy.phpBinConsoleCommand` does not work anymore. Use `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` instead.');
@@ -77,10 +79,12 @@ export class ConfigurationManager {
             workspaceDirectory,
         });
 
-        this.applySettings(twigEnvironment);
+        this.applySettings(twigEnvironment, phpExecutor);
     }
 
-    private applySettings(frameworkEnvironment: IFrameworkTwigEnvironment) {
+    private applySettings(frameworkEnvironment: IFrameworkTwigEnvironment, phpExecutor: PhpExecutor | null) {
+        this.definitionProvider.phpExecutor = phpExecutor;
+        this.completionProvider.phpExecutor = phpExecutor;
         this.completionProvider.refresh(frameworkEnvironment);
         this.signatureHelpProvider.reindex(frameworkEnvironment);
         this.documentCache.configure(frameworkEnvironment);

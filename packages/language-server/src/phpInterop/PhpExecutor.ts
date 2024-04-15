@@ -1,4 +1,6 @@
+import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
 import { execPromisified, isProcessError } from '../utils/exec';
+import { ReflectedType } from './ReflectedType';
 
 export class PhpExecutor {
     constructor(
@@ -31,5 +33,27 @@ export class PhpExecutor {
 
             return null;
         }
+    }
+
+    async getClassDefinition(className: string) {
+        return await this.call<{ path: string | null }>(PhpUtilPath.getDefinitionPhp, [
+            this._workspaceDirectory,
+            `'${className}'`,
+        ]);
+    }
+
+    async getClassCompletion(className: string) {
+        return await this.call<string[]>(PhpUtilPath.getCompletionPhp, [
+            this._workspaceDirectory,
+            `'${className}'`,
+        ]) || [];
+    }
+
+
+    async completeInstanceProperties(className: string) {
+        return await this.call<ReflectedType>(PhpUtilPath.completeInstanceProperties, [
+            this._workspaceDirectory,
+            `'${className}'`,
+        ]);
     }
 }

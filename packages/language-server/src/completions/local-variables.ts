@@ -3,7 +3,7 @@ import { SyntaxNode } from 'web-tree-sitter';
 import { Document } from '../documents';
 import { FunctionArgument, TwigVariable } from '../symbols/types';
 import { isEmptyEmbedded } from '../utils/node';
-import { rangeContainsPosition, pointToPosition } from '../utils/position';
+import { pointToPosition } from '../utils/position';
 
 const toCompletionItem = (variable: TwigVariable | FunctionArgument): CompletionItem => ({
     label: variable.name,
@@ -11,23 +11,14 @@ const toCompletionItem = (variable: TwigVariable | FunctionArgument): Completion
     detail: variable.value,
 });
 
-
 export function localVariables(document: Document, cursorNode: SyntaxNode): CompletionItem[] {
     if (cursorNode.type !== 'variable' && !isEmptyEmbedded(cursorNode)) {
         return [];
     }
 
-    const cursorPosition = pointToPosition(cursorNode.startPosition);
+    const locals = document.getLocalsAt(
+        pointToPosition(cursorNode.startPosition),
+    );
 
-    const blocks = document.locals.block.filter(x => rangeContainsPosition(x.range, cursorPosition));
-    const macroses = document.locals.macro.filter(x => rangeContainsPosition(x.range, cursorPosition));
-
-    const scopedVariables = [ ...macroses, ...blocks ].flatMap(x => x.symbols.variable);
-
-    return [
-        ...scopedVariables,
-        ...macroses.flatMap(x => x.args),
-        ...document.locals.variable,
-        ...document.locals.imports,
-    ].map(toCompletionItem);
+    return locals.map(toCompletionItem);
 }

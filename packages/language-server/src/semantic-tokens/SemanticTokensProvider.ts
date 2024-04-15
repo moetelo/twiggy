@@ -3,32 +3,16 @@ import {
     SemanticTokens,
     SemanticTokensBuilder,
     Connection,
-    SemanticTokenTypes,
 } from 'vscode-languageserver';
 import { PreOrderCursorIterator } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { semanticTokensLegend } from './tokens-provider';
-import { TreeCursor } from 'web-tree-sitter';
 import { DocumentCache } from '../documents';
-
-const tokenTypes = new Map(
-    semanticTokensLegend.tokenTypes.map((tokenType, index) => [tokenType, index]),
-);
-
-const methodTokenType = tokenTypes.get(SemanticTokenTypes.method)!;
-
-const resolveTokenType = (node: TreeCursor) => {
-    if (
-        node.nodeType === 'property' &&
-        node.currentNode().parent!.nextSibling?.type === 'arguments'
-    ) {
-        return methodTokenType;
-    }
-
-    return tokenTypes.get(node.nodeType);
-};
+import { TokenTypeResolver } from './TokenTypeResolver';
 
 export class SemanticTokensProvider {
+    readonly #tokenTypeResolver: TokenTypeResolver;
+
     constructor(
         private readonly connection: Connection,
         private readonly documentCache: DocumentCache,
@@ -36,6 +20,8 @@ export class SemanticTokensProvider {
         this.connection.languages.semanticTokens.on(
             this.serverRequestHandler.bind(this),
         );
+
+        this.#tokenTypeResolver = new TokenTypeResolver(semanticTokensLegend);
     }
 
     async serverRequestHandler(params: SemanticTokensParams) {
@@ -51,7 +37,7 @@ export class SemanticTokensProvider {
         const nodes = new PreOrderCursorIterator(document.tree.walk());
 
         for (const node of nodes) {
-            const tokenType = resolveTokenType(node);
+            const tokenType = this.#tokenTypeResolver.resolve(node);
 
             if (tokenType === undefined) {
                 continue;

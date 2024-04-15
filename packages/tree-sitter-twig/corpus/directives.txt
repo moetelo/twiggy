@@ -30,7 +30,14 @@ Lorem { ipsum
   (content))
 
 ==================
-Comment single line
+Empty comment
+==================
+{# #}
+---
+(template (comment))
+
+==================
+comment single line
 ==================
 {# comment #}
 ---
@@ -38,7 +45,7 @@ Comment single line
   (comment))
 
 ==================
-Comment multi line
+comment multi line
 ==================
 {# note: disabled template because we no longer use this
   {% for user in users %}
@@ -50,7 +57,7 @@ Comment multi line
   (comment))
 
 ==================
-Content comment content
+Lorem {# comment #} ipsum
 ==================
 Lorem {# comment #} ipsum
 ---
@@ -60,7 +67,7 @@ Lorem {# comment #} ipsum
   (content))
 
 ==================
-Comment content  Comment
+{# comment #} Lorem  {# comment #}
 ==================
 {# comment #} Lorem  {# comment #}
 ---

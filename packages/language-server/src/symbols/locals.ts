@@ -23,12 +23,12 @@ function toBlock(node: SyntaxNode): TwigBlock {
 
 function toVariable(node: SyntaxNode): TwigVariable {
     const variableNode = node.childForFieldName('variable')!;
-    const valueNode = node.childForFieldName('value')!;
 
     return {
         name: variableNode.text,
         nameRange: getNodeRange(variableNode),
-        value: valueNode.text,
+        value: node.childForFieldName('value')?.text,
+        type: node.childForFieldName('type')?.text,
         range: getNodeRange(node),
     };
 }
@@ -122,6 +122,7 @@ export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
                 localSymbols.block.push(block);
                 continue;
             case 'set':
+            case 'var_declaration':
                 const variable = toVariable(cursor.currentNode());
                 localSymbols.variable.push(variable);
                 continue;
