@@ -6,6 +6,7 @@ const aliasedNodes = new Map([
     ['comment_end', SemanticTokenTypes.comment],
     ['php_identifier', SemanticTokenTypes.class],
     ['primitive_type', SemanticTokenTypes.type],
+    ...'()[]{}:.'.split('').map((operator) => [operator, SemanticTokenTypes.operator] as const),
 ]);
 
 export class TokenTypeResolver {
