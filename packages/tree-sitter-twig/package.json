@@ -3,30 +3,17 @@
   "version": "0.4.0",
   "description": "Twig grammar for tree-sitter",
   "main": "bindings/node",
-  "types": "bindings/node",
   "scripts": {
     "build": "tree-sitter generate && rm -f ./tree-sitter-twig.wasm",
-    "build-wasm": "pnpm run build && tree-sitter build --wasm --output tree-sitter-twig.wasm",
-    "test": "tree-sitter test",
-    "install": "node-gyp-build",
-    "prebuildify": "prebuildify --napi --strip"
+    "build-wasm": "pnpm run build && tree-sitter build-wasm",
+    "test": "tree-sitter test"
   },
   "license": "Mozilla Public License 2.0",
   "dependencies": {
-    "node-addon-api": "^7.1.0",
-    "node-gyp-build": "^4.8.0"
-  },
-  "peerDependencies": {
-    "tree-sitter": "^0.21.0"
-  },
-  "peerDependenciesMeta": {
-    "tree_sitter": {
-      "optional": true
-    }
+    "nan": "^2.17.0"
   },
   "devDependencies": {
-    "tree-sitter-cli": "^0.22.5",
-    "prebuildify": "^6.0.0"
+    "tree-sitter-cli": "^0.20.8"
   },
   "files": [
     "README.md",
