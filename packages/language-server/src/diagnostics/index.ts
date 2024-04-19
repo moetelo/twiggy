@@ -11,7 +11,7 @@ export async function validateTwigDocument(
     connection: Connection,
     { tree, uri }: Document,
 ): Promise<void> {
-    if (!tree.rootNode.hasError()) {
+    if (!tree.rootNode.hasError) {
         await connection.sendDiagnostics({ uri, diagnostics: [] });
         return;
     }

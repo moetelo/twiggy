@@ -21,14 +21,11 @@ module.exports = grammar({
     [$.primary_expression, $.filter_expression],
   ],
   conflicts: ($) => [
-    [$.primary_expression, $._property_name],
-    [$.primary_expression, $._property_name, $.arrow_function],
     [$.primary_expression, $.arrow_function],
     [$.primary_expression, $.call_expression],
 
     [$._type, $.union_type, $.intersection_type, $.disjunctive_normal_form_type],
     [$.union_type, $.disjunctive_normal_form_type],
-    [$.intersection_type],
     [$.namespace],
     [$._namespace_name],
   ],

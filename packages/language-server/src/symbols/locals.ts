@@ -106,7 +106,7 @@ export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
     do {
         switch (cursor.nodeType) {
             case 'extends':
-                const exprNode = cursor.currentNode().childForFieldName('expr');
+                const exprNode = cursor.currentNode.childForFieldName('expr');
 
                 if (exprNode?.type === 'string') {
                     localSymbols.extends = getStringNodeValue(exprNode);
@@ -114,20 +114,20 @@ export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
 
                 continue;
             case 'import':
-                const twigImport = toImport(cursor.currentNode());
+                const twigImport = toImport(cursor.currentNode);
                 localSymbols.imports.push(twigImport);
                 continue;
             case 'block':
-                const block = toBlock(cursor.currentNode());
+                const block = toBlock(cursor.currentNode);
                 localSymbols.block.push(block);
                 continue;
             case 'set':
             case 'var_declaration':
-                const variable = toVariable(cursor.currentNode());
+                const variable = toVariable(cursor.currentNode);
                 localSymbols.variable.push(variable);
                 continue;
             case 'macro':
-                const macro = toMacro(cursor.currentNode());
+                const macro = toMacro(cursor.currentNode);
                 localSymbols.macro.push(macro);
                 continue;
 
@@ -138,7 +138,7 @@ export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
                 continue;
 
             case 'source_elements':
-                const sourceElementsLocals = collectLocals(cursor.currentNode());
+                const sourceElementsLocals = collectLocals(cursor.currentNode);
                 localSymbols.variable.push(...sourceElementsLocals.variable);
                 localSymbols.macro.push(...sourceElementsLocals.macro);
                 localSymbols.block.push(...sourceElementsLocals.block);

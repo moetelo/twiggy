@@ -2,7 +2,9 @@ node_modules
 tree-sitter-twig.wasm
 build
 bindings
-src/tree_sitter/parser.h
-src/parser.c
-src/node-types.json
-src/grammar.json
+Makefile
+pyproject.toml
+Package.swift
+setup.py
+src/**/*
+!src/scanner.c

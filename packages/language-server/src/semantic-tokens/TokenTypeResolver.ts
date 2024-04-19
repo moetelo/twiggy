@@ -24,7 +24,7 @@ export class TokenTypeResolver {
     resolve(node: TreeCursor) {
         if (
             node.nodeType === 'property' &&
-            node.currentNode().parent!.nextSibling?.type === 'arguments'
+            node.currentNode.parent!.nextSibling?.type === 'arguments'
         ) {
             return this.methodTokenType;
         }

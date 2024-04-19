@@ -50,9 +50,7 @@ export class InlayHintProvider {
         const nodes = new PreOrderCursorIterator(document.tree.walk());
         for (const node of nodes) {
             if (macroArguments && node.nodeType === 'call_expression') {
-                const currentNode = node.currentNode();
-
-                const calledFunc = parseFunctionCall(currentNode);
+                const calledFunc = parseFunctionCall(node.currentNode);
                 if (!calledFunc || !calledFunc.object || !calledFunc.args.length) continue;
 
                 const importedDocument = await this.documentCache.resolveImport(document, calledFunc.object);
@@ -79,7 +77,7 @@ export class InlayHintProvider {
                 (block && node.nodeType === 'block' || macro && node.nodeType === 'macro')
                 && node.startPosition.row !== node.endPosition.row
             ) {
-                const hint = toInlayHint(node.currentNode());
+                const hint = toInlayHint(node.currentNode);
                 inlayHints.push(hint);
             }
         }

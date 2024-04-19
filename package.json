@@ -1,6 +1,7 @@
 {
   "name": "twiggy-root",
   "version": "0.8.0",
+  "packageManager": "pnpm@9.0.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/moetelo/twiggy.git"
