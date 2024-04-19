@@ -9,7 +9,7 @@
     "vscode": "^1.74.0"
   },
   "activationEvents": [
-    "onStartupFinished"
+    "onLanguage:twig"
   ],
   "main": "./dist/extension.js",
   "publisher": "moetelo",
