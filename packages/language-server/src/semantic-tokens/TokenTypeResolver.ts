@@ -23,6 +23,12 @@ export class TokenTypeResolver {
     }
 
     resolve(node: TreeCursor) {
+        // Skip adding semantic tokens for comment_begin/comment_end nodes
+        // inside of comments.
+        if (node.currentNode.parent?.type === 'comment') {
+            return undefined;
+        }
+
         if (
             node.nodeType === 'property' &&
             node.currentNode.parent!.nextSibling?.type === 'arguments'

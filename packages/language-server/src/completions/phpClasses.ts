@@ -26,8 +26,8 @@ const typeNodes = new Set([
     'incomplete_type',
 ]);
 
-// `\Foo|Bar & | #}`
-// `|` is a cursor
+// `\Foo|Bar & ^ #}`
+// `^` is a cursor
 const isAtTheEndOfVarDeclaration = (node: SyntaxNode) => node.type === 'comment_end' && node.parent!.type === 'var_declaration';
 
 export async function phpClasses(

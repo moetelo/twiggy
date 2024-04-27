@@ -76,6 +76,13 @@ Lorem {# comment #} ipsum
   (content)
   (comment))
 
+===
+comment with hashes
+===
+{# # safsaf
+    # asfasf
+#}
+
 ==================
 Output directive
 ==================
