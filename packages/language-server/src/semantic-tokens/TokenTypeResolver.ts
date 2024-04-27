@@ -6,7 +6,6 @@ const aliasedNodes = new Map([
     ['comment_end', SemanticTokenTypes.comment],
     ['php_identifier', SemanticTokenTypes.class],
     ['primitive_type', SemanticTokenTypes.type],
-    ...'()[]{}:.,='.split('').map((operator) => [operator, SemanticTokenTypes.operator] as const),
 ]);
 
 export class TokenTypeResolver {
@@ -23,6 +22,10 @@ export class TokenTypeResolver {
     }
 
     resolve(node: TreeCursor) {
+        if (node.nodeType === 'macro') {
+            return undefined;
+        }
+
         // Skip adding semantic tokens for comment_begin/comment_end nodes
         // inside of comments.
         if (node.currentNode.parent?.type === 'comment') {

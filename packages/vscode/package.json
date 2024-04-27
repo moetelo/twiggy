@@ -135,7 +135,7 @@
       {
         "language": "twig",
         "scopeName": "text.html.twig",
-        "path": "./syntaxes/html.tmLanguage.json",
+        "path": "./syntaxes/twig.tmLanguage.json",
         "embeddedLanguages": {
           "source.twig": "twig",
           "source.js": "javascript",
