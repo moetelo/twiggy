@@ -774,10 +774,33 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
     },
 ];
 
-type KeywordCompletionItem = {
+export type SnippetLike = {
     label: string,
-    body?: string[],
-}
+    snippet?: string[],
+};
+
+export const miscSnippets: SnippetLike[] = [
+    {
+        label: 'set block',
+        snippet: [
+            '{% set $1 %}\n\t$0\n{% endset %}',
+        ],
+    },
+    {
+        label: 'if else',
+        snippet: [
+            '{% if $1 %}\n\t$2\n{% else %}\n\t$3\n{% endif %}',
+        ],
+    },
+    {
+        label: 'block with body',
+        snippet: [
+            '{% block $1 %}\n\t$2\n{% endblock %}',
+        ],
+    },
+];
+
+type KeywordCompletionItem = SnippetLike;
 
 export const twigKeywords: KeywordCompletionItem[] = [
     { label: 'as' },
@@ -802,7 +825,7 @@ export const twigKeywords: KeywordCompletionItem[] = [
     { label: 'endverbatim' },
     {
         label: 'apply',
-        body: [
+        snippet: [
             '{% apply $1 %}',
             '\t$2',
             '{% endapply %}',
@@ -810,7 +833,7 @@ export const twigKeywords: KeywordCompletionItem[] = [
     },
     {
         label: 'block',
-        body: [
+        snippet: [
             '{% block $1 %}',
             '\t$2',
             '{% endblock %}',
@@ -818,7 +841,7 @@ export const twigKeywords: KeywordCompletionItem[] = [
     },
     {
         label: 'if',
-        body: [
+        snippet: [
             '{% if $1 %}',
             '\t$2',
             '{% endif %}',
@@ -826,13 +849,13 @@ export const twigKeywords: KeywordCompletionItem[] = [
     },
     {
         label: 'extends',
-        body: [
+        snippet: [
             "{% extends '$1' %}",
         ],
     },
     {
         label: 'for',
-        body: [
+        snippet: [
             '{% for $1 in $1s %}',
             '\t$2',
             '{% endfor %}',
@@ -840,7 +863,7 @@ export const twigKeywords: KeywordCompletionItem[] = [
     },
     {
         label: 'macro',
-        body: [
+        snippet: [
             '{% macro $1($2) %}',
             '\t$3',
             '{% endmacro %}',
@@ -848,7 +871,7 @@ export const twigKeywords: KeywordCompletionItem[] = [
     },
     {
         label: 'set',
-        body: [
+        snippet: [
             '{% set $1 = $2 %}',
         ],
     },

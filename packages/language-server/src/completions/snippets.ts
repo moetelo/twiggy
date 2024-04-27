@@ -1,6 +1,6 @@
 import { SyntaxNode } from 'web-tree-sitter';
 import { commonCompletionItem as commonFunctionCompletionItem } from './functions';
-import { twigFunctions, twigKeywords } from '../staticCompletionInfo';
+import { SnippetLike, miscSnippets, twigFunctions, twigKeywords } from '../staticCompletionInfo';
 import { CompletionItem, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver';
 import { commonCompletionItem as commonKeywordCompletionItem } from './keywords';
 import { triggerCompletion } from './triggerCompletionCommand';
@@ -10,6 +10,14 @@ const commonSnippetItem: Partial<CompletionItem> = {
     insertTextFormat: InsertTextFormat.Snippet,
     detail: 'snippet',
 };
+
+const snippetLikeToCompletionItem = (snippetLike: SnippetLike): CompletionItem => ({
+    ...commonKeywordCompletionItem,
+    ...commonSnippetItem,
+    label: snippetLike.label,
+    command: triggerCompletion,
+    insertText: snippetLike.snippet!.join('\n'),
+});
 
 const functionSnippets: CompletionItem[] = twigFunctions
     .filter(x => x.createSnippet)
@@ -21,14 +29,10 @@ const functionSnippets: CompletionItem[] = twigFunctions
     }));
 
 const keywordSnippets: CompletionItem[] = twigKeywords
-    .filter(item => item.body)
-    .map(item => ({
-        ...commonKeywordCompletionItem,
-        ...commonSnippetItem,
-        label: item.label,
-        command: triggerCompletion,
-        insertText: item.body!.join('\n'),
-    }));
+    .filter(item => item.snippet)
+    .map(snippetLikeToCompletionItem);
+
+const miscSnippetCompletions = miscSnippets.map(snippetLikeToCompletionItem);
 
 export function snippets(cursorNode: SyntaxNode) {
     if (cursorNode.type !== 'content') {
@@ -38,5 +42,6 @@ export function snippets(cursorNode: SyntaxNode) {
     return [
         ...functionSnippets,
         ...keywordSnippets,
+        ...miscSnippetCompletions,
     ];
 }
