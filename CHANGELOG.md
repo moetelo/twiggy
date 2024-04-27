@@ -1,3 +1,6 @@
+## v0.9.1 (2024-04-27)
+* Fix brackets coloring in `<a href="{{ path('somepath') }}">`.
+
 ## v0.9.0 (2024-04-27)
 * `@var` comment: grammar, semantic tokens, completion, definition. (#16)
     Completion for properties and methods of type-hinted var.
