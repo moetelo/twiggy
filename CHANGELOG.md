@@ -1,3 +1,12 @@
+## v0.9.0 (2024-04-27)
+* `@var` comment: grammar, semantic tokens, completion, definition. (#16)
+    Completion for properties and methods of type-hinted var.
+* Fix syntax highlighting for macroses. #20
+* Add snippets `set block`, `if else`, `block with body`. #21
+* Use more specific `onLanguage:twig` activation event.
+    This fixes Twiggy starting in non-twig projects.
+* Update dependencies. Remove `glob` dependency.
+
 ## v0.8.0 (2024-04-08)
 * Provide Twig environment for Craft. \
     https://github.com/moetelo/twiggy/issues/10 \
