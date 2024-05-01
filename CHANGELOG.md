@@ -1,3 +1,6 @@
+## v0.9.2 (2024-05-01)
+* set blocks: completion and definition (#22)
+
 ## v0.9.1 (2024-04-27)
 * Fix brackets coloring in `<a href="{{ path('somepath') }}">`.
 
