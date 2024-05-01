@@ -122,6 +122,7 @@ export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
                 localSymbols.block.push(block);
                 continue;
             case 'set':
+            case 'set_block':
             case 'var_declaration':
                 const variable = toVariable(cursor.currentNode);
                 localSymbols.variable.push(variable);
