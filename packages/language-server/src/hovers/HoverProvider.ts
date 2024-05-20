@@ -1,5 +1,4 @@
 import { Connection, HoverParams } from 'vscode-languageserver';
-import { findNodeByPosition } from '../utils/node';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
 import { forLoop } from './for-loop';
@@ -23,11 +22,7 @@ export class HoverProvider {
             return;
         }
 
-        const cursorNode = findNodeByPosition(
-            document.tree.rootNode,
-            params.position,
-        );
-
+        const cursorNode = document.deepestAt(params.position);
         if (!cursorNode) {
             return;
         }

@@ -5,7 +5,7 @@ import {
     Range,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import { findNodeByPosition, getNodeRange } from '../utils/node';
+import { getNodeRange } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,
@@ -81,11 +81,7 @@ export class DefinitionProvider {
             return;
         }
 
-        const cursorNode = findNodeByPosition(
-            document.tree.rootNode,
-            params.position,
-        );
-
+        const cursorNode = document.deepestAt(params.position);
         if (!cursorNode) {
             return;
         }

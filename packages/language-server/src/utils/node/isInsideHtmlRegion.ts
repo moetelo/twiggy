@@ -1,5 +1,4 @@
 import { Position } from 'vscode-languageserver';
-import { findNodeByPosition } from './findNodeByPosition';
 import { Document } from '../../documents';
 
 export async function isInsideHtmlRegion(
@@ -7,6 +6,6 @@ export async function isInsideHtmlRegion(
     position: Position,
 ): Promise<boolean> {
     await document.ensureParsed();
-    const node = findNodeByPosition(document.tree.rootNode, position);
+    const node = document.deepestAt(position);
     return node?.type === 'content';
 }

@@ -1,5 +1,4 @@
 import { CompletionParams, Connection, WorkspaceFolder } from 'vscode-languageserver/node';
-import { findNodeByPosition } from '../utils/node';
 import { templatePaths } from './template-paths';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
@@ -43,7 +42,7 @@ export class CompletionProvider {
             return;
         }
 
-        const cursorNode = findNodeByPosition(document.tree.rootNode, params.position);
+        const cursorNode = document.deepestAt(params.position);
         if (!cursorNode) {
             return;
         }

@@ -19,11 +19,15 @@
     "README.md"
   ],
   "scripts": {
-    "build": "esbuild ./src/index.ts --bundle --outfile=dist/index.js --format=cjs --platform=node"
+    "build": "esbuild ./src/index.ts --bundle --outfile=dist/index.js --format=cjs --platform=node",
+    "test:watch": "glob -c \"node --import tsx --no-warnings --test --watch\" \"./__tests__/**/*.test.ts\"",
+    "test": "glob -c \"node --import tsx --no-warnings --test\" \"./__tests__/**/*.test.ts\""
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
     "esbuild": "^0.20.2",
+    "glob": "^10.3.15",
+    "tsx": "^4.10.5",
     "typescript": "^5.4.5"
   },
   "dependencies": {

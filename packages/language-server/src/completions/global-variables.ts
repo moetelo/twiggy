@@ -2,7 +2,7 @@ import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigGlobalVariables } from '../staticCompletionInfo';
 import { TwigVariable } from '../twigEnvironment/types';
-import { isEmptyEmbedded } from '../utils/node';
+import { isInExpressionScope } from '../utils/node';
 
 const commonCompletionItem: Partial<CompletionItem> = {
     kind: CompletionItemKind.Variable,
@@ -16,7 +16,7 @@ const completions: CompletionItem[] = twigGlobalVariables.map((item) => ({
 }));
 
 export function globalVariables(cursorNode: SyntaxNode, globals: TwigVariable[]): CompletionItem[] {
-    if (cursorNode.type === 'variable' || isEmptyEmbedded(cursorNode)) {
+    if (cursorNode.type === 'variable' || isInExpressionScope(cursorNode)) {
         const completionsPhp = globals.map((variable): CompletionItem => ({
             ...commonCompletionItem,
             label: variable.identifier,

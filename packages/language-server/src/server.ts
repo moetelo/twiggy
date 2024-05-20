@@ -6,7 +6,7 @@ import {
     WorkspaceFolder,
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import { validateTwigDocument } from './diagnostics';
+import { DiagnosticProvider } from './diagnostics';
 import { DocumentCache } from './documents';
 import { HoverProvider } from './hovers/HoverProvider';
 import { CompletionProvider } from './completions/CompletionProvider';
@@ -34,8 +34,11 @@ export class Server {
     bracketSpacesInsertionProvider!: BracketSpacesInsertionProvider;
     inlayHintProvider!: InlayHintProvider;
     signatureHelpProvider!: SignatureHelpProvider;
+    diagnosticProvider: DiagnosticProvider;
 
     constructor(connection: Connection) {
+        this.diagnosticProvider = new DiagnosticProvider(connection);
+
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
 
@@ -108,7 +111,7 @@ export class Server {
 
         this.documents.onDidChangeContent(async ({ document }) => {
             const doc = this.documentCache.updateText(document.uri, document.getText());
-            await validateTwigDocument(connection, doc);
+            await this.diagnosticProvider.validate(doc);
         });
         this.documents.listen(connection);
     }

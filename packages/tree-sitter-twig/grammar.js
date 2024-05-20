@@ -36,12 +36,11 @@ module.exports = grammar({
     _source_element: ($) =>
       choice($._statement, $.output, $.comment, $.var_declaration, $.content),
 
-    output: ($) =>
-      seq(
-        alias(choice('{{', '{{-', '{{~'), 'embedded_begin'),
-        $.expression,
-        alias(choice('}}', '-}}', '~}}'), 'embedded_end'),
-      ),
+    output: $ => seq(
+      alias(choice('{{', '{{-', '{{~'), 'embedded_begin'),
+      optional($.expression),
+      alias(choice('}}', '-}}', '~}}'), 'embedded_end')
+    ),
 
     comment: $ => seq(
       alias('{#', 'comment_begin'),
@@ -486,7 +485,7 @@ module.exports = grammar({
         alias('for', 'keyword'),
         commaSep1(field('variable', alias($.identifier, $.variable))),
         alias('in', 'keyword'),
-        field('expr', $.expression),
+        optional(field('expr', $.expression)),
         source_elements($),
         optional(seq(alias('else', 'keyword'), source_elements($))),
         alias('endfor', 'keyword'),
@@ -517,7 +516,7 @@ module.exports = grammar({
       statement(
         $,
         alias('if', 'keyword'),
-        field('expr', $.expression),
+        optional(field('expr', $.expression)),
         source_elements($, 'then'),
         optional(field('elseif', repeat($.elseif))),
         optional(seq(alias('else', 'keyword'), source_elements($, 'else'))),

@@ -84,10 +84,22 @@ comment with hashes
 #}
 
 ==================
-Output directive
+output directive
 ==================
 {{ user }}
 ---
 (template
   (output
     (variable)))
+
+==================
+empty output
+==================
+{{}} {{ }} {{
+
+}}
+---
+(template
+  (output)
+  (output)
+  (output))

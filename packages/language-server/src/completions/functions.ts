@@ -6,7 +6,7 @@ import {
 import { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../staticCompletionInfo';
 import { TwigFunctionLike } from '../twigEnvironment/types';
-import { isEmptyEmbedded } from '../utils/node';
+import { isInExpressionScope } from '../utils/node';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 
 export const commonCompletionItem: Partial<CompletionItem> = {
@@ -23,7 +23,7 @@ const completions: CompletionItem[] = twigFunctions.map((item) => ({
 }));
 
 export function functions(cursorNode: SyntaxNode, functions: TwigFunctionLike[]): CompletionItem[] {
-    if (['variable', 'function'].includes(cursorNode.type) || isEmptyEmbedded(cursorNode)) {
+    if (['variable', 'function'].includes(cursorNode.type) || isInExpressionScope(cursorNode)) {
         const completionsPhp = functions.map((func): CompletionItem => ({
             ...commonCompletionItem,
             label: func.identifier,

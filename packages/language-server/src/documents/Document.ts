@@ -1,11 +1,12 @@
 import { parser } from '../utils/parser';
 import { readFile } from 'fs/promises';
 import { DocumentUri, Position } from 'vscode-languageserver';
-import Parser from 'web-tree-sitter';
+import Parser, { SyntaxNode } from 'web-tree-sitter';
 import { collectLocals } from '../symbols/locals';
 import { LocalSymbol, LocalSymbolInformation, TwigBlock, TwigMacro } from '../symbols/types';
 import { documentUriToFsPath } from '../utils/uri';
 import { pointToPosition, rangeContainsPosition } from '../utils/position';
+import { getNodeRange } from '../utils/node';
 
 class NoTextError extends Error {
     get message() {
@@ -107,5 +108,18 @@ export class Document {
             ...this.locals.variable,
             ...this.locals.imports,
         ];
+    }
+
+    deepestAt(pos: Position): SyntaxNode {
+        let node = this.tree.rootNode;
+        while (node.childCount > 0) {
+            const foundNode = node.children.find((n) => rangeContainsPosition(getNodeRange(n), pos))!;
+
+            if (!foundNode) return node;
+
+            node = foundNode;
+        }
+
+        return node;
     }
 }

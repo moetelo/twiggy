@@ -1,5 +1,4 @@
 import { Connection, SignatureHelp, SignatureHelpParams, SignatureInformation } from 'vscode-languageserver';
-import { findNodeByPosition } from '../utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctionsSignatureInformation } from './staticSignatureInformation';
 import { Document, DocumentCache } from '../documents';
@@ -31,7 +30,7 @@ export class SignatureHelpProvider {
             return undefined;
         }
 
-        const cursorNode = findNodeByPosition(document.tree.rootNode, params.position);
+        const cursorNode = document.deepestAt(params.position);
         if (!cursorNode) return;
 
         const argumentsNode = cursorNode.parent;
