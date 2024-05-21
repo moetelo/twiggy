@@ -5,6 +5,8 @@ import { Document, DocumentCache } from '../documents';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 import { TwigMacro } from '../symbols/types';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import { pointToPosition } from '../utils/position';
+import { Position } from 'vscode-languageserver-textdocument';
 
 const macroToCompletionItem = (macro: TwigMacro) => ({
     label: macro.name,
@@ -37,6 +39,7 @@ export async function variableProperties(
     documentCache: DocumentCache,
     cursorNode: SyntaxNode,
     phpExecutor: PhpExecutor | null,
+    pos: Position,
 ): Promise<CompletionItem[]> {
     const variableNode = getVariableNode(cursorNode);
     if (!variableNode) {
@@ -79,7 +82,7 @@ export async function variableProperties(
         ];
     }
 
-    const importedDocument = await documentCache.resolveImport(document, variableName);
+    const importedDocument = await documentCache.resolveImport(document, variableName, pos);
     if (importedDocument) {
         await importedDocument.ensureParsed();
         const localMacros = importedDocument.locals.macro.map(macroToCompletionItem);
@@ -88,7 +91,9 @@ export async function variableProperties(
             return localMacros;
         }
 
-        const scopedMacros = importedDocument.getScopeAt(cursorNode.startPosition)?.symbols.macro.map(macroToCompletionItem) || [];
+        const scopedMacros = importedDocument
+            .getScopeAt(pointToPosition(cursorNode.startPosition))
+            ?.symbols.macro.map(macroToCompletionItem) || [];
 
         return [
             ...localMacros,

@@ -132,7 +132,7 @@ export class DefinitionProvider {
             );
 
             const scopedVariables = [...macroses, ...blocks].flatMap(
-                (x) => x.symbols.variable,
+                (x) => [...x.symbols.variable, ...x.symbols.imports],
             );
 
             const symbol = [
@@ -154,7 +154,7 @@ export class DefinitionProvider {
             const macroName = cursorNode.text;
             const importName = cursorNode.parent!.firstChild!.text;
 
-            const importedDocument = await this.documentCache.resolveImport(document, importName);
+            const importedDocument = await this.documentCache.resolveImport(document, importName, params.position);
             if (!importedDocument) return;
 
             await importedDocument.ensureParsed();

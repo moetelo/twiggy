@@ -6,6 +6,10 @@ import { twigFilters } from '../src/staticCompletionInfo';
 import { localVariables } from '../src/completions/local-variables';
 import { CompletionItemKind } from 'vscode-languageserver';
 import { documentFromCode, initializeTestParser } from './utils';
+import { Document } from '../src/documents/Document';
+import { variableProperties } from '../src/completions/variableProperties';
+import { DocumentCache } from '../src/documents/DocumentCache';
+import { MockEnvironment } from './mocks';
 
 describe('completion', () => {
     let parser!: Parser;
@@ -14,7 +18,7 @@ describe('completion', () => {
         parser = await initializeTestParser();
     });
 
-    test('in empty output, {{| }}', async () => {
+    test('in empty output, {{| }}', () => {
         const code = `{% set variable = 123 %}{{ }}`;
         const document = documentFromCode(code);
 
@@ -27,7 +31,7 @@ describe('completion', () => {
         assert.ok(completionFound, 'variable not in completions.');
     });
 
-    test('in empty output, {{ |}}', async () => {
+    test('in empty output, {{ |}}', () => {
         const code = `{% set variable = 123 %}{{ }}`;
         const document = documentFromCode(code);
 
@@ -40,7 +44,7 @@ describe('completion', () => {
         assert.ok(completionFound, 'variable not in completions.');
     });
 
-    test('in empty if, {% if | %}', async () => {
+    test('in empty if, {% if | %}', () => {
         const code = `{% set var = 1 %}{% if  %}{% endif %}`;
         const document = documentFromCode(code);
 
@@ -52,7 +56,7 @@ describe('completion', () => {
         assert.equal(completions[0]?.label, 'var');
     });
 
-    test('in empty for, {% for el in | %}', async () => {
+    test('in empty for, {% for el in | %}', () => {
         const code = `{% set users = [1, 2] %}{% for u in  %}{% endfor %}`;
         const document = documentFromCode(code);
 
@@ -64,7 +68,7 @@ describe('completion', () => {
         assert.equal(completions[0]?.label, 'users');
     });
 
-    test('localVariables', async () => {
+    test('localVariables', () => {
         const code = `{% set variable = 123 %}{{ v^ }}`;
         const document = documentFromCode(code);
 
@@ -79,7 +83,7 @@ describe('completion', () => {
         assert.ok(completionFound.kind === CompletionItemKind.Field, 'wrong variable type.');
     });
 
-    test('filters', async () => {
+    test('filters', () => {
         const code = `{{ something|^ }}`;
         const document = documentFromCode(code);
         const cursorNode = document.deepestAt({ line: 0, character: code.indexOf('^') })!;
@@ -110,4 +114,42 @@ describe('completion', () => {
 
         assert.equal(completions.length, twigFilters.length + customFilters.length);
     });
+
+    test('macroses', async () => {
+        const documentWithMacroUsage = documentFromCode(`
+            {% macro test() %}
+                {% import 'components.html.twig' as components %}
+                {{ components. }}
+            {% endmacro %}`,
+            'documentWithMacroUsage.html.twig',
+        );
+        const importedDocument = documentFromCode(`
+            {% macro new_macro() %}
+                ...
+            {% endmacro %}`,
+            'components.html.twig',
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment);
+        documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
+        documentCache.updateText(importedDocument.uri, importedDocument.text);
+
+        const pos = {
+            line: 3,
+            character: documentWithMacroUsage.text.split('\n')[3].indexOf('components.') + 'components.'.length,
+        };
+        const cursorNode = documentWithMacroUsage.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            documentWithMacroUsage,
+            documentCache,
+            cursorNode,
+            null,
+            pos,
+        );
+
+        const completionFound = completions.find((item) => item.label === 'new_macro');
+        assert.ok(completionFound, 'macro not in completions.');
+    })
 });

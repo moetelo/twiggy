@@ -1,9 +1,9 @@
-import { DocumentUri, WorkspaceFolder } from 'vscode-languageserver';
+import { DocumentUri, Position, WorkspaceFolder } from 'vscode-languageserver';
 import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
 import * as path from 'path';
 import { fileStat } from '../utils/files/fileStat';
-import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment';
+import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
 
 export class DocumentCache {
     #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
@@ -46,21 +46,30 @@ export class DocumentCache {
                 : pathFromTwig.replace(namespace, directory);
 
             const pathToTwig = path.resolve(this.workspaceFolderPath, includePath);
+            const documentUri = toDocumentUri(pathToTwig);
+
+            if (this.documents.has(documentUri)) {
+                return this.documents.get(documentUri);
+            }
 
             const stats = await fileStat(pathToTwig);
             if (stats) {
-                const documentUri = toDocumentUri(pathToTwig);
-                return this.get(documentUri);
+                return this.add(documentUri);
             }
         }
 
         return undefined;
     }
 
-    async resolveImport(document: Document, variableName: string) {
+    async resolveImport(document: Document, variableName: string, pos?: Position) {
         if (variableName === '_self') return document;
 
-        const twigImport = document.locals.imports.find(imp => imp.name === variableName);
+        const scopedImports = pos
+            ? document.getScopeAt(pos)?.symbols.imports
+            : document.locals.imports
+
+        const twigImport = scopedImports?.find(imp => imp.name === variableName);
+
         if (!twigImport) return;
 
         if (!twigImport.path) return document;

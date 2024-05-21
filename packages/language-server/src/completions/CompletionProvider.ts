@@ -59,7 +59,7 @@ export class CompletionProvider {
             ...filters(cursorNode, environment?.Filters || []),
             ...symfonyRouteNames(cursorNode, this.#symfonyRouteNames),
             ...await phpClasses(cursorNode, this.phpExecutor),
-            ...await variableProperties(document, this.documentCache, cursorNode, this.phpExecutor),
+            ...await variableProperties(document, this.documentCache, cursorNode, this.phpExecutor, params.position),
             ...await templatePaths(
                 cursorNode,
                 this.workspaceFolderPath,
