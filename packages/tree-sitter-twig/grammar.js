@@ -341,6 +341,8 @@ module.exports = grammar({
           ['%', 60],
           ['is', 100],
           ['is not', 100],
+          ['is divisible by', 100],
+          ['is same as', 100],
           ['**', 200, 'right'],
           ['??', 300, 'right'],
         ]).map(([operator, precedence, associativity = 'left']) =>

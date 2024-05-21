@@ -1,5 +1,5 @@
 ==================
-Divisible by
+divisible by
 ==================
 {% if loop.index is divisible by(3) %}
   ...
@@ -11,15 +11,13 @@ Divisible by
       (member_expression
         (variable)
         (property))
-      (call_expression
-        (function)
-        (arguments
-          (number))))
+      (parenthesized_expression
+        (number)))
     (source_elements
       (content))))
 
 ==================
-Same as
+same as parenthesized
 ==================
 {% if foo.attribute is same as(false) %}
   ...
@@ -31,9 +29,46 @@ Same as
       (member_expression
         (variable)
         (property))
+      (parenthesized_expression
+        (boolean)))
+    (source_elements
+      (content))))
+
+==================
+same as
+==================
+{% if foo is same as false %}
+  ...
+{% endif %}
+---
+(template
+  (if
+    (binary_expression
+      (variable)
+      (boolean))
+    (source_elements
+      (content))))
+
+==================
+issue #18
+==================
+{% if app.request.query.get('email') is same as email.uuid %}open{% endif %}
+---
+(template
+  (if
+    (binary_expression
       (call_expression
-        (function)
+        (member_expression
+          (member_expression
+            (member_expression
+              (variable)
+              (property))
+            (property))
+          (property))
         (arguments
-          (boolean))))
+          (string)))
+      (member_expression
+        (variable)
+        (property)))
     (source_elements
       (content))))
