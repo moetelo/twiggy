@@ -1,3 +1,7 @@
+## v0.10.0 (2024-05-22)
+* Fix syntax error for `is same as` and `is divisible by` tests (#18).
+* Language server features for macro imports inside of macro (#17).
+
 ## v0.9.2 (2024-05-01)
 * set blocks: completion and definition (#22)
 
