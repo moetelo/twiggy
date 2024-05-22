@@ -100,7 +100,7 @@ export class Document {
         const blocks = this.locals.block.filter(x => rangeContainsPosition(x.range, cursorPosition));
         const macroses = this.locals.macro.filter(x => rangeContainsPosition(x.range, cursorPosition));
 
-        const scopedVariables = [ ...macroses, ...blocks ].flatMap(x => x.symbols.variable);
+        const scopedVariables = [ ...macroses, ...blocks ].flatMap(x => [ ...x.symbols.variable, ...x.symbols.imports ]);
 
         return [
             ...scopedVariables,

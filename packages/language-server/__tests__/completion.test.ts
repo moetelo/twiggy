@@ -83,6 +83,29 @@ describe('completion', () => {
         assert.ok(completionFound.kind === CompletionItemKind.Field, 'wrong variable type.');
     });
 
+    test('macroses (list imports)', () => {
+        const variableName = 'components';
+        const document = documentFromCode(
+            `{% macro test() %}
+                {% import 'components.html.twig' as ${variableName} %}
+                {{  }}
+            {% endmacro %}`,
+        );
+
+        const pos = {
+            line: 2,
+            character: document.text.split('\n')[2].indexOf('{{') + '{{'.length,
+        };
+
+        const completions = localVariables(
+            document,
+            document.deepestAt(pos)!,
+        );
+
+        const completionFound = completions.find((item) => item.label === variableName);
+        assert.ok(completionFound, 'macro not in completions.');
+    });
+
     test('filters', () => {
         const code = `{{ something|^ }}`;
         const document = documentFromCode(code);
@@ -115,16 +138,16 @@ describe('completion', () => {
         assert.equal(completions.length, twigFilters.length + customFilters.length);
     });
 
-    test('macroses', async () => {
-        const documentWithMacroUsage = documentFromCode(`
-            {% macro test() %}
+    test('macroses (list properties of imported file)', async () => {
+        const documentWithMacroUsage = documentFromCode(
+            `{% macro test() %}
                 {% import 'components.html.twig' as components %}
                 {{ components. }}
             {% endmacro %}`,
             'documentWithMacroUsage.html.twig',
         );
-        const importedDocument = documentFromCode(`
-            {% macro new_macro() %}
+        const importedDocument = documentFromCode(
+            `{% macro new_macro() %}
                 ...
             {% endmacro %}`,
             'components.html.twig',
@@ -136,8 +159,8 @@ describe('completion', () => {
         documentCache.updateText(importedDocument.uri, importedDocument.text);
 
         const pos = {
-            line: 3,
-            character: documentWithMacroUsage.text.split('\n')[3].indexOf('components.') + 'components.'.length,
+            line: 2,
+            character: documentWithMacroUsage.text.split('\n')[2].indexOf('components.') + 'components.'.length,
         };
         const cursorNode = documentWithMacroUsage.deepestAt(pos)!;
 
@@ -151,5 +174,5 @@ describe('completion', () => {
 
         const completionFound = completions.find((item) => item.label === 'new_macro');
         assert.ok(completionFound, 'macro not in completions.');
-    })
+    });
 });
