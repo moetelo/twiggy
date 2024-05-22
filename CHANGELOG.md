@@ -1,3 +1,6 @@
+## v0.10.1 (2024-05-22)
+* Completion/definition/hover for imported twig files.
+
 ## v0.10.0 (2024-05-22)
 * Fix syntax error for `is same as` and `is divisible by` tests (#18).
 * Language server features for macro imports inside of macro (#17).
