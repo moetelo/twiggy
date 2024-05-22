@@ -1,0 +1,41 @@
+name: Publish to NPM
+
+on:
+  workflow_dispatch: ~
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_PAT }}
+  VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2.4.0
+        with:
+          version: 9
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
+            - args: [--global, "@vscode/vsce"]
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - run: pnpm build
+
+      - run: vsce publish --no-dependencies
+        working-directory: ./packages/vscode
+
+      - name: pnpm publish
+        working-directory: ./packages/language-server
+        run: |
+            npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
+            pnpm publish --no-git-checks

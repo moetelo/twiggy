@@ -3,11 +3,8 @@
 import { execSync } from 'child_process';
 import * as esbuild from 'esbuild';
 import { cp, rm, stat } from 'fs/promises';
-import { spawnSync } from 'node:child_process';
 import path from 'path';
 
-const isPublish = process.argv.includes('--publish');
-const isPackage = process.argv.includes('--package');
 const isDev = process.argv.includes('--dev');
 
 const treeSitterWasmPath = path.resolve('../language-server/node_modules/web-tree-sitter/tree-sitter.wasm');
@@ -49,18 +46,6 @@ async function buildProduction(options) {
 
     await cp('./dist', '../language-server/dist', { recursive: true });
     await rm('../language-server/dist/extension.js');
-
-    const vsceCommand = isPublish
-        ? 'publish'
-        : isPackage
-            ? 'package'
-            : '';
-
-    if (vsceCommand) {
-        spawnSync('vsce', [vsceCommand, '--no-dependencies'], {
-            stdio: 'inherit',
-        });
-    }
 }
 
 
