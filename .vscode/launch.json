@@ -24,7 +24,7 @@
       "smartStep": true,
       "outFiles": [
         "${workspaceRoot}/packages/vscode/dist/*",
-      ]
+      ],
     },
     {
         "type": "node",

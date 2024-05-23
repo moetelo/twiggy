@@ -23,6 +23,7 @@ import {
 import { initializeParser } from './utils/parser';
 import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesInsertionProvider';
 import { InlayHintProvider } from './inlayHints/InlayHintProvider';
+import { ReferenceProvider } from './references/ReferenceProvider';
 
 export class Server {
     readonly documents = new TextDocuments(TextDocument);
@@ -34,6 +35,7 @@ export class Server {
     bracketSpacesInsertionProvider!: BracketSpacesInsertionProvider;
     inlayHintProvider!: InlayHintProvider;
     signatureHelpProvider!: SignatureHelpProvider;
+    referenceProvider!: ReferenceProvider;
     diagnosticProvider: DiagnosticProvider;
 
     constructor(connection: Connection) {
@@ -51,6 +53,7 @@ export class Server {
             new SymbolProvider(connection, documentCache);
             new HoverProvider(connection, documentCache);
             this.signatureHelpProvider = new SignatureHelpProvider(connection, documentCache);
+            this.referenceProvider = new ReferenceProvider(connection, documentCache);
             this.definitionProvider = new DefinitionProvider(
                 connection,
                 documentCache,
@@ -84,6 +87,7 @@ export class Server {
                     full: true,
                 },
                 inlayHintProvider: true,
+                referencesProvider: true,
                 executeCommandProvider: {
                     commands: [
                         `${Command.IsInsideHtmlRegion}(${this.workspaceFolder.uri})`,

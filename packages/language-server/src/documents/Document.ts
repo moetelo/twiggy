@@ -87,7 +87,7 @@ export class Document {
             .find((s) => s.name === name);
     }
 
-    getScopeAt(pos: Position): LocalSymbolInformation | undefined {
+    getScopeAt(pos: Position): LocalSymbolInformation {
         const scopes = [
             ...this.locals.macro,
             ...this.locals.block,

@@ -4,12 +4,12 @@ import {
     TwigBlock,
     TwigImport,
     TwigMacro,
-    TwigVariable,
+    TwigVariableDeclaration,
 } from './types';
 import { getNodeRange, getStringNodeValue } from '../utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 
-function toBlock(node: SyntaxNode): TwigBlock {
+function toBlock(node: SyntaxNode, variableDefinitionMap: Map<string, TwigVariableDeclaration>): TwigBlock {
     const nameNode = node.childForFieldName('name')!;
     const bodyNode = node.childForFieldName('body');
 
@@ -17,11 +17,11 @@ function toBlock(node: SyntaxNode): TwigBlock {
         name: nameNode.text,
         range: getNodeRange(node),
         nameRange: getNodeRange(nameNode),
-        symbols: collectLocals(bodyNode),
+        symbols: collectLocals(bodyNode, variableDefinitionMap),
     };
 }
 
-function toVariable(node: SyntaxNode): TwigVariable {
+function toVariable(node: SyntaxNode): TwigVariableDeclaration {
     const variableNode = node.childForFieldName('variable')!;
 
     return {
@@ -30,6 +30,7 @@ function toVariable(node: SyntaxNode): TwigVariable {
         value: node.childForFieldName('value')?.text,
         type: node.childForFieldName('type')?.text,
         range: getNodeRange(node),
+        references: [],
     };
 }
 
@@ -85,10 +86,11 @@ function toImport(node: SyntaxNode): TwigImport {
         path: resolveImportPath(pathNode),
         range: getNodeRange(node),
         nameRange: getNodeRange(aliasNode),
+        references: [],
     };
 }
 
-export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
+export function collectLocals(tree: SyntaxNode | null, variableDefinitionMap = new Map<string, TwigVariableDeclaration>()): LocalSymbolInformation {
     const localSymbols: LocalSymbolInformation = {
         variable: [],
         macro: [],
@@ -116,36 +118,72 @@ export function collectLocals(tree: SyntaxNode | null): LocalSymbolInformation {
             case 'import':
                 const twigImport = toImport(cursor.currentNode);
                 localSymbols.imports.push(twigImport);
+                variableDefinitionMap.set(twigImport.name, twigImport);
                 continue;
             case 'block':
-                const block = toBlock(cursor.currentNode);
+                const block = toBlock(cursor.currentNode, variableDefinitionMap);
                 localSymbols.block.push(block);
                 continue;
             case 'set':
             case 'set_block':
-            case 'var_declaration':
-                const variable = toVariable(cursor.currentNode);
-                localSymbols.variable.push(variable);
+            case 'var_declaration': {
+                const { currentNode } = cursor;
+                const variableDeclaration = toVariable(currentNode);
+                localSymbols.variable.push(variableDeclaration);
+                variableDefinitionMap.set(variableDeclaration.name, variableDeclaration);
+
+                const localsInAssignmentExpr = collectLocals(
+                    currentNode.childForFieldName('value'),
+                    variableDefinitionMap,
+                );
+                localSymbols.variable.push(...localsInAssignmentExpr.variable);
                 continue;
+            }
             case 'macro':
                 const macro = toMacro(cursor.currentNode);
                 localSymbols.macro.push(macro);
                 continue;
 
+            case 'variable':
+                const { currentNode } = cursor;
+                const nameRange = getNodeRange(currentNode);
+
+                const alreadyDefinedVar = variableDefinitionMap.get(currentNode.text);
+                if (alreadyDefinedVar) {
+                    alreadyDefinedVar.references.push(nameRange);
+                    continue;
+                }
+
+                const variable: TwigVariableDeclaration = {
+                    name: currentNode.text,
+                    nameRange,
+                    range: getNodeRange(currentNode.parent!),
+                    references: [],
+                };
+                localSymbols.variable.push(variable);
+                variableDefinitionMap.set(variable.name, variable);
+                continue;
+
             case 'if':
             case 'elseif':
             case 'else':
-                cursor.gotoFirstChild();
-                continue;
-
-            case 'source_elements':
-                const sourceElementsLocals = collectLocals(cursor.currentNode);
+            case 'for':
+            case 'output':
+            case 'primary_expression':
+            case 'unary_expression':
+            case 'binary_expression':
+            case 'ternary_expression':
+            case 'member_expression':
+            case 'call_expression':
+            case 'arguments':
+            case 'source_elements': {
+                const sourceElementsLocals = collectLocals(cursor.currentNode, variableDefinitionMap);
                 localSymbols.variable.push(...sourceElementsLocals.variable);
                 localSymbols.macro.push(...sourceElementsLocals.macro);
                 localSymbols.block.push(...sourceElementsLocals.block);
                 localSymbols.imports.push(...sourceElementsLocals.imports);
-                cursor.gotoParent();
                 continue;
+            }
         }
     } while (cursor.gotoNextSibling());
 
