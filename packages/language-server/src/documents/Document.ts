@@ -87,13 +87,14 @@ export class Document {
             .find((s) => s.name === name);
     }
 
-    getScopeAt(pos: Position): TwigBlock | TwigMacro | undefined {
+    getScopeAt(pos: Position): LocalSymbolInformation | undefined {
         const scopes = [
             ...this.locals.macro,
             ...this.locals.block,
         ];
 
-        return scopes.find((scope) => rangeContainsPosition(scope.range, pos));
+        return scopes.find((scope) => rangeContainsPosition(scope.range, pos))?.symbols
+            || this.locals;
     }
 
     getLocalsAt(cursorPosition: Position): LocalSymbol[] {

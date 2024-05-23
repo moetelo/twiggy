@@ -83,7 +83,7 @@ describe('completion', () => {
         assert.ok(completionFound.kind === CompletionItemKind.Field, 'wrong variable type.');
     });
 
-    test('macroses (list imports)', () => {
+    test('macroses (in macro, list imports)', () => {
         const variableName = 'components';
         const document = documentFromCode(
             `{% macro test() %}
@@ -95,6 +95,27 @@ describe('completion', () => {
         const pos = {
             line: 2,
             character: document.text.split('\n')[2].indexOf('{{') + '{{'.length,
+        };
+
+        const completions = localVariables(
+            document,
+            document.deepestAt(pos)!,
+        );
+
+        const completionFound = completions.find((item) => item.label === variableName);
+        assert.ok(completionFound, 'macro not in completions.');
+    });
+
+    test('macroses (list imports)', () => {
+        const variableName = 'components';
+        const document = documentFromCode(
+            `{% import 'components.html.twig' as ${variableName} %}
+            {{  }}`,
+        );
+
+        const pos = {
+            line: 1,
+            character: document.text.split('\n')[1].indexOf('{{') + '{{'.length,
         };
 
         const completions = localVariables(
@@ -139,6 +160,42 @@ describe('completion', () => {
     });
 
     test('macroses (list properties of imported file)', async () => {
+        const documentWithMacroUsage = documentFromCode(
+            `{% import 'components.html.twig' as components %}
+            {{ components. }}`,
+            'documentWithMacroUsage.html.twig',
+        );
+        const importedDocument = documentFromCode(
+            `{% macro new_macro() %}
+                ...
+            {% endmacro %}`,
+            'components.html.twig',
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment);
+        documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
+        documentCache.updateText(importedDocument.uri, importedDocument.text);
+
+        const pos = {
+            line: 1,
+            character: documentWithMacroUsage.text.split('\n')[1].indexOf('components.') + 'components.'.length,
+        };
+        const cursorNode = documentWithMacroUsage.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            documentWithMacroUsage,
+            documentCache,
+            cursorNode,
+            null,
+            pos,
+        );
+
+        const completionFound = completions.find((item) => item.label === 'new_macro');
+        assert.ok(completionFound, 'macro not in completions.');
+    });
+
+    test('macroses (in macro, list properties of imported file)', async () => {
         const documentWithMacroUsage = documentFromCode(
             `{% macro test() %}
                 {% import 'components.html.twig' as components %}

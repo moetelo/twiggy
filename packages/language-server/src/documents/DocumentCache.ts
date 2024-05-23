@@ -65,7 +65,7 @@ export class DocumentCache {
         if (variableName === '_self') return document;
 
         const scopedImports = pos
-            ? document.getScopeAt(pos)?.symbols.imports
+            ? document.getScopeAt(pos)?.imports
             : document.locals.imports
 
         const twigImport = scopedImports?.find(imp => imp.name === variableName);
