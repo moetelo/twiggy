@@ -22,14 +22,22 @@ describe('diagnostics', () => {
     };
 
     test('empty output', () => testDiagnostic('{{ }}'));
-    test('empty if condition', () => testDiagnostic('{% if %}<input>{% endif %}'));
+    test('empty if condition', () => testDiagnostic(`{% if %}<input>{% endif %}`, 0, '{% if %}'.length));
     test('empty for element', () => testDiagnostic('{% for %}<input>{% endfor %}', 0, '{% for %}'.length));
+
+    test(
+        'empty if condition (multiline)',
+        () => testDiagnostic(
+            `{% if %}\n<input>\n{% endif %}`,
+            0, '{% if %}'.length,
+        ),
+    );
 
     test(
         'empty output in if block',
         () => testDiagnostic(
             '{% if true %}{{ }}{% endif %}',
             '{% if true %}'.length, '{% if true %}{{ }}'.length,
-        )
+        ),
     );
 });

@@ -61,4 +61,12 @@ describe('Document.deepestAt for incomplete nodes', () => {
 
         assert.equal(node.type, 'output');
     });
+
+    test('empty if condition', () => {
+        const document = documentFromCode(`{% if %}{% endif %}`);
+
+        const node = document.deepestAt({ line: 0, character: `{% if`.length })!;
+
+        assert.equal(node.parent!.type, 'if');
+    });
 });
