@@ -111,6 +111,20 @@ export class Document {
         ];
     }
 
+    variableAt(pos: Position): LocalSymbol | undefined {
+        const cursorNode = this.deepestAt(pos);
+        if (!cursorNode || cursorNode.type !== 'variable') {
+            return;
+        }
+
+        const variableName = cursorNode.text;
+        const cursorPosition = pointToPosition(cursorNode.startPosition);
+        const scopedVariables = this.getLocalsAt(cursorPosition);
+        const variable = scopedVariables.find((x) => x.name === variableName);
+
+        return variable;
+    }
+
     deepestAt(pos: Position): SyntaxNode {
         let node = this.tree.rootNode;
         while (node.childCount > 0) {

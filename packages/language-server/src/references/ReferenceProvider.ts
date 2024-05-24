@@ -1,7 +1,6 @@
 import { Connection, Range, ReferenceParams } from 'vscode-languageserver/node';
 import { DocumentCache } from '../documents/DocumentCache';
-import { pointToPosition } from '../utils/position';
-import { TwigVariableDeclaration, hasReferences } from '../symbols/types';
+import { hasReferences } from '../symbols/types';
 
 const rangeToLocation = (range: Range, uri: string) => ({ uri, range });
 
@@ -19,16 +18,7 @@ export class ReferenceProvider {
             return;
         }
 
-        const cursorNode = document.deepestAt(params.position);
-        if (!cursorNode || cursorNode.type !== 'variable') {
-            return;
-        }
-
-        const variableName = cursorNode.text;
-        const cursorPosition = pointToPosition(cursorNode.startPosition);
-        const scopedVariables = document.getLocalsAt(cursorPosition);
-        const variable = scopedVariables.find((x) => x.name === variableName);
-
+        const variable = document.variableAt(params.position);
         if (!variable) {
             return;
         }
