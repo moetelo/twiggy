@@ -1,3 +1,7 @@
+## v0.10.2 (2024-05-24)
+* Fix completions not showing for top-level imports.
+* Fix yellow file when `{% if %}` has no condition (mark only the `{% if %}` part as invalid).
+
 ## v0.10.1 (2024-05-22)
 * Completion/definition/hover for imported twig files.
 
