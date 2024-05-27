@@ -53,10 +53,6 @@ export class ConfigurationManager {
 
         this.applySettings(EmptyEnvironment, null);
 
-        if (config.phpBinConsoleCommand) {
-            console.warn('`twiggy.phpBinConsoleCommand` does not work anymore. Use `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` instead.');
-        }
-
         if (config.framework === PhpFramework.Ignore) {
             return;
         }
