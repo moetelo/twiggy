@@ -1,3 +1,6 @@
+## v0.11.1 (2024-05-29)
+* Collect variable usage in other types of expressions.
+
 ## v0.11.0 (2024-05-24)
 * Variable references.
 * Unused variable diagnostics.
