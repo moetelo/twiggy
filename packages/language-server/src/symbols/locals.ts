@@ -173,9 +173,14 @@ export function collectLocals(tree: SyntaxNode | null, variableDefinitionMap = n
             case 'unary_expression':
             case 'binary_expression':
             case 'ternary_expression':
+            case 'subscript_expression':
             case 'member_expression':
+            case 'filter_expression':
+            case 'parenthesized_expression':
             case 'call_expression':
             case 'arguments':
+            case 'object':
+            case 'pair':
             case 'source_elements': {
                 const sourceElementsLocals = collectLocals(cursor.currentNode, variableDefinitionMap);
                 localSymbols.variable.push(...sourceElementsLocals.variable);

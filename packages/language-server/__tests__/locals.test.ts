@@ -2,7 +2,7 @@ import { describe, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'web-tree-sitter';
 import { collectLocals } from '../src/symbols/locals';
-import { createLengthRange, createRange, initializeTestParser } from './utils';
+import { createLengthRange, documentFromCode, initializeTestParser } from './utils';
 import { LocalSymbolInformation } from '../src/symbols/types';
 
 describe('locals', () => {
@@ -110,9 +110,9 @@ describe('locals', () => {
         return variable;
     };
 
-    test('collects implicitly defined variable inside of if statement', () => {
+    test('collects implicitly defined variable inside of if condition', () => {
         const varName = 'variable0';
-        const code = `{% if ${varName} %}{{ ${varName} }}{% endif %}{% if not ${varName} %} var0 is falsy :( {% endif %}`;
+        const code = `{% if ${varName} %}{{ ${varName}[0].prop }}{% endif %}{% if not ${varName} %} var0 is falsy :( {% endif %}`;
 
         const variable = testOneVariable(varName, code);
 
@@ -121,6 +121,22 @@ describe('locals', () => {
             [
                 createLengthRange(code.indexOf(varName, variable.nameRange.end.character), varName.length),
                 createLengthRange(code.lastIndexOf(varName), varName.length),
+            ],
+        );
+    });
+
+    test('collects references inside of filter args', async () => {
+        const varName = 'variable0';
+        const document = await documentFromCode(`{% if ${varName} %}{{ 'something'|trans({ prop1: ${varName}, prop2: 123 }) }}{% endif %}`);
+
+        const variable = document.locals.variable[0];
+
+        assert.strictEqual(variable.name, varName);
+
+        assert.deepEqual(
+            variable.references,
+            [
+                createLengthRange(document.text.lastIndexOf(varName), varName.length),
             ],
         );
     });
