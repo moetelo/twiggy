@@ -1,13 +1,19 @@
-import { Connection, Diagnostic, DiagnosticSeverity } from 'vscode-languageserver';
+import { Connection, Diagnostic, DiagnosticSeverity, DiagnosticTag, Range } from 'vscode-languageserver';
 import { Document } from '../documents';
 import { PreOrderCursorIterator, getNodeRange, isEmptyEmbedded } from '../utils/node';
 import { SyntaxNode, Tree } from 'web-tree-sitter';
+import { pointToPosition } from '../utils/position';
 
-const createDiagnostic = (node: SyntaxNode, message: string): Diagnostic => ({
+const createDiagnosticFromRange = (range: Range, message: string): Diagnostic => ({
     severity: DiagnosticSeverity.Warning,
-    range: getNodeRange(node),
+    range,
     message,
 });
+
+const createDiagnostic = (node: SyntaxNode, message: string): Diagnostic => createDiagnosticFromRange(
+    getNodeRange(node),
+    message,
+);
 
 export class DiagnosticProvider {
     constructor(
@@ -18,6 +24,16 @@ export class DiagnosticProvider {
     validateNode(node: SyntaxNode): Diagnostic | null {
         if (node.type === 'ERROR') {
             return createDiagnostic(node, 'Unexpected syntax');
+        }
+
+        if (node.type === 'if' && !node.childForFieldName('expr')) {
+            const diag = createDiagnostic(node, 'Empty if condition');
+
+            // {% if %}
+            //        ^
+            const ifEmbeddedEnd = node.descendantsOfType('embedded_end')[0];
+            diag.range.end = pointToPosition(ifEmbeddedEnd.endPosition);
+            return diag;
         }
 
         if (isEmptyEmbedded(node)) {
@@ -44,10 +60,32 @@ export class DiagnosticProvider {
     }
 
     async validate(document: Document) {
-        const diagnostics = this.validateTree(document.tree);
+        const syntaxDiagnostics = this.validateTree(document.tree);
+
+        const blockScopedVariables = document.locals.block.flatMap(b => b.symbols.variable);
+        const unusedVariables = [
+            ...document.locals.variable,
+            ...blockScopedVariables,
+        ]
+            .filter((variable) => variable.references.length === 0)
+            // {% if var %}
+            // {% if for ... in var %}
+            // TODO: optimize. Don't use deepestAt, mark variables as used in the `collectLocals` phase.
+            .filter((variable) => document.deepestAt(variable.nameRange.start).nextSibling?.type !== 'embedded_end');
+
+        const unusedVariablesDiagnostics = unusedVariables.map((variable): Diagnostic => ({
+            severity: DiagnosticSeverity.Hint,
+            range: variable.nameRange,
+            message: `Unused variable`,
+            tags: [ DiagnosticTag.Unnecessary ],
+        }));
+
         await this.connection.sendDiagnostics({
             uri: document.uri,
-            diagnostics,
+            diagnostics: [
+                ...syntaxDiagnostics,
+                ...unusedVariablesDiagnostics,
+            ],
         });
     }
 

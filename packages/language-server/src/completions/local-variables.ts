@@ -1,11 +1,11 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { Document } from '../documents';
-import { FunctionArgument, TwigVariable } from '../symbols/types';
+import { FunctionArgument, TwigVariableDeclaration } from '../symbols/types';
 import { isInExpressionScope } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 
-const toCompletionItem = (variable: TwigVariable | FunctionArgument): CompletionItem => ({
+const toCompletionItem = (variable: TwigVariableDeclaration | FunctionArgument): CompletionItem => ({
     label: variable.name,
     kind: CompletionItemKind.Field,
     detail: variable.value,

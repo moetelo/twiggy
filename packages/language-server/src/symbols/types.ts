@@ -7,9 +7,14 @@ export interface LocalSymbol {
     range: Range;
 }
 
-export interface TwigVariable extends LocalSymbol {
+export interface TwigVariableDeclaration extends LocalSymbol {
     value?: string;
     type?: string;
+    references: Range[];
+}
+
+export function hasReferences<T extends LocalSymbol>(node: T): node is T & { references: Range[] } {
+    return 'references' in node;
 }
 
 export interface FunctionArgument extends LocalSymbol {
@@ -27,6 +32,7 @@ export interface TwigBlock extends LocalSymbol {
 
 export interface TwigImport extends LocalSymbol {
     path?: string;
+    references: Range[];
 }
 
 export namespace TwigImport {
@@ -36,7 +42,7 @@ export namespace TwigImport {
 export type LocalSymbolInformation = {
     extends?: string;
     imports: TwigImport[];
-    variable: TwigVariable[];
+    variable: TwigVariableDeclaration[];
     macro: TwigMacro[];
     block: TwigBlock[];
 };

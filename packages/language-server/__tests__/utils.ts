@@ -24,3 +24,5 @@ export const createRange = (start: number, end: number): Range => ({
     start: { character: start, line: 0 },
     end: { character: end, line: 0 },
 });
+
+export const createLengthRange = (start: number, length: number): Range => createRange(start, start + length);

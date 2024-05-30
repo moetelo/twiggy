@@ -93,7 +93,7 @@ export async function variableProperties(
 
         const scopedMacros = importedDocument
             .getScopeAt(pointToPosition(cursorNode.startPosition))
-            ?.symbols.macro.map(macroToCompletionItem) || [];
+            ?.macro.map(macroToCompletionItem) || [];
 
         return [
             ...localMacros,

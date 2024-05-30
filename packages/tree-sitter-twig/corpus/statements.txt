@@ -742,3 +742,13 @@ if empty condition (completion)
 ---
 (template
   (if))
+
+==================
+if empty condition (diagnostics)
+==================
+{% if %}<input>{% endif %}
+---
+(template
+  (if
+    (source_elements
+      (content))))

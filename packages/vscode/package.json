@@ -4,7 +4,7 @@
   "description": "Twig language support for VS Code",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
-  "version": "0.10.1",
+  "version": "0.11.1",
   "engines": {
     "vscode": "^1.88.0"
   },
@@ -54,12 +54,6 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "Inlay hints for `{% endblock %}`."
-        },
-        "twiggy.phpBinConsoleCommand": {
-          "type": "string",
-          "markdownDeprecationMessage": "Use `twiggy.phpExecutable` and `twiggy.symfonyConsolePath` instead.",
-          "scope": "resource",
-          "markdownDescription": "Shell command that will be used for PHP command execution. \n\ne.g. `php bin/console` \n\nSee: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
         },
         "twiggy.phpExecutable": {
           "type": "string",
@@ -149,6 +143,7 @@
     "@types/node": "^20.12.7",
     "@types/vscode": "^1.88.0",
     "esbuild": "^0.20.2",
+    "esbuild-plugin-copy": "^2.1.1",
     "typescript": "^5.4.5"
   },
   "dependencies": {

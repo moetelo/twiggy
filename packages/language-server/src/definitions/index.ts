@@ -124,23 +124,9 @@ export class DefinitionProvider {
 
         if (cursorNode.type === 'variable') {
             const cursorPosition = pointToPosition(cursorNode.startPosition);
-            const blocks = document.locals.block.filter((x) =>
-                rangeContainsPosition(x.range, cursorPosition),
-            );
-            const macroses = document.locals.macro.filter((x) =>
-                rangeContainsPosition(x.range, cursorPosition),
-            );
+            const scopedVariables = document.getLocalsAt(cursorPosition);
 
-            const scopedVariables = [...macroses, ...blocks].flatMap(
-                (x) => [...x.symbols.variable, ...x.symbols.imports],
-            );
-
-            const symbol = [
-                ...scopedVariables,
-                ...macroses.flatMap((x) => x.args),
-                ...document.locals.variable,
-                ...document.locals.imports,
-            ].find((x) => x.name === cursorNode.text);
+            const symbol = scopedVariables.find((x) => x.name === cursorNode.text);
 
             if (!symbol) return;
 

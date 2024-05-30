@@ -14,12 +14,6 @@ export type LanguageServerSettings = {
     autoInsertSpaces: boolean,
     inlayHints: InlayHintSettings,
 
-    /**
-     * @deprecated
-     * Used only for warning.
-     * */
-    phpBinConsoleCommand?: string,
-
     framework?: PhpFramework,
     phpExecutable: string,
     symfonyConsolePath: string,

@@ -87,13 +87,14 @@ export class Document {
             .find((s) => s.name === name);
     }
 
-    getScopeAt(pos: Position): TwigBlock | TwigMacro | undefined {
+    getScopeAt(pos: Position): LocalSymbolInformation {
         const scopes = [
             ...this.locals.macro,
             ...this.locals.block,
         ];
 
-        return scopes.find((scope) => rangeContainsPosition(scope.range, pos));
+        return scopes.find((scope) => rangeContainsPosition(scope.range, pos))?.symbols
+            || this.locals;
     }
 
     getLocalsAt(cursorPosition: Position): LocalSymbol[] {
@@ -108,6 +109,20 @@ export class Document {
             ...this.locals.variable,
             ...this.locals.imports,
         ];
+    }
+
+    variableAt(pos: Position): LocalSymbol | undefined {
+        const cursorNode = this.deepestAt(pos);
+        if (!cursorNode || cursorNode.type !== 'variable') {
+            return;
+        }
+
+        const variableName = cursorNode.text;
+        const cursorPosition = pointToPosition(cursorNode.startPosition);
+        const scopedVariables = this.getLocalsAt(cursorPosition);
+        const variable = scopedVariables.find((x) => x.name === variableName);
+
+        return variable;
     }
 
     deepestAt(pos: Position): SyntaxNode {

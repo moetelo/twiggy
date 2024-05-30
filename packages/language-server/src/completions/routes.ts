@@ -11,10 +11,17 @@ export const commonCompletionItem: Partial<CompletionItem> = {
 };
 
 const isInStringInsideOfPathCall = (cursorNode: SyntaxNode): boolean => {
-    return cursorNode.type === 'string'
+    if (!(cursorNode.type === 'string'
         && cursorNode.parent?.type === 'arguments'
         && !!cursorNode.parent.firstNamedChild?.equals(cursorNode)
-        && cursorNode.parent.parent!.childForFieldName('name')?.text === 'path';
+    )) {
+        return false;
+    }
+
+    const functionName = cursorNode.parent.parent!.childForFieldName('name')?.text;
+    if (!functionName) return false;
+
+    return ['path', 'is_route'].includes(functionName);
 }
 
 export function symfonyRouteNames(cursorNode: SyntaxNode, routeNames: string[]): CompletionItem[] {
