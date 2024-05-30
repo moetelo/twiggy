@@ -1,4 +1,4 @@
-export const primitives = [
+export const primitives = new Set([
     'int',
     'float',
     'string',
@@ -13,4 +13,4 @@ export const primitives = [
     'false',
     'mixed',
     'never',
-];
+]);

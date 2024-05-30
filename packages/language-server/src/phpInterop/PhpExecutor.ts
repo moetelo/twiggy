@@ -1,8 +1,9 @@
 import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
 import { execPromisified, isProcessError } from '../utils/exec';
+import { IPhpExecutor } from './IPhpExecutor';
 import { ReflectedType } from './ReflectedType';
 
-export class PhpExecutor {
+export class PhpExecutor implements IPhpExecutor {
     constructor(
         private readonly _phpExecutable: string | undefined,
         private readonly _workspaceDirectory: string,
@@ -49,9 +50,8 @@ export class PhpExecutor {
         ]) || [];
     }
 
-
-    async completeInstanceProperties(className: string) {
-        return await this.call<ReflectedType>(PhpUtilPath.completeInstanceProperties, [
+    async reflectType(className: string) {
+        return await this.call<ReflectedType>(PhpUtilPath.reflectType, [
             this._workspaceDirectory,
             `'${className}'`,
         ]);

@@ -4,12 +4,23 @@ import { filters } from '../src/completions/filters';
 import Parser from 'web-tree-sitter';
 import { twigFilters } from '../src/staticCompletionInfo';
 import { localVariables } from '../src/completions/local-variables';
-import { CompletionItemKind } from 'vscode-languageserver';
-import { documentFromCode, initializeTestParser } from './utils';
-import { Document } from '../src/documents/Document';
+import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
+import { documentFromCode, documentFromCodeWithTypeResolver, initializeTestParser } from './utils';
 import { variableProperties } from '../src/completions/variableProperties';
 import { DocumentCache } from '../src/documents/DocumentCache';
-import { MockEnvironment } from './mocks';
+import { MockEnvironment, MockPhpExecutor } from './mocks';
+import { ExpressionTypeResolver } from '../src/typing/ExpressionTypeResolver';
+import { TypeResolver } from '../src/typing/TypeResolver';
+import type { ReflectedType } from '../src/phpInterop/ReflectedType';
+
+const assertExpectedType = (completions: CompletionItem[], expectedType: ReflectedType) => {
+    const expectedLabels = [...expectedType.properties, ...expectedType.methods].map((prop) => prop.name);
+
+    expectedLabels.every((label) => {
+        const completionFound = completions.find((item) => item.label === label);
+        assert.ok(completionFound, `${label} not in completions.`);
+    });
+};
 
 describe('completion', () => {
     let parser!: Parser;
@@ -18,9 +29,9 @@ describe('completion', () => {
         parser = await initializeTestParser();
     });
 
-    test('in empty output, {{| }}', () => {
+    test('in empty output, {{| }}', async () => {
         const code = `{% set variable = 123 %}{{ }}`;
-        const document = documentFromCode(code);
+        const document = await documentFromCode(code);
 
         const completions = localVariables(
             document,
@@ -31,9 +42,9 @@ describe('completion', () => {
         assert.ok(completionFound, 'variable not in completions.');
     });
 
-    test('in empty output, {{ |}}', () => {
+    test('in empty output, {{ |}}', async () => {
         const code = `{% set variable = 123 %}{{ }}`;
-        const document = documentFromCode(code);
+        const document = await documentFromCode(code);
 
         const completions = localVariables(
             document,
@@ -44,9 +55,9 @@ describe('completion', () => {
         assert.ok(completionFound, 'variable not in completions.');
     });
 
-    test('in empty if, {% if | %}', () => {
+    test('in empty if, {% if | %}', async () => {
         const code = `{% set var = 1 %}{% if  %}{% endif %}`;
-        const document = documentFromCode(code);
+        const document = await documentFromCode(code);
 
         const completions = localVariables(
             document,
@@ -56,9 +67,9 @@ describe('completion', () => {
         assert.equal(completions[0]?.label, 'var');
     });
 
-    test('in empty for, {% for el in | %}', () => {
+    test('in empty for, {% for el in | %}', async () => {
         const code = `{% set users = [1, 2] %}{% for u in  %}{% endfor %}`;
-        const document = documentFromCode(code);
+        const document = await documentFromCode(code);
 
         const completions = localVariables(
             document,
@@ -68,9 +79,9 @@ describe('completion', () => {
         assert.equal(completions[0]?.label, 'users');
     });
 
-    test('localVariables', () => {
+    test('localVariables', async () => {
         const code = `{% set variable = 123 %}{{ v^ }}`;
-        const document = documentFromCode(code);
+        const document = await documentFromCode(code);
 
         const completions = localVariables(
             document,
@@ -83,9 +94,9 @@ describe('completion', () => {
         assert.ok(completionFound.kind === CompletionItemKind.Field, 'wrong variable type.');
     });
 
-    test('macroses (in macro, list imports)', () => {
+    test('macroses (in macro, list imports)', async () => {
         const variableName = 'components';
-        const document = documentFromCode(
+        const document = await documentFromCode(
             `{% macro test() %}
                 {% import 'components.html.twig' as ${variableName} %}
                 {{  }}
@@ -106,9 +117,9 @@ describe('completion', () => {
         assert.ok(completionFound, 'macro not in completions.');
     });
 
-    test('macroses (list imports)', () => {
+    test('macroses (list imports)', async () => {
         const variableName = 'components';
-        const document = documentFromCode(
+        const document = await documentFromCode(
             `{% import 'components.html.twig' as ${variableName} %}
             {{  }}`,
         );
@@ -127,9 +138,9 @@ describe('completion', () => {
         assert.ok(completionFound, 'macro not in completions.');
     });
 
-    test('filters', () => {
+    test('filters', async () => {
         const code = `{{ something|^ }}`;
-        const document = documentFromCode(code);
+        const document = await documentFromCode(code);
         const cursorNode = document.deepestAt({ line: 0, character: code.indexOf('^') })!;
         const customFilters = [
             { identifier: 'custom_filter_without_args', arguments: [] },
@@ -160,12 +171,12 @@ describe('completion', () => {
     });
 
     test('macroses (list properties of imported file)', async () => {
-        const documentWithMacroUsage = documentFromCode(
+        const documentWithMacroUsage = await documentFromCode(
             `{% import 'components.html.twig' as components %}
             {{ components. }}`,
             'documentWithMacroUsage.html.twig',
         );
-        const importedDocument = documentFromCode(
+        const importedDocument = await documentFromCode(
             `{% macro new_macro() %}
                 ...
             {% endmacro %}`,
@@ -173,9 +184,9 @@ describe('completion', () => {
         );
 
         const documentCache = new DocumentCache({ name: '', uri: '' });
-        documentCache.configure(MockEnvironment);
-        documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
-        documentCache.updateText(importedDocument.uri, importedDocument.text);
+        documentCache.configure(MockEnvironment, null);
+        await documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
+        await documentCache.updateText(importedDocument.uri, importedDocument.text);
 
         const pos = {
             line: 1,
@@ -196,14 +207,14 @@ describe('completion', () => {
     });
 
     test('macroses (in macro, list properties of imported file)', async () => {
-        const documentWithMacroUsage = documentFromCode(
+        const documentWithMacroUsage = await documentFromCode(
             `{% macro test() %}
                 {% import 'components.html.twig' as components %}
                 {{ components. }}
             {% endmacro %}`,
             'documentWithMacroUsage.html.twig',
         );
-        const importedDocument = documentFromCode(
+        const importedDocument = await documentFromCode(
             `{% macro new_macro() %}
                 ...
             {% endmacro %}`,
@@ -211,9 +222,9 @@ describe('completion', () => {
         );
 
         const documentCache = new DocumentCache({ name: '', uri: '' });
-        documentCache.configure(MockEnvironment);
-        documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
-        documentCache.updateText(importedDocument.uri, importedDocument.text);
+        documentCache.configure(MockEnvironment, null);
+        await documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
+        await documentCache.updateText(importedDocument.uri, importedDocument.text);
 
         const pos = {
             line: 2,
@@ -231,5 +242,174 @@ describe('completion', () => {
 
         const completionFound = completions.find((item) => item.label === 'new_macro');
         assert.ok(completionFound, 'macro not in completions.');
+    });
+
+    test('php completion for typed variable', async () => {
+        const typeResolver = new TypeResolver(new MockPhpExecutor);
+        const document = await documentFromCodeWithTypeResolver(
+            `{# @var something \\App\\SomeClass #}
+            {{ something. }}`,
+            typeResolver,
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment, typeResolver);
+
+        const pos = {
+            line: 1,
+            character: document.text.split('\n')[1].lastIndexOf('.') + '.'.length,
+        };
+        const cursorNode = document.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            document,
+            documentCache,
+            cursorNode,
+            new ExpressionTypeResolver(typeResolver),
+            pos,
+        );
+
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\SomeClass']);
+    });
+
+    test('php completion for method return type', async () => {
+        const typeResolver = new TypeResolver(new MockPhpExecutor);
+        const document = await documentFromCodeWithTypeResolver(
+            `{# @var something \\App\\SomeClass #}
+            {{ something.getPerson(). }}`,
+            typeResolver,
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment, typeResolver);
+
+        const pos = {
+            line: 1,
+            character: document.text.split('\n')[1].lastIndexOf('.') + '.'.length,
+        };
+        const cursorNode = document.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            document,
+            documentCache,
+            cursorNode,
+            new ExpressionTypeResolver(typeResolver),
+            pos,
+        );
+
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\Person']);
+    });
+
+    test('php completion for something.getPerson (without parentheses)', async () => {
+        const typeResolver = new TypeResolver(new MockPhpExecutor);
+        const document = await documentFromCodeWithTypeResolver(
+            `{# @var something \\App\\SomeClass #}
+            {{ something.getPerson. }}`,
+            typeResolver,
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment, typeResolver);
+
+        const pos = {
+            line: 1,
+            character: document.text.split('\n')[1].lastIndexOf('.') + '.'.length,
+        };
+        const cursorNode = document.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            document,
+            documentCache,
+            cursorNode,
+            new ExpressionTypeResolver(typeResolver),
+            pos,
+        );
+
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\Person']);
+    });
+
+    test('php completion for deep properties', async () => {
+        const typeResolver = new TypeResolver(new MockPhpExecutor);
+        const document = await documentFromCodeWithTypeResolver(
+            `{# @var something \\App\\SomeClass #}
+            {{ something.getPerson().getOtherClass(). }}`,
+            typeResolver,
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment, typeResolver);
+
+        const pos = {
+            line: 1,
+            character: document.text.split('\n')[1].lastIndexOf('.') + '.'.length,
+        };
+        const cursorNode = document.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            document,
+            documentCache,
+            cursorNode,
+            new ExpressionTypeResolver(typeResolver),
+            pos,
+        );
+
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\OtherClass']);
+    });
+
+    test('php completion for method return type (recursive type)', async () => {
+        const typeResolver = new TypeResolver(new MockPhpExecutor);
+        const document = await documentFromCodeWithTypeResolver(
+            `{# @var something \\App\\SomeClass #}
+            {{ something.getPerson().getParent().getParent().getParent(). }}`,
+            typeResolver,
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment, typeResolver);
+
+        const pos = {
+            line: 1,
+            character: document.text.split('\n')[1].lastIndexOf('.') + '.'.length,
+        };
+        const cursorNode = document.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            document,
+            documentCache,
+            cursorNode,
+            new ExpressionTypeResolver(typeResolver),
+            pos,
+        );
+
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\Person']);
+    });
+
+    test('php completion for method return type saved to variable', async () => {
+        const typeResolver = new TypeResolver(new MockPhpExecutor());
+        const document = await documentFromCodeWithTypeResolver(
+            `{# @var something \\App\\SomeClass #}
+            {% set person = something.getPerson() %}
+            {{ person. }}`,
+            typeResolver,
+        );
+
+        const documentCache = new DocumentCache({ name: '', uri: '' });
+        documentCache.configure(MockEnvironment, typeResolver);
+
+        const pos = {
+            line: 2,
+            character: document.text.split('\n')[2].lastIndexOf('.') + '.'.length,
+        };
+        const cursorNode = document.deepestAt(pos)!;
+
+        const completions = await variableProperties(
+            document,
+            documentCache,
+            cursorNode,
+            new ExpressionTypeResolver(typeResolver),
+            pos,
+        );
+
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\Person']);
     });
 });

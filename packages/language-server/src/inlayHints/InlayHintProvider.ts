@@ -56,8 +56,6 @@ export class InlayHintProvider {
                 const importedDocument = await this.documentCache.resolveImport(document, calledFunc.object);
                 if (!importedDocument) continue;
 
-                await importedDocument.ensureParsed();
-
                 const macro = importedDocument.locals.macro.find(macro => macro.name === calledFunc.name);
                 if (!macro) continue;
 

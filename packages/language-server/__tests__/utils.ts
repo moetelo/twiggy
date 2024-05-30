@@ -2,10 +2,24 @@ import { Range } from 'vscode-languageserver';
 import { Document } from '../src/documents/Document';
 import { initializeParser } from '../src/utils/parser';
 import * as path from 'path';
+import { LocalSymbolCollector } from '../src/symbols/LocalSymbolCollector';
+import { MockPhpExecutor } from './mocks';
+import { TypeResolver } from '../src/typing/TypeResolver';
 
-export const documentFromCode = (code: string, uri = 'test://test.html.twig') => {
+export const documentFromCode = async (code: string, uri = 'test://test.html.twig') => {
+    const typeResolver = new TypeResolver(new MockPhpExecutor());
+    return documentFromCodeWithTypeResolver(code, typeResolver, uri);
+};
+
+export const documentFromCodeWithTypeResolver = async (code: string, typeResolver: TypeResolver, uri = 'test://test.html.twig') => {
     const document = new Document(uri);
-    document.setText(code);
+    document.text = code;
+    document.tree = (await initializeTestParser()).parse(document.text);
+    document.locals = await new LocalSymbolCollector(
+        document.tree.rootNode,
+        typeResolver,
+    ).collect();
+
     return document;
 };
 
@@ -20,7 +34,7 @@ export const initializeTestParser = async () => {
     return await initializeParser(wasmPath);
 };
 
-export const createRange = (start: number, end: number): Range => ({
+const createRange = (start: number, end: number): Range => ({
     start: { character: start, line: 0 },
     end: { character: end, line: 0 },
 });

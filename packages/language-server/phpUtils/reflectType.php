@@ -51,6 +51,7 @@ foreach ($methods as $method) {
 
     $completionMethods[] = [
         'name' => $methodName,
+        'type' => $method->getReturnType()?->getName() ?? '',
         'parameters' => array_map(
             fn(\ReflectionParameter $parameter) => [
                 'name' => $parameter->getName(),
@@ -60,7 +61,6 @@ foreach ($methods as $method) {
             ],
             $parameters,
         ),
-        'returnType' => $method->getReturnType()?->getName() ?? '',
     ];
 }
 

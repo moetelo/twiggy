@@ -4,9 +4,15 @@ import { Document } from './Document';
 import * as path from 'path';
 import { resolveTemplate } from '../utils/files/resolveTemplate';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
+import { parser } from '../utils/parser';
+import { LocalSymbolCollector } from '../symbols/LocalSymbolCollector';
+import { ITypeResolver } from '../typing/ITypeResolver';
+import { readFile } from 'fs/promises';
 
 export class DocumentCache {
     #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
+    #typeResolver: ITypeResolver | null = null;
+
     readonly documents: Map<DocumentUri, Document> = new Map();
     readonly workspaceFolderPath: string;
 
@@ -14,8 +20,9 @@ export class DocumentCache {
         this.workspaceFolderPath = documentUriToFsPath(workspaceFolder.uri);
     }
 
-    configure(frameworkEnvironment: IFrameworkTwigEnvironment) {
+    configure(frameworkEnvironment: IFrameworkTwigEnvironment, typeResolver: ITypeResolver | null) {
         this.#environment = frameworkEnvironment;
+        this.#typeResolver = typeResolver;
     }
 
     get(documentUri: DocumentUri) {
@@ -28,11 +35,25 @@ export class DocumentCache {
         return this.add(documentUri);
     }
 
-    updateText(documentUri: DocumentUri, text: string) {
+    async updateText(documentUri: DocumentUri, text?: string) {
         const document = this.get(documentUri);
-        document.setText(text);
+
+        await this.setText(document, text);
 
         return document;
+    }
+
+    async setText(document: Document, text?: string) {
+        if (text !== undefined) {
+            document.text = text;
+        } else {
+            const fsPath = documentUriToFsPath(document.uri);
+            const text = await readFile(fsPath, 'utf-8');
+            document.text = text;
+        }
+
+        document.tree = parser.parse(document.text);
+        document.locals = await new LocalSymbolCollector(document.tree.rootNode, this.#typeResolver).collect();
     }
 
     async resolveByTwigPath(pathFromTwig: string) {
@@ -49,13 +70,14 @@ export class DocumentCache {
             const documentUri = toDocumentUri(pathToTwig);
 
             if (this.documents.has(documentUri)) {
-                return this.documents.get(documentUri);
+                return this.documents.get(documentUri)!;
             }
 
             const resolvedTemplate = await resolveTemplate(pathToTwig);
-
             if (resolvedTemplate) {
-                return this.add(toDocumentUri(resolvedTemplate));
+                const newDocument = this.add(toDocumentUri(resolvedTemplate));
+                await this.setText(newDocument);
+                return newDocument;
             }
         }
 

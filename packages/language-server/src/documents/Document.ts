@@ -1,9 +1,6 @@
-import { parser } from '../utils/parser';
-import { readFile } from 'fs/promises';
 import { DocumentUri, Position } from 'vscode-languageserver';
 import Parser, { SyntaxNode } from 'web-tree-sitter';
-import { collectLocals } from '../symbols/locals';
-import { LocalSymbol, LocalSymbolInformation, TwigBlock, TwigMacro } from '../symbols/types';
+import { LocalSymbol, LocalSymbolInformation, TwigBlock } from '../symbols/types';
 import { documentUriToFsPath } from '../utils/uri';
 import { pointToPosition, rangeContainsPosition } from '../utils/position';
 import { getNodeRange } from '../utils/node';
@@ -45,10 +42,18 @@ export class Document {
         return this.#tree;
     }
 
+    set tree(tree: Parser.Tree) {
+        this.#tree = tree;
+    }
+
     get locals() {
         if (!this.#locals) throw new TreeNotParsedError(this.uri);
 
         return this.#locals;
+    }
+
+    set locals(locals: LocalSymbolInformation) {
+        this.#locals = locals;
     }
 
     get text() {
@@ -57,25 +62,8 @@ export class Document {
         return this.#text;
     }
 
-    setText(text: string) {
-        if (text === this.#text) {
-            return;
-        }
-
+    set text(text: string) {
         this.#text = text;
-
-        this.#tree = parser.parse(this.#text);
-        this.#locals = collectLocals(this.#tree.rootNode);
-    }
-
-    async ensureParsed(): Promise<void> {
-        if (this.#tree) {
-            return;
-        }
-
-        const fsPath = documentUriToFsPath(this.uri);
-        const text = await readFile(fsPath, 'utf-8');
-        this.setText(text);
     }
 
     getBlock(name: string): TwigBlock | undefined {

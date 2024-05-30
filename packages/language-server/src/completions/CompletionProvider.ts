@@ -13,13 +13,17 @@ import { DocumentCache } from '../documents';
 import { symfonyRouteNames } from './routes';
 import { phpClasses } from './phpClasses';
 import { documentUriToFsPath } from '../utils/uri';
-import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import { IPhpExecutor } from '../phpInterop/IPhpExecutor';
+import { ExpressionTypeResolver } from '../typing/ExpressionTypeResolver';
+import { ITypeResolver } from '../typing/ITypeResolver';
+import { IExpressionTypeResolver } from '../typing/IExpressionTypeResolver';
 
 export class CompletionProvider {
     #symfonyRouteNames: string[] = [];
     #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
     workspaceFolderPath: string;
-    phpExecutor: PhpExecutor | null = null;
+    #phpExecutor: IPhpExecutor | null = null;
+    #expressionTypeResolver: IExpressionTypeResolver | null = null;
 
     constructor(
         private readonly connection: Connection,
@@ -31,9 +35,15 @@ export class CompletionProvider {
         this.workspaceFolderPath = documentUriToFsPath(workspaceFolder.uri);
     }
 
-    refresh(environment: IFrameworkTwigEnvironment) {
+    refresh(
+        environment: IFrameworkTwigEnvironment,
+        phpExecutor: IPhpExecutor | null,
+        typeResolver: ITypeResolver | null,
+    ) {
         this.#environment = environment;
         this.#symfonyRouteNames = Object.keys(environment.routes);
+        this.#phpExecutor = phpExecutor;
+        this.#expressionTypeResolver = typeResolver ? new ExpressionTypeResolver(typeResolver) : null;
     }
 
     async onCompletion(params: CompletionParams) {
@@ -58,8 +68,8 @@ export class CompletionProvider {
             ...functions(cursorNode, environment?.Functions || []),
             ...filters(cursorNode, environment?.Filters || []),
             ...symfonyRouteNames(cursorNode, this.#symfonyRouteNames),
-            ...await phpClasses(cursorNode, this.phpExecutor),
-            ...await variableProperties(document, this.documentCache, cursorNode, this.phpExecutor, params.position),
+            ...await phpClasses(cursorNode, this.#phpExecutor),
+            ...await variableProperties(document, this.documentCache, cursorNode, this.#expressionTypeResolver, params.position),
             ...await templatePaths(
                 cursorNode,
                 this.workspaceFolderPath,

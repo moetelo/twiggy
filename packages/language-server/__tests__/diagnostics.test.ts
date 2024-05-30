@@ -1,6 +1,6 @@
 import { describe, test, before } from 'node:test'
 import * as assert from 'node:assert/strict'
-import { createRange, initializeTestParser } from './utils';
+import { createLengthRange, initializeTestParser } from './utils';
 import Parser from 'web-tree-sitter';
 import { DiagnosticProvider } from '../src/diagnostics';
 
@@ -13,12 +13,12 @@ describe('diagnostics', () => {
         parser = await initializeTestParser();
     });
 
-    const testDiagnostic = (code: string, start = 0, end = code.length) => {
+    const testDiagnostic = (code: string, start = 0, length = code.length) => {
         const template = parser.parse(code);
         const diagnostics = diagnosticProvider.validateTree(template);
 
         assert.equal(diagnostics.length, 1);
-        assert.deepEqual(diagnostics[0].range, createRange(start, end));
+        assert.deepEqual(diagnostics[0].range, createLengthRange(start, length));
     };
 
     test('empty output', () => testDiagnostic('{{ }}'));
@@ -37,7 +37,7 @@ describe('diagnostics', () => {
         'empty output in if block',
         () => testDiagnostic(
             '{% if true %}{{ }}{% endif %}',
-            '{% if true %}'.length, '{% if true %}{{ }}'.length,
+            '{% if true %}'.length, '{{ }}'.length,
         ),
     );
 });

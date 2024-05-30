@@ -66,6 +66,7 @@ const buildOptions = /** @type {const} @satisfies {esbuild.BuildOptions} */ ({
     logLevel: isDev ? 'error' : 'info',
     define: {
         'process.env.NODE_ENV': !isDev ? '"production"' : 'undefined',
+        '__DEBUG__': JSON.stringify(isDev),
     },
     plugins: [
         ...(isDev ? [ triggerVscodeDebug, watchLogPlugin ] : []),

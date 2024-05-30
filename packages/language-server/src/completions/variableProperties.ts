@@ -4,16 +4,20 @@ import { forLoopProperties } from '../staticCompletionInfo';
 import { Document, DocumentCache } from '../documents';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 import { TwigMacro } from '../symbols/types';
-import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { pointToPosition } from '../utils/position';
 import { Position } from 'vscode-languageserver-textdocument';
+import { ReflectedType } from '../phpInterop/ReflectedType';
+import { IExpressionTypeResolver } from '../typing/IExpressionTypeResolver';
+import { ExpressionTypeResolver } from '../typing/ExpressionTypeResolver';
 
 const macroToCompletionItem = (macro: TwigMacro) => ({
     label: macro.name,
     kind: CompletionItemKind.Function,
     insertTextFormat: InsertTextFormat.Snippet,
     command: triggerParameterHints,
-    insertText: `${macro.name}($1)$0`,
+    insertText: !macro.args.length
+        ? `${macro.name}()$0`
+        : macro.name,
 });
 
 const getVariableNode = (cursorNode: SyntaxNode) => {
@@ -34,16 +38,60 @@ const getVariableNode = (cursorNode: SyntaxNode) => {
     return null;
 };
 
+const getExpressionNode = (cursorNode: SyntaxNode) => {
+    if (
+        cursorNode.text === '.'
+        && cursorNode.parent?.firstNamedChild
+        && ExpressionTypeResolver.supportedTypes.has(cursorNode.parent.firstNamedChild.type)
+    ) {
+        return cursorNode.previousSibling;
+    }
+
+    return null;
+};
+
+const reflectedTypeToCompletions = (reflectedType: ReflectedType, options: { includeMethods: boolean }) => {
+    const properties = reflectedType.properties.map((prop) => (({
+        label: prop.name,
+        detail: prop.type,
+        kind: CompletionItemKind.Property
+    }) as CompletionItem));
+
+    if (!options.includeMethods) return properties;
+
+    return [
+        ...properties,
+        ...reflectedType.methods.map((method) => (({
+            label: method.name,
+            kind: CompletionItemKind.Method,
+            command: triggerParameterHints,
+            insertTextFormat: InsertTextFormat.Snippet,
+            detail: method.type,
+            insertText: !method.parameters.length
+                ? `${method.name}()$0`
+                : `${method.name}($1)$0`,
+        }) as CompletionItem)),
+    ];
+}
+
 export async function variableProperties(
     document: Document,
     documentCache: DocumentCache,
     cursorNode: SyntaxNode,
-    phpExecutor: PhpExecutor | null,
+    exprTypeResolver: IExpressionTypeResolver | null,
     pos: Position,
 ): Promise<CompletionItem[]> {
     const variableNode = getVariableNode(cursorNode);
     if (!variableNode) {
-        return [];
+        if (!exprTypeResolver) return [];
+
+        const expressionNode = getExpressionNode(cursorNode);
+        if (!expressionNode) return [];
+
+        const type = await exprTypeResolver.resolveExpression(expressionNode, document.locals);
+        if (!type) return [];
+
+        return reflectedTypeToCompletions(type, { includeMethods: true });
     }
 
     const variableName = variableNode.text;
@@ -52,39 +100,17 @@ export async function variableProperties(
         return forLoopProperties;
     }
 
-    const variable = document.locals.variable.find((x) => x.name === variableName);
-    if (variable && variable.type) {
-        if (!phpExecutor) return [];
+    const variable = document.locals.variableDefinition.get(variableName);
+    if (variable && 'reflectedType' in variable) {
+        if (!exprTypeResolver || !variable.reflectedType) return [];
 
-        const result = await phpExecutor.completeInstanceProperties(variable.type);
-
-        if (!result) return [];
-
-        const properties = result.properties.map((prop) => (({
-            label: prop.name,
-            detail: prop.type,
-            kind: CompletionItemKind.Property
-        }) as CompletionItem));
-
-        if (cursorNode.parent!.type === 'subscript_expression') {
-            return properties;
-        }
-
-        return [
-            ...properties,
-            ...result.methods.map((method) => (({
-                label: method.name,
-                kind: CompletionItemKind.Method,
-                insertText: `${method.name}($1)$0`,
-                insertTextFormat: InsertTextFormat.Snippet,
-                detail: method.returnType
-            }) as CompletionItem)),
-        ];
+        return reflectedTypeToCompletions(variable.reflectedType, {
+            includeMethods: cursorNode.parent!.type !== 'subscript_expression',
+        });
     }
 
     const importedDocument = await documentCache.resolveImport(document, variableName, pos);
     if (importedDocument) {
-        await importedDocument.ensureParsed();
         const localMacros = importedDocument.locals.macro.map(macroToCompletionItem);
 
         if (importedDocument !== document) {

@@ -106,7 +106,6 @@ export class DefinitionProvider {
 
             let extendedDocument: Document | undefined = document;
             while (extendedDocument) {
-                await extendedDocument.ensureParsed();
                 const blockSymbol = extendedDocument.getBlock(blockName);
                 if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
                     extendedDocument = await this.getExtendedTemplate(extendedDocument);
@@ -142,8 +141,6 @@ export class DefinitionProvider {
 
             const importedDocument = await this.documentCache.resolveImport(document, importName, params.position);
             if (!importedDocument) return;
-
-            await importedDocument.ensureParsed();
 
             const macro = importedDocument.locals.macro.find(macro => macro.name === macroName);
             if (!macro) return;

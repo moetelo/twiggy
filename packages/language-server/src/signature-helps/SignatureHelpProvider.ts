@@ -80,8 +80,6 @@ export class SignatureHelpProvider {
             const importedDocument = await this.documentCache.resolveImport(document, importName);
             if (!importedDocument) return;
 
-            await importedDocument.ensureParsed();
-
             const macro = importedDocument.locals.macro.find(macro => macro.name === macroName);
             if (!macro) return;
 

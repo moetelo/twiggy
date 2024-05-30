@@ -1,9 +1,9 @@
 import { describe, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'web-tree-sitter';
-import { collectLocals } from '../src/symbols/locals';
 import { createLengthRange, documentFromCode, initializeTestParser } from './utils';
 import { LocalSymbolInformation } from '../src/symbols/types';
+import { LocalSymbolCollector } from '../src/symbols/LocalSymbolCollector';
 
 describe('locals', () => {
     let parser!: Parser;
@@ -12,13 +12,13 @@ describe('locals', () => {
         parser = await initializeTestParser();
     });
 
-    test('collects `set` variables', () => {
+    test('collects `set` variables', async () => {
         const var0 = 'variable0';
         const var1 = 'anotherVariable';
         const code = `{% set ${var0} = 123 %}{% set ${var1} = 'asdf' %}`;
 
         const tree = parser.parse(code);
-        const locals = collectLocals(tree.rootNode);
+        const locals = await new LocalSymbolCollector(tree.rootNode, null).collect();
 
         assert.strictEqual(locals.variable[0].name, var0);
         assert.strictEqual(locals.variable[1].name, var1);
@@ -37,13 +37,13 @@ describe('locals', () => {
         assert.strictEqual(locals.variable.length, 2);
     });
 
-    test('collects implicitly defined variables', () => {
+    test('collects implicitly defined variables', async () => {
         const var0 = 'variable0';
         const var1 = 'anotherVariable';
         const code = `{{ ${var0} }}{{ ${var1} }}{{ ${var0} }}{{ ${var1} }}`;
 
         const tree = parser.parse(code);
-        const locals = collectLocals(tree.rootNode);
+        const locals = await new LocalSymbolCollector(tree.rootNode, null).collect();
 
         assert.strictEqual(locals.variable[0].name, var0);
         assert.strictEqual(locals.variable[1].name, var1);
@@ -69,12 +69,12 @@ describe('locals', () => {
         assert.strictEqual(locals.variable.length, 2);
     });
 
-    test('collects implicitly defined variable reference inside of block', () => {
+    test('collects implicitly defined variable reference inside of block', async () => {
         const var0 = 'variable0';
         const code = `{{ ${var0} }}{% block block1 %}{{ ${var0} }}{% endblock %}`;
 
         const tree = parser.parse(code);
-        const locals = collectLocals(tree.rootNode);
+        const locals = await new LocalSymbolCollector(tree.rootNode, null).collect();
 
         assert.strictEqual(locals.variable.length, 1);
 
@@ -91,10 +91,10 @@ describe('locals', () => {
         );
     });
 
-    const testOneVariable = (varName: string, code: string, scope?: LocalSymbolInformation) => {
+    const testOneVariable = async (varName: string, code: string, scope?: LocalSymbolInformation) => {
         if (!scope) {
             const tree = parser.parse(code);
-            scope = collectLocals(tree.rootNode);
+            scope = await new LocalSymbolCollector(tree.rootNode, null).collect();
         }
 
         assert.strictEqual(scope.variable.length, 1);
@@ -110,11 +110,11 @@ describe('locals', () => {
         return variable;
     };
 
-    test('collects implicitly defined variable inside of if condition', () => {
+    test('collects implicitly defined variable inside of if condition', async () => {
         const varName = 'variable0';
         const code = `{% if ${varName} %}{{ ${varName}[0].prop }}{% endif %}{% if not ${varName} %} var0 is falsy :( {% endif %}`;
 
-        const variable = testOneVariable(varName, code);
+        const variable = await testOneVariable(varName, code);
 
         assert.deepEqual(
             variable.references,
@@ -143,13 +143,13 @@ describe('locals', () => {
         );
     });
 
-    test('collects implicitly defined variable inside of block', () => {
+    test('collects implicitly defined variable inside of block', async () => {
         const varName = 'variable0';
         const code = `{% block block1 %}{{ ${varName}.hello }} {% if ${varName} %}var0 is truthy!{% endif %} {% endblock %}`;
 
         const tree = parser.parse(code);
-        const locals = collectLocals(tree.rootNode);
-        const variable = testOneVariable(varName, code, locals.block[0].symbols);
+        const locals = await new LocalSymbolCollector(tree.rootNode, null).collect();
+        const variable = await testOneVariable(varName, code, locals.block[0].symbols);
 
         assert.deepEqual(
             variable.references,
@@ -160,13 +160,13 @@ describe('locals', () => {
         );
     });
 
-    test('collects implicitly defined variable inside of the second block', () => {
+    test('collects implicitly defined variable inside of the second block', async () => {
         const varName = 'variable0';
         const code = `{% block block1 %}{% endblock %}{% block block2 %}{{ ${varName}.hello }} {% if ${varName} %}var0 is truthy!{% endif %} {% endblock %}`;
 
         const tree = parser.parse(code);
-        const locals = collectLocals(tree.rootNode);
-        const variable = testOneVariable(varName, code, locals.block[1].symbols);
+        const locals = await new LocalSymbolCollector(tree.rootNode, null).collect();
+        const variable = await testOneVariable(varName, code, locals.block[1].symbols);
 
         assert.deepEqual(
             variable.references,
@@ -177,12 +177,12 @@ describe('locals', () => {
         );
     });
 
-    test('collects implicitly defined variable inside of set assignment', () => {
+    test('collects implicitly defined variable inside of set assignment', async () => {
         const varName = 'post';
         const code = `{% set canEdit = ${varName}.author.id == 1 %}`;
 
         const tree = parser.parse(code);
-        const locals = collectLocals(tree.rootNode);
+        const locals = await new LocalSymbolCollector(tree.rootNode, null).collect();
 
         assert.strictEqual(locals.variable.length, 2);
         assert.strictEqual(locals.variable[0].name, 'canEdit');
@@ -190,7 +190,7 @@ describe('locals', () => {
 
     });
 
-    test('collects variables defined inside of for', () => {
+    test('collects variables defined inside of for', async () => {
         const keyVar = 'keyInList';
         const itemVar = 'itemInList';
         const listVar = 'items';
@@ -199,7 +199,7 @@ describe('locals', () => {
         const code = `{% for ${keyVar}, ${itemVar} in ${listVar} %}{{ ${keyVar} }}{{ ${itemVar}.prop }}{{ count(${listVar}) }}{% endfor %}`;
 
         const tree = parser.parse(code);
-        const locals = collectLocals(tree.rootNode);
+        const locals = await new LocalSymbolCollector(tree.rootNode, null).collect();
 
         assert.strictEqual(locals.variable.length, 3);
 

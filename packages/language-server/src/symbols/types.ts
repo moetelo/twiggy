@@ -1,4 +1,5 @@
 import { Range } from 'vscode-languageserver/node';
+import { ReflectedType } from '../phpInterop/ReflectedType';
 
 export interface LocalSymbol {
     name: string;
@@ -7,14 +8,22 @@ export interface LocalSymbol {
     range: Range;
 }
 
-export interface TwigVariableDeclaration extends LocalSymbol {
+export type IWithReferences = { references: Range[] };
+export type IWithReflectedType = {
+    type?: string,
+    reflectedType: ReflectedType | null,
+};
+
+export interface TwigVariableDeclaration extends LocalSymbol, IWithReferences, IWithReflectedType {
     value?: string;
-    type?: string;
-    references: Range[];
 }
 
-export function hasReferences<T extends LocalSymbol>(node: T): node is T & { references: Range[] } {
+export function hasReferences<T extends LocalSymbol | IWithReflectedType>(node: T): node is T & IWithReferences {
     return 'references' in node;
+}
+
+export function hasReflectedType<T extends LocalSymbol | IWithReferences>(node: T): node is T & IWithReflectedType {
+    return 'reflectedType' in node;
 }
 
 export interface FunctionArgument extends LocalSymbol {
@@ -30,9 +39,8 @@ export interface TwigBlock extends LocalSymbol {
     symbols: LocalSymbolInformation;
 }
 
-export interface TwigImport extends LocalSymbol {
+export interface TwigImport extends LocalSymbol, IWithReferences {
     path?: string;
-    references: Range[];
 }
 
 export namespace TwigImport {
@@ -40,7 +48,9 @@ export namespace TwigImport {
 }
 
 export type LocalSymbolInformation = {
-    extends?: string;
+    variableDefinition: Map<string, TwigImport | TwigVariableDeclaration>;
+
+    extends: string | undefined;
     imports: TwigImport[];
     variable: TwigVariableDeclaration[];
     macro: TwigMacro[];

@@ -19,6 +19,7 @@ import {
     CraftTwigEnvironment,
     EmptyEnvironment,
 } from '../twigEnvironment';
+import { TypeResolver } from '../typing/TypeResolver';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -79,10 +80,11 @@ export class ConfigurationManager {
     }
 
     private applySettings(frameworkEnvironment: IFrameworkTwigEnvironment, phpExecutor: PhpExecutor | null) {
+        const typeResolver = phpExecutor ? new TypeResolver(phpExecutor) : null;
+
         this.definitionProvider.phpExecutor = phpExecutor;
-        this.completionProvider.phpExecutor = phpExecutor;
-        this.completionProvider.refresh(frameworkEnvironment);
+        this.completionProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver);
         this.signatureHelpProvider.reindex(frameworkEnvironment);
-        this.documentCache.configure(frameworkEnvironment);
+        this.documentCache.configure(frameworkEnvironment, typeResolver);
     }
 }

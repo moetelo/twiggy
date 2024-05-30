@@ -6,7 +6,7 @@ describe('Document.deepestAt', () => {
     before(initializeTestParser);
 
     test('cursor between nodes takes the node before the cursor', async () => {
-        const document = documentFromCode(`{{hello}}{{world}}`);
+        const document = await documentFromCode(`{{hello}}{{world}}`);
 
         const node = document.deepestAt({ line: 0, character: `{{hello}}`.length })!;
 
@@ -14,7 +14,7 @@ describe('Document.deepestAt', () => {
     });
 
     test('cursor after the space char takes the next node because its startIndex is eq to space idx', async () => {
-        const document = documentFromCode(`{{ hello }}`);
+        const document = await documentFromCode(`{{ hello }}`);
         const character = `{{ `.length;
 
         const node = document.deepestAt({ line: 0, character })!;
@@ -24,7 +24,7 @@ describe('Document.deepestAt', () => {
     });
 
     test('iterate tokens', async () => {
-        const document = documentFromCode(`{%set variable = 123%}{{variable}}`);
+        const document = await documentFromCode(`{%set variable = 123%}{{variable}}`);
         const expectedNodes = [
             { type: 'embedded_begin', start: 0, nodeText: '{%' },
             { type: 'keyword', start: 3, nodeText: 'set' },
@@ -55,15 +55,15 @@ describe('Document.deepestAt for incomplete nodes', () => {
     before(initializeTestParser);
 
     test('empty output', async () => {
-        const document = documentFromCode(`{{  }}`);
+        const document = await documentFromCode(`{{  }}`);
 
         const node = document.deepestAt({ line: 0, character: `{{ `.length })!;
 
         assert.equal(node.type, 'output');
     });
 
-    test('empty if condition', () => {
-        const document = documentFromCode(`{% if %}{% endif %}`);
+    test('empty if condition', async () => {
+        const document = await documentFromCode(`{% if %}{% endif %}`);
 
         const node = document.deepestAt({ line: 0, character: `{% if`.length })!;
 

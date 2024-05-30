@@ -20,7 +20,7 @@ export class ExecuteCommandProvider {
         );
     }
 
-    onExecuteCommand(params: ExecuteCommandParams) {
+    async onExecuteCommand(params: ExecuteCommandParams) {
         const [ commandName ] = params.command.split('(');
         const command = commands.get(commandName as Command);
 
@@ -33,6 +33,10 @@ export class ExecuteCommandProvider {
 
         if (!document) {
             return;
+        }
+
+        if (!document.text) {
+            await this.documentCache.setText(document);
         }
 
         return command(document, position);

@@ -120,7 +120,7 @@ export class Server {
         });
 
         this.documents.onDidChangeContent(async ({ document }) => {
-            const doc = this.documentCache.updateText(document.uri, document.getText());
+            const doc = await this.documentCache.updateText(document.uri, document.getText());
             await this.diagnosticProvider.validate(doc);
         });
         this.documents.listen(connection);

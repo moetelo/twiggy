@@ -1,6 +1,6 @@
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
 import { SyntaxNode } from 'web-tree-sitter';
-import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 import { primitives } from '../phpInterop/primitives';
 import { closestByPredicate } from '../utils/node';
 
@@ -16,7 +16,7 @@ const toCompletionItem = (variable: VarVariable): CompletionItem => ({
     insertText: variable.fullClassName,
 });
 
-const primitiveCompletions = primitives.map(
+const primitiveCompletions = [...primitives].map(
     primitive => toCompletionItem({ fullClassName: primitive, className: primitive }),
 );
 
@@ -32,7 +32,7 @@ const isAtTheEndOfVarDeclaration = (node: SyntaxNode) => node.type === 'comment_
 
 export async function phpClasses(
     node: SyntaxNode,
-    phpExecutor: PhpExecutor | null,
+    phpExecutor: IPhpExecutor | null,
 ): Promise<CompletionItem[]> {
     const typeNode = closestByPredicate(node, (n) => typeNodes.has(n.type))
     if (!typeNode && !isAtTheEndOfVarDeclaration(node)) return [];

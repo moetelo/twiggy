@@ -1,16 +1,22 @@
+type Property = {
+    name: string;
+    type: string;
+};
+
+type MethodParam = {
+    name: string;
+    type: string;
+    isOptional: boolean;
+    isVariadic: boolean;
+};
+
+type Method = {
+    name: string;
+    type: string;
+    parameters: MethodParam[];
+};
+
 export type ReflectedType = {
-    properties: {
-        name: string;
-        type: string;
-    }[];
-    methods: {
-        name: string;
-        returnType: string;
-        parameters: {
-            name: string;
-            type: string;
-            isOptional: boolean;
-            isVariadic: boolean;
-        }[];
-    }[];
+    properties: Property[];
+    methods: Method[];
 };
