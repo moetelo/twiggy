@@ -2,7 +2,7 @@ import { DocumentUri, Position, WorkspaceFolder } from 'vscode-languageserver';
 import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
 import * as path from 'path';
-import { fileStat } from '../utils/files/fileStat';
+import { resolveTemplate } from '../utils/files/resolveTemplate';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
 
 export class DocumentCache {
@@ -52,9 +52,10 @@ export class DocumentCache {
                 return this.documents.get(documentUri);
             }
 
-            const stats = await fileStat(pathToTwig);
-            if (stats) {
-                return this.add(documentUri);
+            const resolvedTemplate = await resolveTemplate(pathToTwig);
+
+            if (resolvedTemplate) {
+                return this.add(toDocumentUri(resolvedTemplate));
             }
         }
 
