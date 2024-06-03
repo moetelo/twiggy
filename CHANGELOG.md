@@ -1,8 +1,12 @@
+## v0.12.0 (2024-06-04)
+* Add fallback to `resolveByTwigPath` to handle missing templates (#26, #27 @webrgp)
+
 ## v0.11.2 (2024-06-03)
 * Fix unused variable diagnostics for implicitly defined variables.
 
 ## v0.11.1 (2024-05-29)
 * Collect variable usage in other types of expressions.
+* Completion for `is_route`
 
 ## v0.11.0 (2024-05-24)
 * Variable references.
