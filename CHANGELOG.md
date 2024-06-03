@@ -1,3 +1,6 @@
+## v0.11.2 (2024-06-03)
+* Fix unused variable diagnostics for implicitly defined variables.
+
 ## v0.11.1 (2024-05-29)
 * Collect variable usage in other types of expressions.
 
