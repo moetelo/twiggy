@@ -14,21 +14,46 @@ if (str_starts_with($INSTANCE_CLASS, '\\')) {
     $INSTANCE_CLASS = substr($INSTANCE_CLASS, strlen('\\'));
 }
 
+$phpFilePath = $loader->findFile($INSTANCE_CLASS);
+require_once $phpFilePath;
+
 $refClass = new \ReflectionClass($INSTANCE_CLASS);
 
 $properties = $refClass->getProperties(\ReflectionProperty::IS_PUBLIC);
 $methods = $refClass->getMethods(\ReflectionMethod::IS_PUBLIC);
 
 const GETTER_PREFIX = 'get';
-function getPropertyName(string $getterName): string
-{
+function getPropertyName(string $getterName): string {
     return lcfirst(
         substr($getterName, strlen(GETTER_PREFIX)),
     );
 }
 
+function typeToString(\ReflectionType $type): string {
+    if ($type instanceof \ReflectionNamedType) {
+        return $type->getName();
+    }
+
+    if ($type instanceof \ReflectionUnionType) {
+        return implode('|', array_map(
+            fn(\ReflectionNamedType $type) => $type->getName(),
+            $type->getTypes(),
+        ));
+    }
+
+    if ($type instanceof \ReflectionIntersectionType) {
+        return implode('&', array_map(
+            fn(\ReflectionNamedType $type) => $type->getName(),
+            $type->getTypes(),
+        ));
+    }
+
+    throw new \RuntimeException('Unknown type');
+}
+
 $completionProperties = [];
 $completionMethods = [];
+/** @var \ReflectionMethod $method */
 foreach ($methods as $method) {
     if ($method->isConstructor() || $method->isDestructor()) {
         continue;
@@ -51,11 +76,11 @@ foreach ($methods as $method) {
 
     $completionMethods[] = [
         'name' => $methodName,
-        'type' => $method->getReturnType()?->getName() ?? '',
+        'type' => $method->hasReturnType() ? typeToString($method->getReturnType()) : '',
         'parameters' => array_map(
             fn(\ReflectionParameter $parameter) => [
                 'name' => $parameter->getName(),
-                'type' => $parameter->getType()?->getName() ?? '',
+                'type' => $parameter->hasType() ? typeToString($parameter->getType()) : '',
                 'isOptional' => $parameter->isOptional(),
                 'isVariadic' => $parameter->isVariadic(),
             ],
