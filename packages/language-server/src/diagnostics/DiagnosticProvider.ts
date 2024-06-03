@@ -67,11 +67,7 @@ export class DiagnosticProvider {
             ...document.locals.variable,
             ...blockScopedVariables,
         ]
-            .filter((variable) => variable.references.length === 0)
-            // {% if var %}
-            // {% if for ... in var %}
-            // TODO: optimize. Don't use deepestAt, mark variables as used in the `collectLocals` phase.
-            .filter((variable) => document.deepestAt(variable.nameRange.start).nextSibling?.type !== 'embedded_end');
+            .filter((variable) => variable.references.length === 0);
 
         const unusedVariablesDiagnostics = unusedVariables.map((variable): Diagnostic => ({
             severity: DiagnosticSeverity.Hint,

@@ -154,14 +154,17 @@ export function collectLocals(tree: SyntaxNode | null, variableDefinitionMap = n
                     continue;
                 }
 
-                const variable: TwigVariableDeclaration = {
+                const implicitVariable: TwigVariableDeclaration = {
                     name: currentNode.text,
                     nameRange,
                     range: getNodeRange(currentNode.parent!),
-                    references: [],
+                    // Implicitly defined variables are used in-place.
+                    // i.e. when you meet a variable for the first time,
+                    // it's "defined" and used in the same place.
+                    references: [ nameRange ],
                 };
-                localSymbols.variable.push(variable);
-                variableDefinitionMap.set(variable.name, variable);
+                localSymbols.variable.push(implicitVariable);
+                variableDefinitionMap.set(implicitVariable.name, implicitVariable);
                 continue;
 
             case 'if':

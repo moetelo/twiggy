@@ -59,11 +59,11 @@ describe('locals', () => {
 
         assert.deepEqual(
             locals.variable[0].references,
-            [ createLengthRange(code.lastIndexOf(var0), var0.length) ],
+            [ locals.variable[0].nameRange, createLengthRange(code.lastIndexOf(var0), var0.length) ],
         );
         assert.deepEqual(
             locals.variable[1].references,
-            [ createLengthRange(code.lastIndexOf(var1), var1.length) ],
+            [ locals.variable[1].nameRange, createLengthRange(code.lastIndexOf(var1), var1.length) ],
         );
 
         assert.strictEqual(locals.variable.length, 2);
@@ -87,7 +87,7 @@ describe('locals', () => {
 
         assert.deepEqual(
             locals.variable[0].references,
-            [ createLengthRange(code.lastIndexOf(var0), var0.length) ],
+            [ locals.variable[0].nameRange, createLengthRange(code.lastIndexOf(var0), var0.length) ],
         );
     });
 
@@ -119,6 +119,7 @@ describe('locals', () => {
         assert.deepEqual(
             variable.references,
             [
+                variable.nameRange,
                 createLengthRange(code.indexOf(varName, variable.nameRange.end.character), varName.length),
                 createLengthRange(code.lastIndexOf(varName), varName.length),
             ],
@@ -136,6 +137,7 @@ describe('locals', () => {
         assert.deepEqual(
             variable.references,
             [
+                variable.nameRange,
                 createLengthRange(document.text.lastIndexOf(varName), varName.length),
             ],
         );
@@ -152,6 +154,7 @@ describe('locals', () => {
         assert.deepEqual(
             variable.references,
             [
+                variable.nameRange,
                 createLengthRange(code.lastIndexOf(varName), varName.length),
             ],
         );
@@ -168,6 +171,7 @@ describe('locals', () => {
         assert.deepEqual(
             variable.references,
             [
+                variable.nameRange,
                 createLengthRange(code.lastIndexOf(varName), varName.length),
             ],
         );
@@ -213,6 +217,7 @@ describe('locals', () => {
             assert.deepEqual(
                 variable.references,
                 [
+                    variable.nameRange,
                     createLengthRange(code.lastIndexOf(varName), varName.length),
                 ],
                 varName + ' references',
