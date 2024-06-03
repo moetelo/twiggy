@@ -3,7 +3,6 @@ import { fileStat } from './fileStat';
 
 // HACK: Maybe we should move these to a configuration setting?
 const extensions = [`.twig`, `.html`];
-
 const indexTemplateFilenames = [`index`];
 
 const isValidPath = (stats: Stats | null): boolean => stats !== null && stats.isFile();
