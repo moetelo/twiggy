@@ -1,5 +1,5 @@
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
-import { fileStat } from '../utils/files/fileStat';
+import { isFile } from '../utils/files/fileStat';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
 import { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
 import { SymfonyTwigDebugJsonOutput, parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
@@ -35,7 +35,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
             console.warn('Symfony console path is not set');
         }
 
-        if (!await fileStat(symfonyConsolePath)) {
+        if (!await isFile(symfonyConsolePath)) {
             console.warn(`Symfony console path "${symfonyConsolePath}" does not exist`);
         }
 

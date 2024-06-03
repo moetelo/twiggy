@@ -1,11 +1,20 @@
-import { Stats } from 'node:fs';
-import { fileStat } from './fileStat';
+import { isFile } from './fileStat';
 
 // HACK: Maybe we should move these to a configuration setting?
-const extensions = [`.twig`, `.html`];
-const indexTemplateFilenames = [`index`];
+const extensions = ['twig', 'html'];
+const CRAFT_INDEX_TEMPLATE_NAME = 'index';
 
-const isValidPath = (stats: Stats | null): boolean => stats !== null && stats.isFile();
+export function* generateResolveSequence(pathToTwig: string): Generator<string> {
+    yield pathToTwig;
+
+    for (const extension of extensions) {
+        yield `${pathToTwig}.${extension}`;
+    }
+
+    for (const extension of extensions) {
+        yield `${pathToTwig}/${CRAFT_INDEX_TEMPLATE_NAME}.${extension}`;
+    }
+}
 
 /**
  * Searches for a template file, and returns the first match if there is one.
@@ -13,23 +22,9 @@ const isValidPath = (stats: Stats | null): boolean => stats !== null && stats.is
 export const resolveTemplate = async (
     pathToTwig: string,
 ): Promise<string | null> => {
-    if (isValidPath(await fileStat(pathToTwig))) {
-        return pathToTwig;
-    }
-
-    for (const extension of extensions) {
-        const testPath = `${pathToTwig}${extension}`;
-        if (isValidPath(await fileStat(testPath))) {
-            return testPath;
-        }
-    }
-
-    for (const filename of indexTemplateFilenames) {
-        for (const extension of extensions) {
-            const testPath = `${pathToTwig}/${filename}${extension}`;
-            if (isValidPath(await fileStat(testPath))) {
-                return testPath;
-            }
+    for (const path of generateResolveSequence(pathToTwig)) {
+        if (await isFile(path)) {
+            return path;
         }
     }
 
