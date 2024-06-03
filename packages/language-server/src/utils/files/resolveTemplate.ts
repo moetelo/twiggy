@@ -13,7 +13,7 @@ export const resolveTemplate = async (
 ): Promise<string | null> => {
     let stats = await fileStat(pathToTwig);
 
-    if (stats && stats.isFile()) {
+    if (stats?.isFile()) {
         return pathToTwig;
     }
 
