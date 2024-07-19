@@ -57,7 +57,7 @@ export class Document {
     }
 
     get text() {
-        if (!this.#text) throw new NoTextError(this.uri);
+        if (this.#text === null) throw new NoTextError(this.uri);
 
         return this.#text;
     }
