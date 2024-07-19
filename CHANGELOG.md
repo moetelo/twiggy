@@ -1,3 +1,8 @@
+## v0.13.0 (2024-07-19)
+* Completion for properties and method return types.
+* Fix `reflectType.php` for `\ReflectionUnionType` and `\ReflectionIntersectionType`. (#31)
+* Fix extension erroring on empty twig file.
+
 ## v0.12.0 (2024-06-04)
 * Add fallback to `resolveByTwigPath` to handle missing templates (#26, #27 @webrgp)
 
