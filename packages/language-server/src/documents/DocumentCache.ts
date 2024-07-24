@@ -25,18 +25,22 @@ export class DocumentCache {
         this.#typeResolver = typeResolver;
     }
 
-    get(documentUri: DocumentUri) {
+    async get(documentUri: DocumentUri) {
         const document = this.documents.get(documentUri);
 
         if (document) {
+            if (document.text === null) {
+                await this.setText(document);
+            }
+
             return document;
         }
 
-        return this.add(documentUri);
+        return await this.add(documentUri);
     }
 
     async updateText(documentUri: DocumentUri, text?: string) {
-        const document = this.get(documentUri);
+        const document = await this.get(documentUri);
 
         await this.setText(document, text);
 
@@ -44,7 +48,7 @@ export class DocumentCache {
     }
 
     async setText(document: Document, text?: string) {
-        if (text !== undefined) {
+        if (typeof text === 'string') {
             document.text = text;
         } else {
             const fsPath = documentUriToFsPath(document.uri);
@@ -75,8 +79,7 @@ export class DocumentCache {
 
             const resolvedTemplate = await resolveTemplate(pathToTwig);
             if (resolvedTemplate) {
-                const newDocument = this.add(toDocumentUri(resolvedTemplate));
-                await this.setText(newDocument);
+                const newDocument = await this.add(toDocumentUri(resolvedTemplate));
                 return newDocument;
             }
         }
@@ -100,11 +103,12 @@ export class DocumentCache {
         return await this.resolveByTwigPath(twigImport.path)!;
     }
 
-    private add(documentUri: DocumentUri) {
+    private async add(documentUri: DocumentUri) {
         documentUri = toDocumentUri(documentUri);
 
         const document = new Document(documentUri);
         this.documents.set(documentUri, document);
+        await this.setText(document);
         return document;
     }
 }

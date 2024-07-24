@@ -5,15 +5,6 @@ import { documentUriToFsPath } from '../utils/uri';
 import { pointToPosition, rangeContainsPosition } from '../utils/position';
 import { getNodeRange } from '../utils/node';
 
-class NoTextError extends Error {
-    get message() {
-        return 'Document text is not set. File: ' + documentUriToFsPath(this.uri);
-    }
-
-    constructor(readonly uri: DocumentUri) {
-        super();
-    }
-}
 class TreeNotParsedError extends Error {
     get message() {
         return 'Document tree is not parsed yet. File: ' + documentUriToFsPath(this.uri);
@@ -27,7 +18,7 @@ class TreeNotParsedError extends Error {
 export class Document {
     readonly uri: DocumentUri;
 
-    #text: string | null = null;
+    text: string | null = null;
 
     #tree?: Parser.Tree;
     #locals?: LocalSymbolInformation;
@@ -54,16 +45,6 @@ export class Document {
 
     set locals(locals: LocalSymbolInformation) {
         this.#locals = locals;
-    }
-
-    get text() {
-        if (this.#text === null) throw new NoTextError(this.uri);
-
-        return this.#text;
-    }
-
-    set text(text: string) {
-        this.#text = text;
     }
 
     getBlock(name: string): TwigBlock | undefined {

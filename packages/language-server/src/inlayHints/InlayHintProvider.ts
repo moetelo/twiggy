@@ -39,7 +39,7 @@ export class InlayHintProvider {
         const { block, macro, macroArguments } = this.settings;
         if (!block && !macro && !macroArguments) return;
 
-        const document = this.documentCache.get(params.textDocument.uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return;

@@ -15,8 +15,7 @@ export class HoverProvider {
     }
 
     async onHover(params: HoverParams) {
-        const uri = params.textDocument.uri;
-        const document = this.documentCache.get(uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return;

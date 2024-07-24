@@ -75,7 +75,7 @@ export class DefinitionProvider {
     async onDefinition(
         params: DefinitionParams,
     ): Promise<Definition | undefined> {
-        const document = this.documentCache.get(params.textDocument.uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return;

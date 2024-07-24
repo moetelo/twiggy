@@ -36,16 +36,7 @@ export class SymbolProvider {
     }
 
     async onDocumentSymbol(params: DocumentSymbolParams): Promise<DocumentSymbol[]> {
-        const uri = params.textDocument.uri;
-        const document = this.documentCache.get(uri);
-
-        if (!document) {
-            return [];
-        }
-
-        if (!document.text) {
-            await this.documentCache.setText(document);
-        }
+        const document = await this.documentCache.get(params.textDocument.uri);
 
         return mapLocalsToSymbols(document.locals);
     }

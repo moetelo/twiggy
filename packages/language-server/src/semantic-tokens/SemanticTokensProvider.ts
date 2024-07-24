@@ -26,8 +26,7 @@ export class SemanticTokensProvider {
 
     async serverRequestHandler(params: SemanticTokensParams) {
         const semanticTokens: SemanticTokens = { data: [] };
-        const uri = params.textDocument.uri;
-        const document = this.documentCache.get(uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return semanticTokens;

@@ -12,7 +12,7 @@ export class RenameProvider {
     }
 
     async onPrepareRename(params: PrepareRenameParams) {
-        const document = this.documentCache.get(params.textDocument.uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
         if (!document) {
             return;
         }
@@ -33,7 +33,7 @@ export class RenameProvider {
     }
 
     async onRenameRequest(params: RenameParams) {
-        const document = this.documentCache.get(params.textDocument.uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
         if (!document) {
             return;
         }

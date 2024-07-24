@@ -13,7 +13,7 @@ export class ReferenceProvider {
     }
 
     async onReferences(params: ReferenceParams) {
-        const document = this.documentCache.get(params.textDocument.uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
         if (!document) {
             return;
         }

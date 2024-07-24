@@ -24,7 +24,7 @@ export class SignatureHelpProvider {
     async provideSignatureHelp(
         params: SignatureHelpParams,
     ): Promise<SignatureHelp | undefined> {
-        const document = this.documentCache.get(params.textDocument.uri);
+        const document = await this.documentCache.get(params.textDocument.uri);
 
         if (!document) {
             return undefined;

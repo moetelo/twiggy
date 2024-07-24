@@ -16,7 +16,7 @@ export class ExecuteCommandProvider {
         private readonly documentCache: DocumentCache,
     ) {
         connection.onExecuteCommand(
-            this.onExecuteCommand.bind(this)
+            this.onExecuteCommand.bind(this),
         );
     }
 
@@ -29,15 +29,7 @@ export class ExecuteCommandProvider {
         }
 
         const [uri, position] = params.arguments as [DocumentUri, Position];
-        const document = this.documentCache.get(uri);
-
-        if (!document) {
-            return;
-        }
-
-        if (!document.text) {
-            await this.documentCache.setText(document);
-        }
+        const document = await this.documentCache.get(uri);
 
         return command(document, position);
     }
