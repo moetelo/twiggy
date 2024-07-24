@@ -25,26 +25,22 @@ export class DocumentCache {
         this.#typeResolver = typeResolver;
     }
 
-    async get(documentUri: DocumentUri) {
+    async get(documentUri: DocumentUri, text?: string) {
         const document = this.documents.get(documentUri);
 
         if (document) {
-            if (document.text === null) {
-                await this.setText(document);
+            if (document.text === null || text !== undefined) {
+                await this.setText(document, text);
             }
 
             return document;
         }
 
-        return await this.add(documentUri);
+        return await this.add(documentUri, text);
     }
 
     async updateText(documentUri: DocumentUri, text?: string) {
-        const document = await this.get(documentUri);
-
-        await this.setText(document, text);
-
-        return document;
+        return await this.get(documentUri, text);
     }
 
     async setText(document: Document, text?: string) {
@@ -103,12 +99,12 @@ export class DocumentCache {
         return await this.resolveByTwigPath(twigImport.path)!;
     }
 
-    private async add(documentUri: DocumentUri) {
+    private async add(documentUri: DocumentUri, text?: string) {
         documentUri = toDocumentUri(documentUri);
 
         const document = new Document(documentUri);
         this.documents.set(documentUri, document);
-        await this.setText(document);
+        await this.setText(document, text);
         return document;
     }
 }

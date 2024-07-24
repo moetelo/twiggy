@@ -6,12 +6,18 @@ import { LocalSymbolCollector } from '../src/symbols/LocalSymbolCollector';
 import { MockPhpExecutor } from './mocks';
 import { TypeResolver } from '../src/typing/TypeResolver';
 
+type DocumentWithText = Document & { text: string };
+
 export const documentFromCode = async (code: string, uri = 'test://test.html.twig') => {
     const typeResolver = new TypeResolver(new MockPhpExecutor());
     return documentFromCodeWithTypeResolver(code, typeResolver, uri);
 };
 
-export const documentFromCodeWithTypeResolver = async (code: string, typeResolver: TypeResolver, uri = 'test://test.html.twig') => {
+export const documentFromCodeWithTypeResolver = async (
+    code: string,
+    typeResolver: TypeResolver,
+    uri = 'test://test.html.twig',
+): Promise<DocumentWithText> => {
     const document = new Document(uri);
     document.text = code;
     document.tree = (await initializeTestParser()).parse(document.text);
@@ -20,7 +26,7 @@ export const documentFromCodeWithTypeResolver = async (code: string, typeResolve
         typeResolver,
     ).collect();
 
-    return document;
+    return document as DocumentWithText;
 };
 
 export const initializeTestParser = async () => {
