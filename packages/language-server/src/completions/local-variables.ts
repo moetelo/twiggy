@@ -4,6 +4,7 @@ import { Document } from '../documents';
 import { FunctionArgument, TwigVariableDeclaration } from '../symbols/types';
 import { isInExpressionScope } from '../utils/node';
 import { pointToPosition } from '../utils/position';
+import { positionsEqual } from '../utils/position/comparePositions';
 
 const toCompletionItem = (variable: TwigVariableDeclaration | FunctionArgument): CompletionItem => ({
     label: variable.name,
@@ -20,5 +21,12 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Comp
         pointToPosition(cursorNode.startPosition),
     );
 
-    return locals.map(toCompletionItem);
+    // excludes the current variable from the completion list
+    // so it doesn't show up when the cursor is on the variable name
+    const localsWithoutCurrentVariable = locals.filter(local =>
+        !(positionsEqual(local.nameRange.start, pointToPosition(cursorNode.startPosition))
+        && positionsEqual(local.nameRange.end, pointToPosition(cursorNode.endPosition)))
+    );
+
+    return localsWithoutCurrentVariable.map(toCompletionItem);
 }
