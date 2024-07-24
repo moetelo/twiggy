@@ -1,3 +1,8 @@
+## v0.13.2 (2024-07-24)
+* Fix documentation for HTML tags (#33).
+* Exclude the current variable from the completion list.
+* Fix duplicate macros in the completion.
+
 ## v0.13.1 (2024-07-24)
 * Fix `Document text is not set.` at the moment of `workspace/executeCommand` and `textDocument/documentSymbol` (#34).
 
