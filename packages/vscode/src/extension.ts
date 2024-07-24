@@ -10,15 +10,18 @@ import {
     CompletionList,
     Uri,
     ConfigurationTarget,
+    CompletionItem,
 } from 'vscode';
 import * as autoInsert from './autoInsert';
 import {
     LanguageClient,
     LanguageClientOptions,
+    MarkupKind,
     ServerOptions,
     TransportKind,
 } from 'vscode-languageclient/node';
 import { unwrapCompletionArray } from './utils/unwrapCompletionArray';
+import ProtocolCompletionItem from 'vscode-languageclient/lib/common/protocolCompletionItem';
 
 const outputChannel = window.createOutputChannel('Twiggy Language Server');
 const clients = new Map<string, LanguageClient>();
@@ -61,7 +64,7 @@ async function addWorkspaceFolder(
 ): Promise<void> {
     const folderPath = workspaceFolder.uri.fsPath;
     const fileEvents = workspace.createFileSystemWatcher(
-        new RelativePattern(workspaceFolder, '*.twig')
+        new RelativePattern(workspaceFolder, '*.twig'),
     );
 
     context.subscriptions.push(fileEvents);
@@ -103,7 +106,9 @@ async function addWorkspaceFolder(
                 pattern: `${folderPath}/**`,
             },
         ],
-        synchronize: { fileEvents },
+        synchronize: {
+            fileEvents,
+        },
         middleware: {
             async provideCompletionItem(
                 document,
@@ -120,7 +125,7 @@ async function addWorkspaceFolder(
                     originalUri,
                     position,
                 );
-                const result = await unwrapCompletionArray(next(document, position, context, token));
+                const result = await unwrapCompletionArray(next(document, position, context, token)) as ProtocolCompletionItem[];
 
                 if (!isInsideHtmlRegion) {
                     return result;
@@ -130,15 +135,28 @@ async function addWorkspaceFolder(
 
                 const encodedUri = encodeURIComponent(originalUri);
                 const vdocUri = Uri.parse(`embedded-content://html/${encodedUri}.html`);
-                const htmlCompletions = await commands.executeCommand<CompletionList>(
+                const htmlCompletionList = await commands.executeCommand<CompletionList<CompletionItem>>(
                     'vscode.executeCompletionItemProvider',
                     vdocUri,
                     position,
                     context.triggerCharacter,
                 );
 
+                const htmlItems = htmlCompletionList
+                    .items
+                    .map(item => {
+                        const protoItem = Object.assign(
+                            new ProtocolCompletionItem(item.label),
+                            item,
+                        );
+
+                        protoItem.documentationFormat = MarkupKind.Markdown;
+
+                        return protoItem;
+                    });
+
                 return [
-                    ...await unwrapCompletionArray(htmlCompletions),
+                    ...htmlItems,
                     ...result,
                 ];
             },
