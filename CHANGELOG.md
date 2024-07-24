@@ -1,3 +1,6 @@
+## v0.13.1 (2024-07-24)
+* Fix `Document text is not set.` at the moment of `workspace/executeCommand` and `textDocument/documentSymbol` (#34).
+
 ## v0.13.0 (2024-07-19)
 * Completion for properties and method return types.
 * Fix `reflectType.php` for `\ReflectionUnionType` and `\ReflectionIntersectionType`. (#31)
