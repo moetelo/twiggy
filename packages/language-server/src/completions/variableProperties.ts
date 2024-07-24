@@ -111,20 +111,22 @@ export async function variableProperties(
 
     const importedDocument = await documentCache.resolveImport(document, variableName, pos);
     if (importedDocument) {
-        const localMacros = importedDocument.locals.macro.map(macroToCompletionItem);
+        const localMacros = importedDocument.locals.macro;
 
         if (importedDocument !== document) {
-            return localMacros;
+            return localMacros.map(macroToCompletionItem);
         }
 
         const scopedMacros = importedDocument
             .getScopeAt(pointToPosition(cursorNode.startPosition))
-            ?.macro.map(macroToCompletionItem) || [];
+            ?.macro || [];
 
-        return [
+        const allMacros = new Set([
             ...localMacros,
             ...scopedMacros,
-        ];
+        ]);
+
+        return [...allMacros].map(macroToCompletionItem);
     }
 
     return [];
