@@ -1,3 +1,6 @@
+## 0.13.3 (2024-08-08)
+* Add `<` to `completionProvider.triggerCharacters`.
+
 ## v0.13.2 (2024-07-24)
 * Fix documentation for HTML tags (#33).
 * Exclude the current variable from the completion list.
