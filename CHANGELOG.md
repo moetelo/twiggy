@@ -1,3 +1,7 @@
+## 0.14.0 (2024-08-13)
+* `@var` type hint for arrays `[]`: grammar, array item type inference. #29
+* Fix `TreeNotParsedError` at the moment of `textDocument/documentSymbol`.
+
 ## 0.13.3 (2024-08-08)
 * Add `<` to `completionProvider.triggerCharacters`.
 

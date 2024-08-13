@@ -1,6 +1,6 @@
 {
   "name": "twiggy-language-server",
-  "version": "0.13.3",
+  "version": "0.14.0",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
   "main": "dist/server.js",
