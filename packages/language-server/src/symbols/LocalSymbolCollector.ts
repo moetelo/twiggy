@@ -5,6 +5,7 @@ import {
     TwigBlock,
     TwigMacro,
     TwigVariableDeclaration,
+    hasReflectedType,
     type TwigImport,
 } from './types';
 import { getNodeRange, getStringNodeValue } from '../utils/node';
@@ -12,6 +13,7 @@ import { SyntaxNode } from 'web-tree-sitter';
 import { ITypeResolver } from '../typing/ITypeResolver';
 import { ExpressionTypeResolver } from '../typing/ExpressionTypeResolver';
 import { toMacro, toVariable, toBlock, toImport } from './nodeToSymbolMapping';
+import type { ReflectedType } from '../phpInterop/ReflectedType';
 
 const nodesToDiveInto: ReadonlySet<string> = new Set([
     'if',
@@ -101,7 +103,7 @@ export class LocalSymbolCollector {
                 }
 
                 case 'variable': {
-                    this.#visitVariable(cursor.currentNode);
+                    await this.#visitVariable(cursor.currentNode);
                     continue;
                 }
             }
@@ -110,7 +112,7 @@ export class LocalSymbolCollector {
         return this.localSymbols;
     }
 
-    #visitVariable(currentNode: SyntaxNode) {
+    async #visitVariable(currentNode: SyntaxNode) {
         const nameRange = getNodeRange(currentNode);
 
         const alreadyDefinedVar = this.localSymbols.variableDefinition.get(currentNode.text);
@@ -119,6 +121,7 @@ export class LocalSymbolCollector {
             return;
         }
 
+        const reflectedType = await this.#reflectVariableDeclarationType(currentNode);
         const implicitVariable: TwigVariableDeclaration = {
             name: currentNode.text,
             nameRange,
@@ -127,7 +130,7 @@ export class LocalSymbolCollector {
             // i.e. when you meet a variable for the first time,
             // it's "defined" and used in the same place.
             references: [ nameRange ],
-            reflectedType: null,
+            reflectedType,
         };
         this.localSymbols.variable.push(implicitVariable);
         this.localSymbols.variableDefinition.set(implicitVariable.name, implicitVariable);
@@ -150,22 +153,41 @@ export class LocalSymbolCollector {
     async #visitVariableDeclaration(currentNode: SyntaxNode) {
         const variableDeclaration = toVariable(currentNode);
         const valueNode = currentNode.childForFieldName('value');
-
-        if (!variableDeclaration.type) {
-            if (this.exprTypeResolver && valueNode) {
-                variableDeclaration.reflectedType = await this.exprTypeResolver.resolveExpression(
-                    valueNode,
-                    this.localSymbols,
-                );
-            }
-        } else if (this.typeResolver) {
-            variableDeclaration.reflectedType = await this.typeResolver.reflectType(variableDeclaration.type);
-        }
+        variableDeclaration.reflectedType = await this.#reflectVariableDeclarationType(currentNode, true);
 
         this.localSymbols.variable.push(variableDeclaration);
         this.localSymbols.variableDefinition.set(variableDeclaration.name, variableDeclaration);
 
         await this.collect(valueNode);
+    }
+
+    async #reflectVariableDeclarationType(varDeclarationNode: SyntaxNode, isDeclaration?: boolean): Promise<ReflectedType | null> {
+        if (!this.exprTypeResolver) return null;
+
+        if (isDeclaration) {
+            return await this.exprTypeResolver.resolveExpression(varDeclarationNode, this.localSymbols);
+        }
+
+        const valueNode = varDeclarationNode.childForFieldName('value');
+        if (valueNode) {
+            return await this.exprTypeResolver.resolveExpression(
+                valueNode,
+                this.localSymbols,
+            );
+        }
+
+        const forLoopArrayNode = varDeclarationNode.parent?.type === 'for'
+            && varDeclarationNode.nextNamedSibling;
+        if (forLoopArrayNode) {
+            const forLoopArrayType = await this.exprTypeResolver.resolveExpression(
+                forLoopArrayNode,
+                this.localSymbols,
+            );
+
+            return forLoopArrayType?.arrayType?.itemReflectedType || null;
+        }
+
+        return null;
     }
 
     async #visitBlock(currentNode: SyntaxNode) {

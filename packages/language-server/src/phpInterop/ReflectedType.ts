@@ -16,7 +16,13 @@ type Method = {
     parameters: MethodParam[];
 };
 
+export type ArrayType = {
+    itemType: string;
+    itemReflectedType: ReflectedType | null;
+};
+
 export type ReflectedType = {
     properties: Property[];
     methods: Method[];
+    arrayType?: ArrayType;
 };

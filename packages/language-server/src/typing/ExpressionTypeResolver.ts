@@ -12,6 +12,7 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
         'call_expression',
         'member_expression',
         'variable',
+        'var_declaration',
         // TODO: handle these
         // 'subscript_expression',
         // 'filter_expression',
@@ -63,7 +64,35 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
             const variable = locals.variableDefinition.get(expr.text);
             if (!variable || !hasReflectedType(variable) || !variable.type) return null;
 
-            return await this.typeResolver.reflectType(variable.type);
+            return variable.reflectedType;
+        }
+
+        if (expr.type === 'var_declaration') {
+            const typeNode = expr.childForFieldName('type');
+
+            if (!typeNode) return null;
+
+            if (typeNode.type === 'array_type') {
+                const arrayItemType = typeNode.firstChild?.text;
+
+                // just in case
+                if (!arrayItemType) return null;
+
+                const itemReflectedType = await this.typeResolver.reflectType(arrayItemType);
+
+                const reflectedType: ReflectedType = {
+                    properties: [],
+                    methods: [],
+                    arrayType: {
+                        itemType: arrayItemType,
+                        itemReflectedType: itemReflectedType,
+                    },
+                };
+
+                return reflectedType;
+            }
+
+            return this.typeResolver.reflectType(typeNode.text);
         }
 
         return null;

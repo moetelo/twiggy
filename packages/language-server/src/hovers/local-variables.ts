@@ -28,7 +28,7 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Hove
         return {
             contents: {
                 kind: 'markdown',
-                value: `**${result.name}**: ${result.type}`,
+                value: result.type,
             },
         };
     }

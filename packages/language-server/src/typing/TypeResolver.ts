@@ -3,21 +3,21 @@ import { ITypeResolver } from './ITypeResolver';
 import { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 
 export class TypeResolver implements ITypeResolver {
-    #typeCache: Map<string, ReflectedType | null> = new Map();
+    #typeCache = new Map<string, ReflectedType | null>();
 
     constructor(
         private readonly phpExecutor: IPhpExecutor,
     ) {
     }
 
-    async reflectType(className: string): Promise<ReflectedType | null> {
-        if (!className) return null;
+    async reflectType(typeName: string): Promise<ReflectedType | null> {
+        if (!typeName) return null;
 
-        const cachedType = this.#typeCache.get(className);
+        const cachedType = this.#typeCache.get(typeName);
         if (cachedType) return cachedType;
 
-        const type = await this.phpExecutor.reflectType(className);
-        this.#typeCache.set(className, type);
+        const type = await this.phpExecutor.reflectType(typeName);
+        this.#typeCache.set(typeName, type);
 
         return type;
     }
