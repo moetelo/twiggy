@@ -28,15 +28,15 @@ export class DocumentCache {
     async get(documentUri: DocumentUri, text?: string) {
         const document = this.documents.get(documentUri);
 
-        if (document) {
-            if (document.text === null || text !== undefined) {
-                await this.setText(document, text);
-            }
-
-            return document;
+        if (!document) {
+            return await this.add(documentUri, text);
         }
 
-        return await this.add(documentUri, text);
+        if (document.text === null || text !== undefined) {
+            await this.setText(document, text);
+        }
+
+        return document;
     }
 
     async updateText(documentUri: DocumentUri, text?: string) {
@@ -103,8 +103,8 @@ export class DocumentCache {
         documentUri = toDocumentUri(documentUri);
 
         const document = new Document(documentUri);
-        this.documents.set(documentUri, document);
         await this.setText(document, text);
+        this.documents.set(documentUri, document);
         return document;
     }
 }
