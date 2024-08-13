@@ -85,6 +85,19 @@ var declaration: incomplete_qualified_name - backslash \
     (incomplete_type
       (namespace))))
 
+==================
+var declaration: array_type
+==================
+{# @var items \Foo\Bar[] #}
+---
+(template
+  (var_declaration
+    (variable)
+    (array_type
+      (qualified_name
+        (namespace
+          (php_identifier))
+        (php_identifier)))))
 
 ==================
 var declaration: incomplete_qualified_name in union

@@ -50,8 +50,6 @@ module.exports = grammar({
       alias('#}', 'comment_end'),
     ),
 
-    // var_declaration
-
     var_declaration: $ => seq(
       alias('{#', 'comment_begin'),
       seq(
@@ -74,6 +72,7 @@ module.exports = grammar({
       $.qualified_name,
       $.primitive_type,
       $.incomplete_type,
+      $.array_type,
     ),
 
     incomplete_type: $ => choice(
@@ -103,6 +102,14 @@ module.exports = grammar({
         $.qualified_name,
         $.primitive_type,
       ),
+    ),
+
+    array_type: $ => seq(
+      choice(
+        $.qualified_name,
+        $.primitive_type,
+      ),
+      '[]',
     ),
 
     _incomplete_qualified_name: $ => $.namespace,
