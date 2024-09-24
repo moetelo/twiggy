@@ -1,3 +1,6 @@
+## 0.15.0 (2024-09-24)
+* Fix hints for imported macroses. #38
+
 ## 0.14.0 (2024-08-13)
 * `@var` type hint for arrays `[]`: grammar, array item type inference. #29
 * Fix `TreeNotParsedError` at the moment of `textDocument/documentSymbol`.
@@ -209,4 +212,3 @@
 
 #### Committers: 1
 - Stanislav Romanov ([@kaermorchen](https://github.com/kaermorchen))
-
