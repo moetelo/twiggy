@@ -86,11 +86,15 @@ export class DocumentCache {
     async resolveImport(document: Document, variableName: string, pos?: Position) {
         if (variableName === '_self') return document;
 
-        const scopedImports = pos
-            ? document.getScopeAt(pos)?.imports
-            : document.locals.imports
+        const imports = document.locals.imports;
+        if (pos !== undefined) {
+            const scopedImports = document.getScopeAt(pos)?.imports;
+            if (scopedImports) {
+                imports.push(...scopedImports);
+            }
+        }
 
-        const twigImport = scopedImports?.find(imp => imp.name === variableName);
+        const twigImport = imports?.find(imp => imp.name === variableName);
 
         if (!twigImport) return;
 
