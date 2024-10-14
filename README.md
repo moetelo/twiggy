@@ -27,6 +27,9 @@ This is a fork of [kaermorchen/twig-language-server (Modern Twig)](https://githu
 
 [Submit new issue](https://github.com/moetelo/twiggy/issues/new) if you have any problems or the feature you want is missing.
 
+## Neovim
+Please refer to [this reply](https://github.com/moetelo/twiggy/issues/12#issuecomment-2044309054) and [the instructions from neovim/nvim-lspconfig](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#twiggy_language_server).
+
 
 # Development
 1. Install [pnpm](https://pnpm.io/installation).
