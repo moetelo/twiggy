@@ -4,6 +4,7 @@
 module.exports = grammar({
   name: 'twig',
   extras: ($) => [
+    // @ts-ignore
     /[\s\p{Zs}\uFEFF\u2060\u200B]/,
   ],
   supertypes: ($) => [$.expression, $.primary_expression],
@@ -246,7 +247,7 @@ module.exports = grammar({
 
     slice: ($) =>
       seq(
-        optional(field('start', $._property_name)),
+        optional(field('start', choice($._property_name, $.unary_expression))),
         ':',
         optional(field('length', $.expression)),
       ),

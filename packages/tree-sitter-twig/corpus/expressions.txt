@@ -369,6 +369,19 @@ Subscript expression slice
       (slice))))
 
 ==================
+Subscript expression negative first arg
+==================
+{{ '123456'[-2:] }}
+---
+(template
+  (output
+    (subscript_expression
+      (string)
+      (slice
+        (unary_expression
+          (number))))))
+
+==================
 Subscript expression deeper
 ==================
 {{ user['name'][prop] }}
