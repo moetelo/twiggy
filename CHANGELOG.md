@@ -1,3 +1,9 @@
+## 0.16.0 (2024-10-14)
+* Add a bit of info for the neovimmers. #13
+* Fix unused variable warnings related to `set` variables. #37
+* grammar: colon `:` as a named argument separator. #41
+* grammar: negative index as a first argument of a slice. #45
+
 ## 0.15.0 (2024-09-24)
 * Fix hints for imported macroses. #38
 
