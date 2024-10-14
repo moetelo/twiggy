@@ -152,6 +152,18 @@ export class LocalSymbolCollector {
 
     async #visitVariableDeclaration(currentNode: SyntaxNode) {
         const variableDeclaration = toVariable(currentNode);
+
+        // `set` may be used to define new variables or to change the existing variable value.
+        if (currentNode.type === 'set') {
+            const alreadyDefinedVar = this.localSymbols.variableDefinition.get(variableDeclaration.name);
+            if (alreadyDefinedVar) {
+                const nameRange = getNodeRange(currentNode);
+
+                alreadyDefinedVar.references.push(nameRange);
+                return;
+            }
+        }
+
         const valueNode = currentNode.childForFieldName('value');
         variableDeclaration.reflectedType = await this.#reflectVariableDeclarationType(currentNode, true);
 
