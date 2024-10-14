@@ -480,7 +480,7 @@ Call expression with named arguments
 ==================
 Call expression with arguments and named arguments
 ==================
-{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}
+{{ "now"|date(format: 'd/m/Y H:i', timezone="Europe/Paris") }}
 ---
 (template
   (output
@@ -488,7 +488,9 @@ Call expression with arguments and named arguments
       (string)
       (function)
       (arguments
-        (string)
+        (named_argument
+          (variable)
+          (string))
         (named_argument
           (variable)
           (string))))))

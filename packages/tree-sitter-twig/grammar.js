@@ -297,7 +297,7 @@ module.exports = grammar({
     named_argument: ($) =>
       seq(
         field('key', alias($.identifier, $.variable)),
-        '=',
+        choice('=', ':'),
         field('value', $.expression),
       ),
 
