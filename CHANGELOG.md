@@ -1,3 +1,6 @@
+## 0.16.1 (2024-10-25)
+* Increase maxBuffer to 5MB. #44
+
 ## 0.16.0 (2024-10-14)
 * Add a bit of info for the neovimmers. #13
 * Fix unused variable warnings related to `set` variables. #37
