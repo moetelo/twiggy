@@ -1,3 +1,8 @@
+## 0.16.2 (2024-11-16)
+* Support apply tag with `call_expression`. #51
+* Support for custom syntax '???'. #39
+* Fix object property key token type. #46
+
 ## 0.16.1 (2024-10-25)
 * Increase maxBuffer to 5MB. #44
 
