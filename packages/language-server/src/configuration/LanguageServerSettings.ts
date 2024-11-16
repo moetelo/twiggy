@@ -6,6 +6,7 @@ export type InlayHintSettings = {
 
 export const enum PhpFramework {
     Ignore = 'ignore',
+    Twig = 'twig',
     Symfony = 'symfony',
     Craft = 'craft',
 }
@@ -17,4 +18,5 @@ export type LanguageServerSettings = {
     framework?: PhpFramework,
     phpExecutable: string,
     symfonyConsolePath: string,
+    vanillaTwigEnvironmentPath: string,
 };

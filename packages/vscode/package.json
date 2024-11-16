@@ -67,9 +67,16 @@
           "enum": [
             "symfony",
             "craft",
+            "twig",
             "ignore"
           ],
           "markdownDescription": "Framework to use."
+        },
+        "twiggy.vanillaTwigEnvironmentPath": {
+          "type": "string",
+          "scope": "resource",
+          "default": "",
+          "markdownDescription": "Path to the Twig environment file. To be used with `\"twiggy.framework\": \"twig\"`.\nSee: https://github.com/moetelo/twiggy/issues/52"
         },
         "twiggy.symfonyConsolePath": {
           "type": "string",

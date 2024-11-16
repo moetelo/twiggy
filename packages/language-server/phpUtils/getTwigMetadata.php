@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Twiggy\Metadata;
 
-function getTwigMetadata(\Twig\Environment $twig, string $framework): array {
+function getTwigMetadata(\Twig\Environment $twig, string $framework = ''): array {
     $loaderPathsArray = [];
     if ($framework !== 'craft') {
         $twigLoader = $twig->getLoader();

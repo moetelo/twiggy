@@ -17,6 +17,7 @@ import {
     IFrameworkTwigEnvironment,
     SymfonyTwigEnvironment,
     CraftTwigEnvironment,
+    VanillaTwigEnvironment,
     EmptyEnvironment,
 } from '../twigEnvironment';
 import { TypeResolver } from '../typing/TypeResolver';
@@ -29,6 +30,7 @@ export class ConfigurationManager {
         inlayHints: InlayHintProvider.defaultSettings,
         phpExecutable: 'php',
         symfonyConsolePath: './bin/console',
+        vanillaTwigEnvironmentPath: '',
         framework: PhpFramework.Symfony,
     };
 
@@ -67,16 +69,30 @@ export class ConfigurationManager {
 
         const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
 
-        const twigEnvironment = config.framework === PhpFramework.Symfony
-            ? new SymfonyTwigEnvironment(phpExecutor)
-            : new CraftTwigEnvironment(phpExecutor);
-
+        const twigEnvironment = this.#resolveTwigEnvironment(config.framework, phpExecutor);
         await twigEnvironment.refresh({
             symfonyConsolePath: config.symfonyConsolePath,
+            vanillaTwigEnvironmentPath: config.vanillaTwigEnvironmentPath,
             workspaceDirectory,
         });
 
         this.applySettings(twigEnvironment, phpExecutor);
+    }
+
+    #resolveTwigEnvironment(
+        framework: PhpFramework.Symfony
+            | PhpFramework.Craft
+            | PhpFramework.Twig,
+        phpExecutor: PhpExecutor,
+    ) {
+        switch (framework) {
+            case PhpFramework.Symfony:
+                return new SymfonyTwigEnvironment(phpExecutor);
+            case PhpFramework.Craft:
+                return new CraftTwigEnvironment(phpExecutor);
+            case PhpFramework.Twig:
+                return new VanillaTwigEnvironment(phpExecutor);
+        }
     }
 
     private applySettings(frameworkEnvironment: IFrameworkTwigEnvironment, phpExecutor: PhpExecutor | null) {
