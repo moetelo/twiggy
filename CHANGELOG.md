@@ -1,3 +1,6 @@
+## 0.17.0 (2024-11-16)
+* Twig without frameworks. #52
+
 ## 0.16.2 (2024-11-16)
 * Support apply tag with `call_expression`. #51
 * Support for custom syntax '???'. #39
