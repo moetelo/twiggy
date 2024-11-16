@@ -710,7 +710,7 @@ With variables
   (with
     (object
       (pair
-        (variable)
+        (identifier)
         (number)))
     (source_elements
       (content))))
@@ -726,7 +726,7 @@ With variables only
   (with
     (object
       (pair
-        (variable)
+        (identifier)
         (number)))
     (source_elements
       (content))))

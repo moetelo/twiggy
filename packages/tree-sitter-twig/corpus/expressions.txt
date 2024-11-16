@@ -1,5 +1,5 @@
 ==================
-Identifier
+Variable
 ==================
 {{ user }}
 ---
@@ -184,10 +184,10 @@ Object property keys as names
   (output
     (object
       (pair
-        (variable)
+        (identifier)
         (string))
       (pair
-        (variable)
+        (identifier)
         (string)))))
 
 ==================

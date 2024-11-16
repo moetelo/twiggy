@@ -215,7 +215,7 @@ module.exports = grammar({
       choice(
         $.string,
         $.number,
-        alias($.identifier, $.variable),
+        $.identifier,
         $.computed_property_name,
       ),
 
