@@ -425,7 +425,11 @@ module.exports = grammar({
         alias('apply', 'keyword'),
         field(
           'filter',
-          choice(alias($.identifier, $.function), $.filter_expression),
+          choice(
+            alias($.identifier, $.function),
+            $.filter_expression,
+            $.call_expression,
+          ),
         ),
         source_elements($),
         alias('endapply', 'keyword'),

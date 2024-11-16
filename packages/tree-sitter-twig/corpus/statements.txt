@@ -43,6 +43,19 @@ Apply
       (content))))
 
 ==================
+Apply call expression
+==================
+{% apply niceComicSans('issue 51') %}
+{% endapply %}
+---
+(template
+  (apply
+    (call_expression
+      (function)
+      (arguments
+        (string)))))
+
+==================
 Apply multiple filters
 ==================
 {% apply lower|escape('html') %}
