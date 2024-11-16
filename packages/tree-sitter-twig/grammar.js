@@ -353,6 +353,7 @@ module.exports = grammar({
           ['is same as', 100],
           ['**', 200, 'right'],
           ['??', 300, 'right'],
+          ['???', 300, 'right'], // https://nystudio107.com/docs/empty-coalesce
         ]).map(([operator, precedence, associativity = 'left']) =>
           prec[associativity](
             precedence,

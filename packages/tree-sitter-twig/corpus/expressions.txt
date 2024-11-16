@@ -554,6 +554,22 @@ Ternary operator short
       (string))))
 
 ==================
+Empty Coalesce
+==================
+{% set choice = thingOne ??? thingTwo ??? thingThree ??? thingFour %}
+---
+(template
+  (set
+    (variable)
+    (binary_expression
+      (variable)
+      (binary_expression
+        (variable)
+        (binary_expression
+          (variable)
+          (variable))))))
+
+==================
 Filter without arguments
 ==================
 {{ name|title }}
