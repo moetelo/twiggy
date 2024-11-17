@@ -4,18 +4,20 @@ export type InlayHintSettings = {
     block: boolean,
 };
 
-export const enum PhpFramework {
+export const enum PhpFrameworkOption {
     Ignore = 'ignore',
     Twig = 'twig',
     Symfony = 'symfony',
     Craft = 'craft',
 }
 
+export type PhpFramework = PhpFrameworkOption.Twig | PhpFrameworkOption.Symfony | PhpFrameworkOption.Craft;
+
 export type LanguageServerSettings = {
     autoInsertSpaces: boolean,
     inlayHints: InlayHintSettings,
 
-    framework?: PhpFramework,
+    framework?: PhpFrameworkOption,
     phpExecutable: string,
     symfonyConsolePath: string,
     vanillaTwigEnvironmentPath: string,

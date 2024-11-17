@@ -4,7 +4,7 @@ import {
     DidChangeConfigurationParams,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import { LanguageServerSettings, PhpFramework } from './LanguageServerSettings';
+import { LanguageServerSettings, PhpFramework, PhpFrameworkOption } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
 import { DocumentCache } from '../documents';
 import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
@@ -21,6 +21,8 @@ import {
     EmptyEnvironment,
 } from '../twigEnvironment';
 import { TypeResolver } from '../typing/TypeResolver';
+import { isFile } from '../utils/files/fileStat';
+import { readFile } from 'fs/promises';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -31,7 +33,7 @@ export class ConfigurationManager {
         phpExecutable: 'php',
         symfonyConsolePath: './bin/console',
         vanillaTwigEnvironmentPath: '',
-        framework: PhpFramework.Symfony,
+        framework: PhpFrameworkOption.Symfony,
     };
 
     constructor(
@@ -56,16 +58,21 @@ export class ConfigurationManager {
 
         this.applySettings(EmptyEnvironment, null);
 
-        if (config.framework === PhpFramework.Ignore) {
-            return;
-        }
-
-        if (!config.framework) {
-            console.warn('`twiggy.framework` is required.');
+        if (config.framework === PhpFrameworkOption.Ignore) {
             return;
         }
 
         const workspaceDirectory = documentUriToFsPath(this.workspaceFolder.uri);
+        if (!config.framework) {
+            config.framework = await this.#tryGuessFramework(workspaceDirectory);
+
+            if (!config.framework) {
+                console.warn('`twiggy.framework` is required.');
+                return;
+            }
+
+            console.info('Guessed `twiggy.framework`: ', config.framework);
+        }
 
         const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
 
@@ -79,19 +86,29 @@ export class ConfigurationManager {
         this.applySettings(twigEnvironment, phpExecutor);
     }
 
-    #resolveTwigEnvironment(
-        framework: PhpFramework.Symfony
-            | PhpFramework.Craft
-            | PhpFramework.Twig,
-        phpExecutor: PhpExecutor,
-    ) {
+    #resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecutor) {
         switch (framework) {
-            case PhpFramework.Symfony:
+            case PhpFrameworkOption.Symfony:
                 return new SymfonyTwigEnvironment(phpExecutor);
-            case PhpFramework.Craft:
+            case PhpFrameworkOption.Craft:
                 return new CraftTwigEnvironment(phpExecutor);
-            case PhpFramework.Twig:
+            case PhpFrameworkOption.Twig:
                 return new VanillaTwigEnvironment(phpExecutor);
+        }
+    }
+
+    async #tryGuessFramework(workspaceDirectory: string): Promise<PhpFramework | undefined> {
+        const composerJsonPath = `${workspaceDirectory}/composer.json`;
+        if (!isFile(composerJsonPath)) {
+            return undefined;
+        }
+
+        const composerJson = await readFile(composerJsonPath, 'utf-8').then(JSON.parse);
+        if (composerJson.require['symfony/twig-bundle']) {
+            return PhpFrameworkOption.Symfony;
+        }
+        if (composerJson.require['craftcms/cms']) {
+            return PhpFrameworkOption.Craft;
         }
     }
 

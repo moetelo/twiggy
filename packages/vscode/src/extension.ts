@@ -1,5 +1,4 @@
 import { Command } from 'twiggy-language-server/src/commands/ExecuteCommandProvider';
-import { PhpFramework } from 'twiggy-language-server/src/configuration/LanguageServerSettings';
 import {
     workspace,
     ExtensionContext,
@@ -9,7 +8,6 @@ import {
     commands,
     CompletionList,
     Uri,
-    ConfigurationTarget,
     CompletionItem,
 } from 'vscode';
 import * as autoInsert from './autoInsert';
@@ -35,21 +33,6 @@ export async function activate(context: ExtensionContext) {
         added.forEach((folder) => addWorkspaceFolder(folder, context));
         removed.forEach((folder) => removeWorkspaceFolder(folder));
     });
-
-    const config = workspace.getConfiguration('twiggy');
-    if (!config.get('framework')) {
-        const result = await window.showWarningMessage(
-            'Please set the `twiggy.framework` configuration option.',
-            'Open settings',
-            'Ignore',
-        );
-
-        if (result === 'Open settings') {
-            await commands.executeCommand('workbench.action.openWorkspaceSettingsFile', 'twiggy.framework');
-        } else {
-            await config.update('framework', PhpFramework.Ignore, ConfigurationTarget.Workspace);
-        }
-    }
 }
 
 export async function deactivate(): Promise<void> {
