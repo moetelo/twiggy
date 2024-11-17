@@ -99,7 +99,7 @@ export class ConfigurationManager {
 
     async #tryGuessFramework(workspaceDirectory: string): Promise<PhpFramework | undefined> {
         const composerJsonPath = `${workspaceDirectory}/composer.json`;
-        if (!isFile(composerJsonPath)) {
+        if (!await isFile(composerJsonPath)) {
             return undefined;
         }
 
