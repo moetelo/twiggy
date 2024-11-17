@@ -23,7 +23,7 @@ export function hasReferences<T extends LocalSymbol | IWithReflectedType>(node: 
 }
 
 export function hasReflectedType<T extends LocalSymbol | IWithReferences>(node: T): node is T & IWithReflectedType {
-    return 'reflectedType' in node;
+    return 'reflectedType' in node && node.reflectedType !== null;
 }
 
 export interface FunctionArgument extends LocalSymbol {
