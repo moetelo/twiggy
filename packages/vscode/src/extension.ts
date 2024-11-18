@@ -9,6 +9,8 @@ import {
     CompletionList,
     Uri,
     CompletionItem,
+    Range,
+    Position,
 } from 'vscode';
 import * as autoInsert from './autoInsert';
 import {
@@ -102,13 +104,24 @@ async function addWorkspaceFolder(
             ) {
                 const originalUri = document.uri.toString(true);
 
-                const isInsideHtmlRegionCommand = `${Command.IsInsideHtmlRegion}(${workspaceUri})`;
                 const isInsideHtmlRegion = await commands.executeCommand<boolean>(
-                    isInsideHtmlRegionCommand,
+                    Command.IsInsideHtmlRegion,
+                    workspaceFolder.uri.fsPath,
                     originalUri,
                     position,
                 );
-                const result = await unwrapCompletionArray(next(document, position, context, token)) as ProtocolCompletionItem[];
+                const completions = next(document, position, context, token);
+                const result = (await unwrapCompletionArray(completions) as ProtocolCompletionItem[])
+                    .map(completion => {
+                        const [ insertStart, insertEnd ] = completion.data as [ number, number ];
+                        return {
+                            ...completion,
+                            range: new Range(
+                                new Position(position.line, insertStart),
+                                new Position(position.line, insertEnd),
+                            ),
+                        };
+                    });
 
                 if (!isInsideHtmlRegion) {
                     return result;

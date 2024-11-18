@@ -72,6 +72,7 @@ export class CompletionProvider {
             ...await variableProperties(document, this.documentCache, cursorNode, this.#expressionTypeResolver, params.position),
             ...await templatePaths(
                 cursorNode,
+                params.position,
                 this.workspaceFolderPath,
                 this.#environment.templateMappings,
             ),
