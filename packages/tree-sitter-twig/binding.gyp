@@ -3,7 +3,7 @@
     {
       "target_name": "tree_sitter_twig_binding",
       "include_dirs": [
-        "<!(node -e \"require('nan')\")",
+        "<!(node -p \"require('node-addon-api').include_dir\")",
         "src"
       ],
       "sources": [
@@ -13,6 +13,17 @@
       ],
       "cflags_c": [
         "-std=c99",
+      ],
+      'conditions': [
+        ['OS=="win"', {
+          "msvs_settings": {
+            "VCCLCompilerTool": {
+              "ExceptionHandling": 0,
+              "AdditionalOptions": ["/EHsc"]
+            }
+          },
+          "defines": [ "NAPI_DISABLE_CPP_EXCEPTIONS" ],
+        }]
       ]
     }
   ]

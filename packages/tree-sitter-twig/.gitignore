@@ -3,6 +3,8 @@ tree-sitter-twig.wasm
 build
 bindings
 src/tree_sitter/parser.h
+src/tree_sitter/alloc.h
+src/tree_sitter/array.h
 src/parser.c
 src/node-types.json
 src/grammar.json
