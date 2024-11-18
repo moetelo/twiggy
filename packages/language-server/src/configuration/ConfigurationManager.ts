@@ -83,6 +83,13 @@ export class ConfigurationManager {
             workspaceDirectory,
         });
 
+        if (null === twigEnvironment.environment) {
+            console.warn('Failed to load Twig environment.')
+        } else {
+            console.info('Successfully loaded Twig environment.')
+            console.debug(twigEnvironment.environment)
+        }
+
         this.applySettings(twigEnvironment, phpExecutor);
     }
 
