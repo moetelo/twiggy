@@ -96,7 +96,7 @@ export class Server {
                 },
                 executeCommandProvider: {
                     commands: [
-                        `${Command.IsInsideHtmlRegion}(${this.workspaceFolder.uri})`,
+                        Command.IsInsideHtmlRegion,
                     ],
                 },
             };
