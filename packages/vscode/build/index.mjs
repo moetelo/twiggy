@@ -3,12 +3,11 @@
 import { execSync } from 'node:child_process';
 import * as esbuild from 'esbuild';
 import { cpSync as cp, rmSync as rm, existsSync } from 'node:fs';
-import * as path from 'node:path';
 import copyPlugin from 'esbuild-plugin-copy';
 
 const isDev = process.argv.includes('--dev');
 
-const grammarWasmPath = path.resolve('../tree-sitter-twig/tree-sitter-twig.wasm');
+const grammarWasmPath = '../tree-sitter-twig/tree-sitter-twig.wasm';
 
 /**
  * @type {esbuild.Plugin}
@@ -86,7 +85,7 @@ async function main() {
     rm('../language-server/dist', { force: true, recursive: true });
 
     const grammarWasmExists = existsSync(grammarWasmPath);
-    console.info({ grammarWasmExists });
+    console.info({ grammarWasmExists, grammarWasmPath });
 
     if (!grammarWasmExists) {
         console.info('Building wasm grammar. This may take a while.');
