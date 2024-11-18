@@ -1,27 +1,59 @@
 import { Connection, Diagnostic, DiagnosticSeverity, DiagnosticTag, Range } from 'vscode-languageserver';
-import { Document } from '../documents';
-import { PreOrderCursorIterator, getNodeRange, isEmptyEmbedded } from '../utils/node';
+import { Document, DocumentCache } from '../documents';
+import { PreOrderCursorIterator, getNodeRange, getStringNodeValue, isBlockIdentifier, isEmptyEmbedded, isPathInsideTemplateEmbedding } from '../utils/node';
 import { SyntaxNode, Tree } from 'web-tree-sitter';
 import { pointToPosition } from '../utils/position';
+import { EmptyEnvironment, IFrameworkTwigEnvironment } from 'twigEnvironment';
+import { IExpressionTypeResolver } from 'typing/IExpressionTypeResolver';
+import { IPhpExecutor } from 'phpInterop/IPhpExecutor';
+import { ExpressionTypeResolver } from 'typing/ExpressionTypeResolver';
+import { ITypeResolver } from 'typing/ITypeResolver';
+import { templateUsingFunctions, templateUsingStatements } from 'constants/template-usage';
+import { positionsEqual } from 'utils/position/comparePositions';
 
-const createDiagnosticFromRange = (range: Range, message: string): Diagnostic => ({
-    severity: DiagnosticSeverity.Warning,
+const createDiagnosticFromRange = (
+    range: Range,
+    message: string,
+    severity: DiagnosticSeverity = DiagnosticSeverity.Warning,
+): Diagnostic => ({
+    severity,
     range,
     message,
 });
 
-const createDiagnostic = (node: SyntaxNode, message: string): Diagnostic => createDiagnosticFromRange(
+const createDiagnostic = (
+    node: SyntaxNode,
+    message: string,
+    severity: DiagnosticSeverity = DiagnosticSeverity.Warning,
+): Diagnostic => createDiagnosticFromRange(
     getNodeRange(node),
     message,
+    severity,
 );
 
+
 export class DiagnosticProvider {
+    #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
+    #phpExecutor: IPhpExecutor | null = null;
+    #expressionTypeResolver: IExpressionTypeResolver | null = null;
+
     constructor(
         private readonly connection: Connection,
+        private readonly documentCache: DocumentCache,
     ) {
     }
 
-    validateNode(node: SyntaxNode): Diagnostic | null {
+    refresh(
+        environment: IFrameworkTwigEnvironment,
+        phpExecutor: IPhpExecutor | null,
+        typeResolver: ITypeResolver | null,
+    ) {
+        this.#environment = environment;
+        this.#phpExecutor = phpExecutor;
+        this.#expressionTypeResolver = typeResolver ? new ExpressionTypeResolver(typeResolver) : null;
+    }
+
+    async validateNode(node: SyntaxNode, document: Document): Promise<Diagnostic | null> {
         if (node.type === 'ERROR') {
             return createDiagnostic(node, 'Unexpected syntax');
         }
@@ -40,16 +72,78 @@ export class DiagnosticProvider {
             return createDiagnostic(node, `Empty ${node.type} block`);
         }
 
+
+        if (isPathInsideTemplateEmbedding(node)) {
+            const path = getStringNodeValue(node);
+            const document = await this.documentCache.resolveByTwigPath(path);
+
+            if (!document) {
+                return createDiagnostic(node, `Template "${path}" not found`, DiagnosticSeverity.Error)
+            }
+
+            // found template, no errors
+            return null;
+        }
+
+        if (isBlockIdentifier(node)) {
+            if (node.parent?.type !== 'block') {
+                let extendedDocument: Document | undefined = document;
+                let documentName = "this document";
+                
+                const blockArgumentNode = node.parent!.namedChildren[0];
+                const templateArgumentNode = node.parent!.namedChildren[1];
+
+                if (templateArgumentNode) {
+                    const path = getStringNodeValue(templateArgumentNode);
+                    const document = await this.documentCache.resolveByTwigPath(path);
+    
+                    if (node.equals(templateArgumentNode)) {
+                        if (!document) {
+                            return createDiagnostic(templateArgumentNode, `Template "${path}" not found`, DiagnosticSeverity.Error)
+                        }
+                        // found template, no errors
+                        // block existence will be checked in next pass
+                        return null;
+                    }
+
+                    extendedDocument = document;
+                    documentName = path;
+                }
+
+                const blockName = blockArgumentNode.type === 'string'
+                    ? getStringNodeValue(blockArgumentNode)
+                    : blockArgumentNode.text;
+
+                let found = false;
+                while (extendedDocument) {
+                    const blockSymbol = extendedDocument.getBlock(blockName);
+                    if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(blockArgumentNode).start)) {
+                        if (!extendedDocument.locals.extends) {
+                            extendedDocument = void 0;
+                        } else {
+                            extendedDocument = await this.documentCache.resolveByTwigPath(extendedDocument.locals.extends);
+                        }
+                        continue;
+                    }
+                    found = true;
+                    break;
+                }
+                if (!found) {
+                    return createDiagnostic(blockArgumentNode, `Block "${blockName}" not found in ${documentName}`, DiagnosticSeverity.Error)
+                }
+            }
+        }
+
         return null;
     }
 
-    validateTree(tree: Tree) {
+    async validateTree(tree: Tree, document: Document) {
         const diagnostics: Diagnostic[] = [];
 
         const cursor = tree.walk();
 
         for (const node of new PreOrderCursorIterator(cursor)) {
-            const diagnostic = this.validateNode(node.currentNode);
+            const diagnostic = await this.validateNode(node.currentNode, document);
 
             if (!diagnostic) continue;
 
@@ -60,7 +154,7 @@ export class DiagnosticProvider {
     }
 
     async validate(document: Document) {
-        const syntaxDiagnostics = this.validateTree(document.tree);
+        const syntaxDiagnostics = await this.validateTree(document.tree, document);
 
         const blockScopedVariables = document.locals.block.flatMap(b => b.symbols.variable);
         const unusedVariables = [

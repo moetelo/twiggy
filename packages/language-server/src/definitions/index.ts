@@ -5,59 +5,14 @@ import {
     Range,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import { getNodeRange } from '../utils/node';
-import { SyntaxNode } from 'web-tree-sitter';
-import {
-    templateUsingFunctions,
-    templateUsingStatements,
-} from '../constants/template-usage';
+import { getNodeRange, isBlockIdentifier, isPathInsideTemplateEmbedding } from '../utils/node';
 import { Document, DocumentCache } from '../documents';
 import { getStringNodeValue } from '../utils/node';
-import { rangeContainsPosition, pointToPosition } from '../utils/position';
-import { parseFunctionCall } from '../utils/node/parseFunctionCall';
+import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { findParentByType } from '../utils/node/findParentByType';
-
-const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
-    if (node.type !== 'string' || !node.parent) {
-        return false;
-    }
-
-    const isInsideStatement = templateUsingStatements.includes(
-        node.parent.type,
-    );
-
-    if (isInsideStatement) {
-        return true;
-    }
-
-    const isInsideFunctionCall =
-        node.parent?.type === 'arguments' &&
-        templateUsingFunctions.some((func) =>
-            parseFunctionCall(node.parent!.parent)?.name === func,
-        );
-
-    return isInsideFunctionCall;
-};
-
-const isBlockIdentifier = (node: SyntaxNode): boolean => {
-    if (!node.parent) {
-        return false;
-    }
-
-    if (node.parent.type === 'block' && node.type === 'identifier') {
-        return true;
-    }
-
-    if (node.parent.parent?.type === 'call_expression') {
-        const call = parseFunctionCall(node.parent.parent);
-        return !!call && node.type === 'string' && call.name === 'block' && !call.object;
-    }
-
-    return false;
-};
 
 export class DefinitionProvider {
     workspaceFolderPath: string;
@@ -96,29 +51,61 @@ export class DefinitionProvider {
             return {
                 uri: document.uri,
                 range: Range.create(0, 0, 0, 0),
+                // range: Range.create(
+                //     cursorNode.startPosition.row, cursorNode.startPosition.column,
+                //     cursorNode.endPosition.row, cursorNode.endPosition.column,
+                // ),
             };
         }
 
         if (isBlockIdentifier(cursorNode)) {
-            const blockName = cursorNode.type === 'string'
-                ? getStringNodeValue(cursorNode)
-                : cursorNode.text;
+            if (cursorNode.parent?.type !== 'block') {
+                let extendedDocument: Document | undefined = document;
 
-            let extendedDocument: Document | undefined = document;
-            while (extendedDocument) {
-                const blockSymbol = extendedDocument.getBlock(blockName);
-                if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
-                    extendedDocument = await this.getExtendedTemplate(extendedDocument);
-                    continue;
+                const blockArgumentNode = cursorNode.parent!.namedChildren[0];
+                const templateArgumentNode = cursorNode.parent!.namedChildren[1];
+
+                const blockName = blockArgumentNode.type === 'string'
+                    ? getStringNodeValue(blockArgumentNode)
+                    : blockArgumentNode.text;
+
+                if (templateArgumentNode) {
+                    const path = getStringNodeValue(templateArgumentNode);
+                    const document = await this.documentCache.resolveByTwigPath(path);
+
+                    if (!document) {
+                        // target template not found
+                        return;
+                    }
+
+                    if (cursorNode.equals(templateArgumentNode)) {
+                        return {
+                            uri: document.uri,
+                            range: Range.create(0, 0, 0, 0),
+                            // range: Range.create(
+                            //     templateArgumentNode.startPosition.row, templateArgumentNode.startPosition.column,
+                            //     templateArgumentNode.endPosition.row, templateArgumentNode.endPosition.column,
+                            // ),
+                        };
+                    }
+                    extendedDocument = document;
                 }
 
-                return {
-                    uri: extendedDocument.uri,
-                    range: blockSymbol.nameRange,
-                };
-            }
+                while (extendedDocument) {
+                    const blockSymbol = extendedDocument.getBlock(blockName);
+                    if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
+                        extendedDocument = await this.getExtendedTemplate(extendedDocument);
+                        continue;
+                    }
 
+                    return {
+                        uri: extendedDocument.uri,
+                        range: blockSymbol.nameRange,
+                    };
+                }
+            }
             return;
+
         }
 
         if (cursorNode.type === 'variable') {

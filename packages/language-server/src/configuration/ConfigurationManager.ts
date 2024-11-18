@@ -23,6 +23,7 @@ import {
 import { TypeResolver } from '../typing/TypeResolver';
 import { isFile } from '../utils/files/fileStat';
 import { readFile } from 'fs/promises';
+import { DiagnosticProvider } from 'diagnostics';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -45,6 +46,7 @@ export class ConfigurationManager {
         private readonly signatureHelpProvider: SignatureHelpProvider,
         private readonly documentCache: DocumentCache,
         private readonly workspaceFolder: WorkspaceFolder,
+        private readonly diagnosticProvider: DiagnosticProvider,
     ) {
         connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
         connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
@@ -124,6 +126,7 @@ export class ConfigurationManager {
 
         this.definitionProvider.phpExecutor = phpExecutor;
         this.completionProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver);
+        this.diagnosticProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver);
         this.signatureHelpProvider.reindex(frameworkEnvironment);
         this.documentCache.configure(frameworkEnvironment, typeResolver);
     }

@@ -38,10 +38,9 @@ export class Server {
     signatureHelpProvider!: SignatureHelpProvider;
     referenceProvider!: ReferenceProvider;
     renameProvider!: RenameProvider;
-    diagnosticProvider: DiagnosticProvider;
+    diagnosticProvider!: DiagnosticProvider;
 
     constructor(connection: Connection) {
-        this.diagnosticProvider = new DiagnosticProvider(connection);
 
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
@@ -49,6 +48,7 @@ export class Server {
             const documentCache = new DocumentCache(this.workspaceFolder);
             this.documentCache = documentCache;
 
+            this.diagnosticProvider = new DiagnosticProvider(connection, documentCache);
             await initializeParser();
 
             new SemanticTokensProvider(connection, documentCache);
@@ -116,6 +116,7 @@ export class Server {
                 this.signatureHelpProvider,
                 this.documentCache,
                 this.workspaceFolder,
+                this.diagnosticProvider,
             );
         });
 
