@@ -3,14 +3,55 @@ declare(strict_types=1);
 
 namespace Twiggy\Metadata;
 
+use Twig\Loader\LoaderInterface;
+
+// From \Twig\Loader\FileSystemLoader
+function isAbsolutePath(string $file): bool {
+    return strspn($file, '/\\', 0, 1)
+        || (\strlen($file) > 3 && ctype_alpha($file[0])
+            && ':' === $file[1]
+            && strspn($file, '/\\', 2, 1)
+        )
+        || null !== parse_url($file, \PHP_URL_SCHEME)
+    ;
+}
+
+/**
+ * Map supported loader namespaces to paths.
+ * @param array<string,string[]> &$loaderPaths
+ * @param LoaderInterface $loader Loader.
+ */
+function mapNamespaces(array &$loaderPaths, \Twig\Loader\LoaderInterface $loader) {
+    if ($loader instanceof \Twig\Loader\FilesystemLoader) {
+        $namespaces = $loader->getNamespaces();
+        $rootPath = getcwd() . \DIRECTORY_SEPARATOR;
+
+        foreach ($namespaces as $namespace) {
+            $ns_index = \Twig\Loader\FilesystemLoader::MAIN_NAMESPACE === $namespace
+                ? ''
+                : ('@' . $namespace);
+
+            $loaderPaths[$ns_index] = [];
+            foreach ($loader->getPaths($namespace) as $path) {
+                $loaderPaths[$ns_index][] = realpath(
+                    isAbsolutePath($path)
+                        ? $path
+                        : $rootPath . $path
+                );
+            }
+        }
+    } else if ($loader instanceof \Twig\Loader\ChainLoader) {
+        foreach ($loader->getLoaders() as $subLoader) {
+            mapNamespaces($loaderPaths, $subLoader);
+        }
+    }
+
+}
+
 function getTwigMetadata(\Twig\Environment $twig, string $framework = ''): array {
     $loaderPathsArray = [];
     if ($framework !== 'craft') {
-        $twigLoader = $twig->getLoader();
-        $namespaces = $twigLoader->getNamespaces();
-        foreach ($namespaces as $namespace) {
-            $loaderPathsArray[$namespace] = $twigLoader->getPaths($namespace);
-        }
+        mapNamespaces($loaderPathsArray, $twig->getLoader());
     }
 
     $globals = $twig->getGlobals();
