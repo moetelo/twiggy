@@ -50,9 +50,10 @@ export async function templatePaths(
                 node.parent?.childForFieldName('name')?.text || '',
             )) ||
         // {{ block("title", "common_blocks.twig") }}
-        (node.type === 'arguments' &&
-            node.parent?.childForFieldName('name')?.text === 'block' &&
-            cursorNode?.equals(node.namedChildren[1]))
+        (node.type === 'arguments'
+            && node.parent?.childForFieldName('name')?.text === 'block'
+            && node.namedChildren[1]
+            && cursorNode?.equals(node.namedChildren[1]))
     ) {
         const completions: CompletionItem[] = [];
 
