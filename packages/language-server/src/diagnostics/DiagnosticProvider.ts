@@ -1,14 +1,13 @@
 import { Connection, Diagnostic, DiagnosticSeverity, DiagnosticTag, Range } from 'vscode-languageserver';
-import { Document, DocumentCache } from '../documents';
-import { PreOrderCursorIterator, getNodeRange, getStringNodeValue, isBlockIdentifier, isEmptyEmbedded, isPathInsideTemplateEmbedding } from '../utils/node';
-import { SyntaxNode, Tree } from 'web-tree-sitter';
-import { pointToPosition } from '../utils/position';
+import { Document, DocumentCache } from 'documents';
+import { PreOrderCursorIterator, getNodeRange, getStringNodeValue, isBlockIdentifier, isEmptyEmbedded, isPathInsideTemplateEmbedding } from 'utils/node';
+import { SyntaxNode } from 'web-tree-sitter';
+import { pointToPosition } from 'utils/position';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from 'twigEnvironment';
 import { IExpressionTypeResolver } from 'typing/IExpressionTypeResolver';
 import { IPhpExecutor } from 'phpInterop/IPhpExecutor';
 import { ExpressionTypeResolver } from 'typing/ExpressionTypeResolver';
 import { ITypeResolver } from 'typing/ITypeResolver';
-import { templateUsingFunctions, templateUsingStatements } from 'constants/template-usage';
 import { positionsEqual } from 'utils/position/comparePositions';
 
 const createDiagnosticFromRange = (
@@ -89,14 +88,14 @@ export class DiagnosticProvider {
             if (node.parent?.type !== 'block') {
                 let extendedDocument: Document | undefined = document;
                 let documentName = "this document";
-                
+
                 const blockArgumentNode = node.parent!.namedChildren[0];
                 const templateArgumentNode = node.parent!.namedChildren[1];
 
                 if (templateArgumentNode) {
                     const path = getStringNodeValue(templateArgumentNode);
                     const document = await this.documentCache.resolveByTwigPath(path);
-    
+
                     if (node.equals(templateArgumentNode)) {
                         if (!document) {
                             return createDiagnostic(templateArgumentNode, `Template "${path}" not found`, DiagnosticSeverity.Error)
@@ -137,7 +136,9 @@ export class DiagnosticProvider {
         return null;
     }
 
-    async validateTree(tree: Tree, document: Document) {
+    async validateTree(document: Document) {
+        const { tree } = document;
+
         const diagnostics: Diagnostic[] = [];
 
         const cursor = tree.walk();
@@ -154,7 +155,7 @@ export class DiagnosticProvider {
     }
 
     async validate(document: Document) {
-        const syntaxDiagnostics = await this.validateTree(document.tree, document);
+        const syntaxDiagnostics = await this.validateTree(document);
 
         const blockScopedVariables = document.locals.block.flatMap(b => b.symbols.variable);
         const unusedVariables = [

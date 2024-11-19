@@ -1,7 +1,9 @@
+import path from 'node:path';
+
 export const PhpUtilPath = {
-    getCraftTwig: require.resolve('./phpUtils/printCraftTwigEnvironment.php'),
-    printTwigEnvironment: require.resolve('./phpUtils/printTwigEnvironment.php'),
-    getDefinitionPhp: require.resolve('./phpUtils/definitionClassPsr4.php'),
-    getCompletionPhp: require.resolve('./phpUtils/completeClassPsr4.php'),
-    reflectType: require.resolve('./phpUtils/reflectType.php'),
+    getCraftTwig: path.resolve(__dirname, './phpUtils/printCraftTwigEnvironment.php'),
+    printTwigEnvironment: path.resolve(__dirname, './phpUtils/printTwigEnvironment.php'),
+    getDefinitionPhp: path.resolve(__dirname, './phpUtils/definitionClassPsr4.php'),
+    getCompletionPhp: path.resolve(__dirname, './phpUtils/completeClassPsr4.php'),
+    reflectType: path.resolve(__dirname, './phpUtils/reflectType.php'),
 } as const;

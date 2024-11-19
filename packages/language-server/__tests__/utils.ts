@@ -5,6 +5,7 @@ import * as path from 'path';
 import { LocalSymbolCollector } from '../src/symbols/LocalSymbolCollector';
 import { MockPhpExecutor } from './mocks';
 import { TypeResolver } from '../src/typing/TypeResolver';
+import { DocumentCache } from 'documents';
 
 type DocumentWithText = Document & { text: string };
 
@@ -28,6 +29,8 @@ export const documentFromCodeWithTypeResolver = async (
 
     return document as DocumentWithText;
 };
+
+export const createDocumentCache = () => new DocumentCache({ name: '', uri: 'file:///' })
 
 export const initializeTestParser = async () => {
     const wasmPath = path.join(
