@@ -51,61 +51,55 @@ export class DefinitionProvider {
             return {
                 uri: document.uri,
                 range: Range.create(0, 0, 0, 0),
-                // range: Range.create(
-                //     cursorNode.startPosition.row, cursorNode.startPosition.column,
-                //     cursorNode.endPosition.row, cursorNode.endPosition.column,
-                // ),
             };
         }
 
         if (isBlockIdentifier(cursorNode)) {
-            if (cursorNode.parent?.type !== 'block') {
-                let extendedDocument: Document | undefined = document;
+            if (cursorNode.parent?.type === 'block') {
+                return
+            }
 
-                const blockArgumentNode = cursorNode.parent!.namedChildren[0];
-                const templateArgumentNode = cursorNode.parent!.namedChildren[1];
+            let extendedDocument: Document | undefined = document;
 
-                const blockName = blockArgumentNode.type === 'string'
-                    ? getStringNodeValue(blockArgumentNode)
-                    : blockArgumentNode.text;
+            const blockArgumentNode = cursorNode.parent!.childForFieldName('name')!;
+            const templateArgumentNode = cursorNode.parent!.childForFieldName('body')!;
 
-                if (templateArgumentNode) {
-                    const path = getStringNodeValue(templateArgumentNode);
-                    const document = await this.documentCache.resolveByTwigPath(path);
+            const blockName = blockArgumentNode.type === 'string'
+                ? getStringNodeValue(blockArgumentNode)
+                : blockArgumentNode.text;
 
-                    if (!document) {
-                        // target template not found
-                        return;
-                    }
+            if (templateArgumentNode) {
+                const path = getStringNodeValue(templateArgumentNode);
+                const document = await this.documentCache.resolveByTwigPath(path);
 
-                    if (cursorNode.equals(templateArgumentNode)) {
-                        return {
-                            uri: document.uri,
-                            range: Range.create(0, 0, 0, 0),
-                            // range: Range.create(
-                            //     templateArgumentNode.startPosition.row, templateArgumentNode.startPosition.column,
-                            //     templateArgumentNode.endPosition.row, templateArgumentNode.endPosition.column,
-                            // ),
-                        };
-                    }
-                    extendedDocument = document;
+                if (!document) {
+                    // target template not found
+                    return;
                 }
 
-                while (extendedDocument) {
-                    const blockSymbol = extendedDocument.getBlock(blockName);
-                    if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
-                        extendedDocument = await this.getExtendedTemplate(extendedDocument);
-                        continue;
-                    }
-
+                if (cursorNode.equals(templateArgumentNode)) {
                     return {
-                        uri: extendedDocument.uri,
-                        range: blockSymbol.nameRange,
+                        uri: document.uri,
+                        range: Range.create(0, 0, 0, 0),
                     };
                 }
+                extendedDocument = document;
             }
-            return;
 
+            while (extendedDocument) {
+                const blockSymbol = extendedDocument.getBlock(blockName);
+                if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
+                    extendedDocument = await this.getExtendedTemplate(extendedDocument);
+                    continue;
+                }
+
+                return {
+                    uri: extendedDocument.uri,
+                    range: blockSymbol.nameRange,
+                };
+            }
+
+            return;
         }
 
         if (cursorNode.type === 'variable') {

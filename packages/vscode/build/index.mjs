@@ -85,7 +85,7 @@ async function main() {
     rm('../language-server/dist', { force: true, recursive: true });
 
     const grammarWasmExists = existsSync(grammarWasmPath);
-    console.info({ grammarWasmExists, grammarWasmPath });
+    console.info({ grammarWasmExists });
 
     if (!grammarWasmExists) {
         console.info('Building wasm grammar. This may take a while.');

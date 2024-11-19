@@ -5,7 +5,7 @@ namespace Twiggy\Metadata;
 
 use Twig\Loader\LoaderInterface;
 
-// From \Twig\Loader\FileSystemLoader
+// https://github.com/twigphp/Twig/blob/8f3f8df9cdedc8cbc66d1a75790225a7d44dac67/src/Loader/FilesystemLoader.php#L280
 function isAbsolutePath(string $file): bool {
     return strspn($file, '/\\', 0, 1)
         || (\strlen($file) > 3 && ctype_alpha($file[0])
@@ -21,7 +21,15 @@ function isAbsolutePath(string $file): bool {
  * @param array<string,string[]> &$loaderPaths
  * @param LoaderInterface $loader Loader.
  */
-function mapNamespaces(array &$loaderPaths, \Twig\Loader\LoaderInterface $loader) {
+function mapNamespaces(array &$loaderPaths, LoaderInterface $loader): void {
+    if ($loader instanceof \Twig\Loader\ChainLoader) {
+        foreach ($loader->getLoaders() as $subLoader) {
+            mapNamespaces($loaderPaths, $subLoader);
+        }
+
+        return;
+    }
+
     if ($loader instanceof \Twig\Loader\FilesystemLoader) {
         $namespaces = $loader->getNamespaces();
         $rootPath = getcwd() . \DIRECTORY_SEPARATOR;
@@ -40,12 +48,7 @@ function mapNamespaces(array &$loaderPaths, \Twig\Loader\LoaderInterface $loader
                 );
             }
         }
-    } else if ($loader instanceof \Twig\Loader\ChainLoader) {
-        foreach ($loader->getLoaders() as $subLoader) {
-            mapNamespaces($loaderPaths, $subLoader);
-        }
     }
-
 }
 
 function getTwigMetadata(\Twig\Environment $twig, string $framework = ''): array {
