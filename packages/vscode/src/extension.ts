@@ -110,18 +110,8 @@ async function addWorkspaceFolder(
                     originalUri,
                     position,
                 );
-                const completions = next(document, position, context, token);
-                const result = (await unwrapCompletionArray(completions) as ProtocolCompletionItem[])
-                    .map(completion => {
-                        const [ insertStart, insertEnd ] = completion.data as [ number, number ];
-                        return {
-                            ...completion,
-                            range: new Range(
-                                new Position(position.line, insertStart),
-                                new Position(position.line, insertEnd),
-                            ),
-                        };
-                    });
+
+                const result = await unwrapCompletionArray(next(document, position, context, token)) as ProtocolCompletionItem[];
 
                 if (!isInsideHtmlRegion) {
                     return result;

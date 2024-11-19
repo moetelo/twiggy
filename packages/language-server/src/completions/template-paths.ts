@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind, Position } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind, Position, Range } from 'vscode-languageserver';
 import path from 'path';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
@@ -58,6 +58,10 @@ export async function templatePaths(
 
         const nodeStringStart = cursorNode.startPosition.column + 1;
         const nodeStringEnd = cursorNode.endPosition.column - 1;
+        const range: Range = {
+            start: { line: position.line, character: nodeStringStart },
+            end: { line: position.line, character: nodeStringEnd },
+        };
 
         const searchText = getStringNodeValue(cursorNode)
             .substring(0, position.character - nodeStringStart);
@@ -66,17 +70,17 @@ export async function templatePaths(
             const templatesDirectory = path.resolve(workspaceFolderDirectory, directory)
 
             for (const twigPath of await getTwigFiles(directory)) {
-                const relativePathToTwigFromTemplatesDirectory = path.relative(templatesDirectory, twigPath)
-                    // fix paths for win32
-                    .replaceAll(path.sep, path.posix.sep);
+                const relativePathToTwigFromTemplatesDirectory = path.posix.relative(templatesDirectory, twigPath);
                 const includePath = path.posix.join(namespace, relativePathToTwigFromTemplatesDirectory)
 
                 if (searchText === '' || includePath.startsWith(searchText)) {
                     completions.push({
                         label: includePath,
                         kind: CompletionItemKind.File,
-                        // Send insertion range to extension
-                        data: [ nodeStringStart, nodeStringEnd, ],
+                        textEdit: {
+                            range,
+                            newText: includePath,
+                        },
                     });
                 }
             }
