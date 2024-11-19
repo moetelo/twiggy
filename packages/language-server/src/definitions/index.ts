@@ -13,6 +13,7 @@ import { positionsEqual } from '../utils/position/comparePositions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { findParentByType } from '../utils/node/findParentByType';
+import { SyntaxNode } from 'web-tree-sitter';
 
 export class DefinitionProvider {
     workspaceFolderPath: string;
@@ -55,47 +56,44 @@ export class DefinitionProvider {
         }
 
         if (isBlockIdentifier(cursorNode)) {
-            if (cursorNode.parent?.type === 'block') {
-                return
+            if (!cursorNode.parent) {
+                return;
             }
 
-            let extendedDocument: Document | undefined = document;
+            if (cursorNode.parent.type === 'block') {
+                const blockName = cursorNode.type === 'string'
+                    ? getStringNodeValue(cursorNode)
+                    : cursorNode.text;
 
-            const blockArgumentNode = cursorNode.parent!.childForFieldName('name')!;
-            const templateArgumentNode = cursorNode.parent!.childForFieldName('body')!;
+                return await this.#resolveBlockSymbol(blockName, document, cursorNode);
+            }
 
-            const blockName = blockArgumentNode.type === 'string'
-                ? getStringNodeValue(blockArgumentNode)
-                : blockArgumentNode.text;
+            if (cursorNode.parent.type === 'arguments') {
+                const [blockNameArgNode, templatePathArgNode] = cursorNode.parent.namedChildren;
 
-            if (templateArgumentNode) {
-                const path = getStringNodeValue(templateArgumentNode);
-                const document = await this.documentCache.resolveByTwigPath(path);
+                const blockName = blockNameArgNode.type === 'string'
+                    ? getStringNodeValue(blockNameArgNode)
+                    : blockNameArgNode.text;
 
-                if (!document) {
+                if (!templatePathArgNode) {
+                    return await this.#resolveBlockSymbol(blockName, document, cursorNode);
+                }
+
+                const path = getStringNodeValue(templatePathArgNode);
+                const resolvedDocument = await this.documentCache.resolveByTwigPath(path);
+
+                if (!resolvedDocument) {
                     // target template not found
                     return;
                 }
 
-                if (cursorNode.equals(templateArgumentNode)) {
-                    return {
-                        uri: document.uri,
-                        range: Range.create(0, 0, 0, 0),
-                    };
-                }
-                extendedDocument = document;
-            }
-
-            while (extendedDocument) {
-                const blockSymbol = extendedDocument.getBlock(blockName);
-                if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
-                    extendedDocument = await this.getExtendedTemplate(extendedDocument);
-                    continue;
+                if (!cursorNode.equals(templatePathArgNode)) {
+                    return await this.#resolveBlockSymbol(blockName, resolvedDocument, cursorNode);
                 }
 
                 return {
-                    uri: extendedDocument.uri,
-                    range: blockSymbol.nameRange,
+                    uri: resolvedDocument.uri,
+                    range: Range.create(0, 0, 0, 0),
                 };
             }
 
@@ -144,6 +142,22 @@ export class DefinitionProvider {
                 range: getNodeRange(typeIdentifierNode),
             };
         }
+    }
+
+    async #resolveBlockSymbol(blockName: string, initialDocument: Document, cursorNode: SyntaxNode) {
+        let extendedDocument: Document | undefined = initialDocument;
+        while (extendedDocument) {
+            const blockSymbol = extendedDocument.getBlock(blockName);
+            if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
+                extendedDocument = await this.getExtendedTemplate(extendedDocument);
+                continue;
+            }
+            return {
+                uri: extendedDocument.uri,
+                range: blockSymbol.nameRange,
+            };
+        }
+        return undefined;
     }
 
     private async getExtendedTemplate(document: Document) {
