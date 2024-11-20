@@ -16,11 +16,8 @@ import { SemanticTokensProvider } from './semantic-tokens/SemanticTokensProvider
 import { ConfigurationManager } from './configuration/ConfigurationManager';
 import { DefinitionProvider } from './definitions';
 import { SymbolProvider } from './symbols/SymbolProvider';
-import {
-    Command,
-    ExecuteCommandProvider,
-} from './commands/ExecuteCommandProvider';
 import { initializeParser } from './utils/parser';
+import { IsInsideHtmlRegionCommandProvider } from './commands/IsInsideHtmlRegionCommandProvider';
 import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesInsertionProvider';
 import { InlayHintProvider } from './inlayHints/InlayHintProvider';
 import { ReferenceProvider } from './references/ReferenceProvider';
@@ -68,7 +65,7 @@ export class Server {
                 this.workspaceFolder,
             );
             this.inlayHintProvider = new InlayHintProvider(connection, documentCache);
-            new ExecuteCommandProvider(connection, documentCache);
+            new IsInsideHtmlRegionCommandProvider(connection, documentCache);
             this.bracketSpacesInsertionProvider = new BracketSpacesInsertionProvider(
                 connection,
                 this.documents,
@@ -93,11 +90,6 @@ export class Server {
                 referencesProvider: true,
                 renameProvider: {
                     prepareProvider: true,
-                },
-                executeCommandProvider: {
-                    commands: [
-                        Command.IsInsideHtmlRegion,
-                    ],
                 },
             };
 
