@@ -5,59 +5,15 @@ import {
     Range,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import { getNodeRange } from '../utils/node';
-import { SyntaxNode } from 'web-tree-sitter';
-import {
-    templateUsingFunctions,
-    templateUsingStatements,
-} from '../constants/template-usage';
+import { getNodeRange, isBlockIdentifier, isPathInsideTemplateEmbedding } from '../utils/node';
 import { Document, DocumentCache } from '../documents';
 import { getStringNodeValue } from '../utils/node';
-import { rangeContainsPosition, pointToPosition } from '../utils/position';
-import { parseFunctionCall } from '../utils/node/parseFunctionCall';
+import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { findParentByType } from '../utils/node/findParentByType';
-
-const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
-    if (node.type !== 'string' || !node.parent) {
-        return false;
-    }
-
-    const isInsideStatement = templateUsingStatements.includes(
-        node.parent.type,
-    );
-
-    if (isInsideStatement) {
-        return true;
-    }
-
-    const isInsideFunctionCall =
-        node.parent?.type === 'arguments' &&
-        templateUsingFunctions.some((func) =>
-            parseFunctionCall(node.parent!.parent)?.name === func,
-        );
-
-    return isInsideFunctionCall;
-};
-
-const isBlockIdentifier = (node: SyntaxNode): boolean => {
-    if (!node.parent) {
-        return false;
-    }
-
-    if (node.parent.type === 'block' && node.type === 'identifier') {
-        return true;
-    }
-
-    if (node.parent.parent?.type === 'call_expression') {
-        const call = parseFunctionCall(node.parent.parent);
-        return !!call && node.type === 'string' && call.name === 'block' && !call.object;
-    }
-
-    return false;
-};
+import { SyntaxNode } from 'web-tree-sitter';
 
 export class DefinitionProvider {
     workspaceFolderPath: string;
@@ -100,21 +56,44 @@ export class DefinitionProvider {
         }
 
         if (isBlockIdentifier(cursorNode)) {
-            const blockName = cursorNode.type === 'string'
-                ? getStringNodeValue(cursorNode)
-                : cursorNode.text;
+            if (!cursorNode.parent) {
+                return;
+            }
 
-            let extendedDocument: Document | undefined = document;
-            while (extendedDocument) {
-                const blockSymbol = extendedDocument.getBlock(blockName);
-                if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
-                    extendedDocument = await this.getExtendedTemplate(extendedDocument);
-                    continue;
+            if (cursorNode.parent.type === 'block') {
+                const blockName = cursorNode.type === 'string'
+                    ? getStringNodeValue(cursorNode)
+                    : cursorNode.text;
+
+                return await this.#resolveBlockSymbol(blockName, document, cursorNode);
+            }
+
+            if (cursorNode.parent.type === 'arguments') {
+                const [blockNameArgNode, templatePathArgNode] = cursorNode.parent.namedChildren;
+
+                const blockName = blockNameArgNode.type === 'string'
+                    ? getStringNodeValue(blockNameArgNode)
+                    : blockNameArgNode.text;
+
+                if (!templatePathArgNode) {
+                    return await this.#resolveBlockSymbol(blockName, document, cursorNode);
+                }
+
+                const path = getStringNodeValue(templatePathArgNode);
+                const resolvedDocument = await this.documentCache.resolveByTwigPath(path);
+
+                if (!resolvedDocument) {
+                    // target template not found
+                    return;
+                }
+
+                if (!cursorNode.equals(templatePathArgNode)) {
+                    return await this.#resolveBlockSymbol(blockName, resolvedDocument, cursorNode);
                 }
 
                 return {
-                    uri: extendedDocument.uri,
-                    range: blockSymbol.nameRange,
+                    uri: resolvedDocument.uri,
+                    range: Range.create(0, 0, 0, 0),
                 };
             }
 
@@ -163,6 +142,22 @@ export class DefinitionProvider {
                 range: getNodeRange(typeIdentifierNode),
             };
         }
+    }
+
+    async #resolveBlockSymbol(blockName: string, initialDocument: Document, cursorNode: SyntaxNode) {
+        let extendedDocument: Document | undefined = initialDocument;
+        while (extendedDocument) {
+            const blockSymbol = extendedDocument.getBlock(blockName);
+            if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
+                extendedDocument = await this.getExtendedTemplate(extendedDocument);
+                continue;
+            }
+            return {
+                uri: extendedDocument.uri,
+                range: blockSymbol.nameRange,
+            };
+        }
+        return undefined;
     }
 
     private async getExtendedTemplate(document: Document) {

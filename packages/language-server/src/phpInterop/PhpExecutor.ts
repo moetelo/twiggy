@@ -26,10 +26,18 @@ export class PhpExecutor implements IPhpExecutor {
 
             return JSON.parse(result.stdout) as TResult;
         } catch (error) {
-            console.error((error as Error).message);
+            console.error(
+                `Command "${command} ${args.join(' ')}" failed with following message:`,
+                (error as Error).message,
+            );
 
             if (isProcessError(error)) {
-                console.error(error.stdout + error.stderr);
+                console.error(
+                    "stdout:\n",
+                    error.stdout,
+                    "stderr:\n",
+                    error.stderr,
+                );
             }
 
             return null;

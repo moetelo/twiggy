@@ -5,9 +5,8 @@ import Parser from 'web-tree-sitter';
 import { twigFilters } from '../src/staticCompletionInfo';
 import { localVariables } from '../src/completions/local-variables';
 import { CompletionItemKind, type CompletionItem } from 'vscode-languageserver';
-import { documentFromCode, documentFromCodeWithTypeResolver, initializeTestParser } from './utils';
+import { createDocumentCache, documentFromCode, documentFromCodeWithTypeResolver, initializeTestParser } from './utils';
 import { variableProperties } from '../src/completions/variableProperties';
-import { DocumentCache } from '../src/documents/DocumentCache';
 import { MockEnvironment, MockPhpExecutor } from './mocks';
 import { ExpressionTypeResolver } from '../src/typing/ExpressionTypeResolver';
 import { TypeResolver } from '../src/typing/TypeResolver';
@@ -183,7 +182,7 @@ describe('completion', () => {
             'components.html.twig',
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, null);
         await documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
         await documentCache.updateText(importedDocument.uri, importedDocument.text);
@@ -221,7 +220,7 @@ describe('completion', () => {
             'components.html.twig',
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, null);
         await documentCache.updateText(documentWithMacroUsage.uri, documentWithMacroUsage.text);
         await documentCache.updateText(importedDocument.uri, importedDocument.text);
@@ -252,7 +251,7 @@ describe('completion', () => {
             typeResolver,
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, typeResolver);
 
         const pos = {
@@ -280,7 +279,7 @@ describe('completion', () => {
             typeResolver,
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, typeResolver);
 
         const pos = {
@@ -308,7 +307,7 @@ describe('completion', () => {
             typeResolver,
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, typeResolver);
 
         const pos = {
@@ -336,7 +335,7 @@ describe('completion', () => {
             typeResolver,
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, typeResolver);
 
         const pos = {
@@ -364,7 +363,7 @@ describe('completion', () => {
             typeResolver,
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, typeResolver);
 
         const pos = {
@@ -393,7 +392,7 @@ describe('completion', () => {
             typeResolver,
         );
 
-        const documentCache = new DocumentCache({ name: '', uri: '' });
+        const documentCache = createDocumentCache();
         documentCache.configure(MockEnvironment, typeResolver);
 
         const pos = {

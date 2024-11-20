@@ -4,13 +4,13 @@
   "description": "Twig grammar for tree-sitter",
   "main": "bindings/node",
   "scripts": {
-    "build": "tree-sitter generate && rm -f ./tree-sitter-twig.wasm",
-    "build-wasm": "pnpm build && tree-sitter build-wasm",
+    "build": "pnpx tree-sitter-cli generate && rm -f ./tree-sitter-twig.wasm",
+    "build-wasm": "pnpm build && pnpx tree-sitter-cli build -w",
     "test": "tree-sitter test"
   },
   "license": "Mozilla Public License 2.0",
   "dependencies": {
-    "nan": "^2.17.0"
+    "node-addon-api": "^8.2.2"
   },
   "devDependencies": {
     "tree-sitter-cli": "^0.20.8"
@@ -19,19 +19,5 @@
     "README.md",
     "LICENSE",
     "tree-sitter-twig.wasm"
-  ],
-  "tree-sitter": [
-    {
-      "scope": "twig",
-      "file-types": [
-        "twig",
-        "html.twig"
-      ],
-      "highlights": [
-        "queries/highlights.scm"
-      ],
-      "injections": "queries/injections.scm",
-      "injection-regex": "twig"
-    }
   ]
 }

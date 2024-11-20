@@ -41,9 +41,9 @@ importers:
 
   packages/tree-sitter-twig:
     dependencies:
-      nan:
-        specifier: ^2.17.0
-        version: 2.19.0
+      node-addon-api:
+        specifier: ^8.2.2
+        version: 8.2.2
     devDependencies:
       tree-sitter-cli:
         specifier: ^0.20.8
@@ -429,8 +429,9 @@ packages:
     resolution: {integrity: sha512-UZ7eQ+h8ywIRAW1hIEl2AqdwzJucU/Kp59+8kkZeSvafXhZjul247BvIJjEVFVeON6d7lM46XX1HXCduKAS8VA==}
     engines: {node: '>=16 || 14 >=14.17'}
 
-  nan@2.19.0:
-    resolution: {integrity: sha512-nO1xXxfh/RWNxfd/XPfbIfFk5vgLsAxUR9y5O0cHMJu/AW9U95JLXqthYHjEp+8gQ5p96K9jUp8nbVOxCdRbtw==}
+  node-addon-api@8.2.2:
+    resolution: {integrity: sha512-9emqXAKhVoNrQ792nLI/wpzPpJ/bj/YXxW0CvAau1+RdGBcCRF1Dmz7719zgVsQNrzHl9Tzn3ImZ4qWFarWL0A==}
+    engines: {node: ^18 || ^20 || >= 21}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -893,7 +894,7 @@ snapshots:
 
   minipass@7.1.1: {}
 
-  nan@2.19.0: {}
+  node-addon-api@8.2.2: {}
 
   normalize-path@3.0.0: {}
 

@@ -1,4 +1,3 @@
-import { Command } from 'twiggy-language-server/src/commands/ExecuteCommandProvider';
 import {
     workspace,
     ExtensionContext,
@@ -20,6 +19,7 @@ import {
 } from 'vscode-languageclient/node';
 import { unwrapCompletionArray } from './utils/unwrapCompletionArray';
 import ProtocolCompletionItem from 'vscode-languageclient/lib/common/protocolCompletionItem';
+import { IsInsideHtmlRegionRequest } from 'twiggy-language-server/src/customRequests/IsInsideHtmlRegionRequest';
 
 const outputChannel = window.createOutputChannel('Twiggy Language Server');
 const clients = new Map<string, LanguageClient>();
@@ -102,12 +102,11 @@ async function addWorkspaceFolder(
             ) {
                 const originalUri = document.uri.toString(true);
 
-                const isInsideHtmlRegionCommand = `${Command.IsInsideHtmlRegion}(${workspaceUri})`;
-                const isInsideHtmlRegion = await commands.executeCommand<boolean>(
-                    isInsideHtmlRegionCommand,
-                    originalUri,
+                const isInsideHtmlRegion = await client.sendRequest<IsInsideHtmlRegionRequest.ResponseType>(IsInsideHtmlRegionRequest.type, {
+                    textDocument: { uri: originalUri },
                     position,
-                );
+                } as IsInsideHtmlRegionRequest.ParamsType);
+
                 const result = await unwrapCompletionArray(next(document, position, context, token)) as ProtocolCompletionItem[];
 
                 if (!isInsideHtmlRegion) {
@@ -150,7 +149,7 @@ async function addWorkspaceFolder(
         'twiggy-language-server ' + workspaceUri,
         'Twiggy Language Server ' + workspaceUri,
         serverOptions,
-        clientOptions
+        clientOptions,
     );
 
     await autoInsert.activate(

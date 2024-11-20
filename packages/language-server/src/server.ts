@@ -16,11 +16,8 @@ import { SemanticTokensProvider } from './semantic-tokens/SemanticTokensProvider
 import { ConfigurationManager } from './configuration/ConfigurationManager';
 import { DefinitionProvider } from './definitions';
 import { SymbolProvider } from './symbols/SymbolProvider';
-import {
-    Command,
-    ExecuteCommandProvider,
-} from './commands/ExecuteCommandProvider';
 import { initializeParser } from './utils/parser';
+import { IsInsideHtmlRegionCommandProvider } from './commands/IsInsideHtmlRegionCommandProvider';
 import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesInsertionProvider';
 import { InlayHintProvider } from './inlayHints/InlayHintProvider';
 import { ReferenceProvider } from './references/ReferenceProvider';
@@ -38,10 +35,9 @@ export class Server {
     signatureHelpProvider!: SignatureHelpProvider;
     referenceProvider!: ReferenceProvider;
     renameProvider!: RenameProvider;
-    diagnosticProvider: DiagnosticProvider;
+    diagnosticProvider!: DiagnosticProvider;
 
     constructor(connection: Connection) {
-        this.diagnosticProvider = new DiagnosticProvider(connection);
 
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
@@ -49,6 +45,7 @@ export class Server {
             const documentCache = new DocumentCache(this.workspaceFolder);
             this.documentCache = documentCache;
 
+            this.diagnosticProvider = new DiagnosticProvider(connection, documentCache);
             await initializeParser();
 
             new SemanticTokensProvider(connection, documentCache);
@@ -68,7 +65,7 @@ export class Server {
                 this.workspaceFolder,
             );
             this.inlayHintProvider = new InlayHintProvider(connection, documentCache);
-            new ExecuteCommandProvider(connection, documentCache);
+            new IsInsideHtmlRegionCommandProvider(connection, documentCache);
             this.bracketSpacesInsertionProvider = new BracketSpacesInsertionProvider(
                 connection,
                 this.documents,
@@ -94,11 +91,6 @@ export class Server {
                 renameProvider: {
                     prepareProvider: true,
                 },
-                executeCommandProvider: {
-                    commands: [
-                        `${Command.IsInsideHtmlRegion}(${this.workspaceFolder.uri})`,
-                    ],
-                },
             };
 
             return {
@@ -116,6 +108,7 @@ export class Server {
                 this.signatureHelpProvider,
                 this.documentCache,
                 this.workspaceFolder,
+                this.diagnosticProvider,
             );
         });
 

@@ -5,3 +5,5 @@ export * from './isEmptyEmbedded';
 export { findParentByType } from './findParentByType';
 export { isInsideHtmlRegion } from './isInsideHtmlRegion';
 export { PreOrderCursorIterator } from './PreOrderCursorIterator';
+export { isBlockIdentifier } from './isBlockIdentifier';
+export { isPathInsideTemplateEmbedding } from './isPathInsideTemplateEmbedding';

@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionItemKind, DocumentUri } from 'vscode-languageserver';
+import { CompletionItem, CompletionItemKind, Position, Range } from 'vscode-languageserver';
 import path from 'path';
 import { SyntaxNode } from 'web-tree-sitter';
 import {
@@ -7,11 +7,12 @@ import {
 } from '../constants/template-usage';
 import getTwigFiles from '../utils/getTwigFiles';
 import { TemplatePathMapping } from '../twigEnvironment/types';
-import { documentUriToFsPath } from '../utils/uri';
+import { getStringNodeValue } from 'utils/node';
 
 export async function templatePaths(
     cursorNode: SyntaxNode,
-    workspaceFolderUri: DocumentUri,
+    position: Position,
+    workspaceFolderDirectory: string,
     templateMappings: TemplatePathMapping[],
 ): Promise<CompletionItem[]> {
     if (cursorNode.type !== 'string') {
@@ -49,25 +50,40 @@ export async function templatePaths(
                 node.parent?.childForFieldName('name')?.text || '',
             )) ||
         // {{ block("title", "common_blocks.twig") }}
-        (node.type === 'arguments' &&
-            node.parent?.childForFieldName('name')?.text === 'block' &&
-            cursorNode?.equals(node.namedChildren[1]))
+        (node.type === 'arguments'
+            && node.parent?.childForFieldName('name')?.text === 'block'
+            && node.namedChildren[1]
+            && cursorNode?.equals(node.namedChildren[1]))
     ) {
-        const workspaceFolderDirectory = documentUriToFsPath(workspaceFolderUri);
-
         const completions: CompletionItem[] = [];
 
+        const nodeStringStart = cursorNode.startPosition.column + 1;
+        const nodeStringEnd = cursorNode.endPosition.column - 1;
+        const range: Range = {
+            start: { line: position.line, character: nodeStringStart },
+            end: { line: position.line, character: nodeStringEnd },
+        };
+
+        const searchText = getStringNodeValue(cursorNode)
+            .substring(0, position.character - nodeStringStart);
+
         for (const { namespace, directory } of templateMappings) {
-            const templatesDirectory = path.resolve(workspaceFolderDirectory, directory);
+            const templatesDirectory = path.resolve(workspaceFolderDirectory, directory)
 
             for (const twigPath of await getTwigFiles(directory)) {
-                const relativePathToTwigFromTemplatesDirectory = path.relative(templatesDirectory, twigPath);
-                const includePath = path.join(namespace, relativePathToTwigFromTemplatesDirectory);
+                const relativePathToTwigFromTemplatesDirectory = path.posix.relative(templatesDirectory, twigPath);
+                const includePath = path.posix.join(namespace, relativePathToTwigFromTemplatesDirectory)
 
-                completions.push({
-                    label: includePath,
-                    kind: CompletionItemKind.File,
-                });
+                if (searchText === '' || includePath.startsWith(searchText)) {
+                    completions.push({
+                        label: includePath,
+                        kind: CompletionItemKind.File,
+                        textEdit: {
+                            range,
+                            newText: includePath,
+                        },
+                    });
+                }
             }
         }
 
