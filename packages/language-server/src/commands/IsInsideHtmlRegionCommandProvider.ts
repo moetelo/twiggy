@@ -1,4 +1,4 @@
-import { Connection, DocumentUri, Position } from 'vscode-languageserver';
+import { Connection } from 'vscode-languageserver';
 import { isInsideHtmlRegion } from '../utils/node';
 import { DocumentCache } from '../documents';
 import { IsInsideHtmlRegionRequest } from 'customRequests/IsInsideHtmlRegionRequest';

@@ -1,5 +1,5 @@
 import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
-import { execPromisified, isProcessError } from '../utils/exec';
+import { exec } from '../utils/exec';
 import { IPhpExecutor } from './IPhpExecutor';
 import { ReflectedType } from './ReflectedType';
 
@@ -13,53 +13,60 @@ export class PhpExecutor implements IPhpExecutor {
         }
     }
 
-    async call<TResult>(command: string, args: string[]): Promise<TResult | null> {
+    async call(command: string, args: string[]) {
         if (!this._phpExecutable) {
             return null;
         }
 
-        try {
-            const result = await execPromisified(
-                `${this._phpExecutable} ${command} ${args.join(' ')}`,
-                { cwd: this._workspaceDirectory },
-            );
+        const result = await exec(this._phpExecutable, [
+            command,
+            ...args,
+        ], {
+            cwd: this._workspaceDirectory
+        });
 
-            return JSON.parse(result.stdout) as TResult;
-        } catch (error) {
+        if (result.stderr) {
             console.error(
                 `Command "${command} ${args.join(' ')}" failed with following message:`,
-                (error as Error).message,
+                result.stderr,
             );
 
-            if (isProcessError(error)) {
-                console.error(
-                    "stdout:\n",
-                    error.stdout,
-                    "stderr:\n",
-                    error.stderr,
-                );
-            }
+            console.error(
+                "stdout:\n",
+                result.stdout,
+                "stderr:\n",
+                result.stderr,
+            );
+        }
 
+        return result;
+    }
+
+    async callJson<TResult>(command: string, args: string[]): Promise<TResult | null> {
+        const result = await this.call(command, args);
+        if (!result) {
             return null;
         }
+
+        return JSON.parse(result.stdout) as TResult;
     }
 
     async getClassDefinition(className: string) {
-        return await this.call<{ path: string | null }>(PhpUtilPath.getDefinitionPhp, [
+        return await this.callJson<{ path: string | null }>(PhpUtilPath.getDefinitionPhp, [
             this._workspaceDirectory,
             `'${className}'`,
         ]);
     }
 
     async getClassCompletion(className: string) {
-        return await this.call<string[]>(PhpUtilPath.getCompletionPhp, [
+        return await this.callJson<string[]>(PhpUtilPath.getCompletionPhp, [
             this._workspaceDirectory,
             `'${className}'`,
         ]) || [];
     }
 
     async reflectType(className: string) {
-        return await this.call<ReflectedType>(PhpUtilPath.reflectType, [
+        return await this.callJson<ReflectedType>(PhpUtilPath.reflectType, [
             this._workspaceDirectory,
             `'${className}'`,
         ]);

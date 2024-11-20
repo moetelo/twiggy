@@ -13,6 +13,10 @@ export const enum PhpFrameworkOption {
 
 export type PhpFramework = PhpFrameworkOption.Twig | PhpFrameworkOption.Symfony | PhpFrameworkOption.Craft;
 
+type DiagnosticsSettings = {
+    twigCsFixer: boolean,
+};
+
 export type LanguageServerSettings = {
     autoInsertSpaces: boolean,
     inlayHints: InlayHintSettings,
@@ -21,4 +25,5 @@ export type LanguageServerSettings = {
     phpExecutable: string,
     symfonyConsolePath: string,
     vanillaTwigEnvironmentPath: string,
+    diagnostics: DiagnosticsSettings,
 };

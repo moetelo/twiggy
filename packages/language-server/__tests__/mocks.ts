@@ -54,7 +54,11 @@ export class MockPhpExecutor implements IPhpExecutor {
         },
     };
 
-    call<TResult>(command: string, args: string[]): Promise<TResult | null> {
+    call(command: string, args: string[]): Promise<{ stdout: string; stderr: string; } | null> {
+        throw new Error('Method not implemented.');
+    }
+
+    callJson<TResult>(command: string, args: string[]): Promise<TResult | null> {
         throw new Error('Method not implemented.');
     }
 

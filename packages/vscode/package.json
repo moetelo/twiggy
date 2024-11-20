@@ -40,6 +40,11 @@
           "default": true,
           "markdownDescription": "Insert spaces inside of `{{ | }}` and `{% | %}`."
         },
+        "twiggy.diagnostics.twigCsFixer": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Use VincentLanglet/Twig-CS-Fixer, if installed."
+        },
         "twiggy.inlayHints.macroArguments": {
           "type": "boolean",
           "default": true,

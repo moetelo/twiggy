@@ -24,6 +24,8 @@ import { TypeResolver } from '../typing/TypeResolver';
 import { isFile } from '../utils/files/fileStat';
 import { readFile } from 'fs/promises';
 import { DiagnosticProvider } from 'diagnostics';
+import { FormattingProvider } from 'formatting/FormattingProvider';
+import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -35,6 +37,9 @@ export class ConfigurationManager {
         symfonyConsolePath: './bin/console',
         vanillaTwigEnvironmentPath: '',
         framework: PhpFrameworkOption.Symfony,
+        diagnostics: {
+            twigCsFixer: true,
+        },
     };
 
     constructor(
@@ -47,6 +52,7 @@ export class ConfigurationManager {
         private readonly documentCache: DocumentCache,
         private readonly workspaceFolder: WorkspaceFolder,
         private readonly diagnosticProvider: DiagnosticProvider,
+        private readonly formattingProvider: FormattingProvider,
     ) {
         connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
         connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
@@ -58,7 +64,7 @@ export class ConfigurationManager {
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
 
-        this.applySettings(EmptyEnvironment, null);
+        this.applySettings(EmptyEnvironment, null, null);
 
         if (config.framework === PhpFrameworkOption.Ignore) {
             return;
@@ -77,6 +83,9 @@ export class ConfigurationManager {
         }
 
         const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
+        const twigCodeStyleFixer = config.diagnostics.twigCsFixer
+            ? new TwigCodeStyleFixer(phpExecutor, workspaceDirectory)
+            : null;
 
         const twigEnvironment = this.#resolveTwigEnvironment(config.framework, phpExecutor);
         await twigEnvironment.refresh({
@@ -92,7 +101,7 @@ export class ConfigurationManager {
             console.debug(twigEnvironment.environment)
         }
 
-        this.applySettings(twigEnvironment, phpExecutor);
+        this.applySettings(twigEnvironment, phpExecutor, twigCodeStyleFixer);
     }
 
     #resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecutor) {
@@ -121,13 +130,19 @@ export class ConfigurationManager {
         }
     }
 
-    private applySettings(frameworkEnvironment: IFrameworkTwigEnvironment, phpExecutor: PhpExecutor | null) {
+    private applySettings(
+        frameworkEnvironment: IFrameworkTwigEnvironment,
+        phpExecutor: PhpExecutor | null,
+        twigCodeStyleFixer: TwigCodeStyleFixer | null,
+    ) {
         const typeResolver = phpExecutor ? new TypeResolver(phpExecutor) : null;
 
         this.definitionProvider.phpExecutor = phpExecutor;
         this.completionProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver);
-        this.diagnosticProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver);
         this.signatureHelpProvider.reindex(frameworkEnvironment);
         this.documentCache.configure(frameworkEnvironment, typeResolver);
+
+        this.diagnosticProvider.refresh(twigCodeStyleFixer);
+        this.formattingProvider.refresh(twigCodeStyleFixer);
     }
 }

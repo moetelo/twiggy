@@ -22,7 +22,7 @@ export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
     }
 
     async #loadEnvironment(workspaceDirectory: string): Promise<TwigEnvironment | null> {
-        const result = await this._phpExecutor.call<SymfonyTwigDebugJsonOutput>(
+        const result = await this._phpExecutor.callJson<SymfonyTwigDebugJsonOutput>(
             PhpUtilPath.getCraftTwig, [
                 workspaceDirectory,
             ]

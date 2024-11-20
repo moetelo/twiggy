@@ -22,6 +22,7 @@ import { BracketSpacesInsertionProvider } from './autoInsertions/BracketSpacesIn
 import { InlayHintProvider } from './inlayHints/InlayHintProvider';
 import { ReferenceProvider } from './references/ReferenceProvider';
 import { RenameProvider } from './references/RenameProvider';
+import { FormattingProvider } from 'formatting/FormattingProvider';
 
 export class Server {
     readonly documents = new TextDocuments(TextDocument);
@@ -36,9 +37,9 @@ export class Server {
     referenceProvider!: ReferenceProvider;
     renameProvider!: RenameProvider;
     diagnosticProvider!: DiagnosticProvider;
+    formattingProvider!: FormattingProvider;
 
     constructor(connection: Connection) {
-
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
 
@@ -66,6 +67,7 @@ export class Server {
             );
             this.inlayHintProvider = new InlayHintProvider(connection, documentCache);
             new IsInsideHtmlRegionCommandProvider(connection, documentCache);
+            this.formattingProvider = new FormattingProvider(connection, this.diagnosticProvider);
             this.bracketSpacesInsertionProvider = new BracketSpacesInsertionProvider(
                 connection,
                 this.documents,
@@ -88,6 +90,7 @@ export class Server {
                 },
                 inlayHintProvider: true,
                 referencesProvider: true,
+                documentFormattingProvider: true,
                 renameProvider: {
                     prepareProvider: true,
                 },
@@ -109,13 +112,21 @@ export class Server {
                 this.documentCache,
                 this.workspaceFolder,
                 this.diagnosticProvider,
+                this.formattingProvider,
             );
+
+            await this.diagnosticProvider.lintWorkspace();
+        });
+
+        this.documents.onDidSave(async ({ document }) => {
+            await this.diagnosticProvider.lint(document.uri);
         });
 
         this.documents.onDidChangeContent(async ({ document }) => {
             const doc = await this.documentCache.updateText(document.uri, document.getText());
-            await this.diagnosticProvider.validate(doc);
+            await this.diagnosticProvider.validateReport(doc);
         });
+
         this.documents.listen(connection);
     }
 }

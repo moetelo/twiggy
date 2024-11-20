@@ -69,7 +69,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
             return null;
         }
 
-        return await this._phpExecutor.call<TResult>(this.#symfonyConsolePath, [
+        return await this._phpExecutor.callJson<TResult>(this.#symfonyConsolePath, [
             command,
             '--format',
             'json',

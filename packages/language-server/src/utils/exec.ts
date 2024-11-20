@@ -1,14 +1,17 @@
-import { promisify } from 'node:util';
-import { exec as execCb, ExecOptions } from 'node:child_process';
+import { spawn, SpawnOptionsWithoutStdio } from 'node:child_process';
 
-type CommandResult = { stdout: string, stderr: string };
+export type CommandResult = { stdout: string, stderr: string, code: number | null };
 
-const BYTES_5MB = 1024 * 1024 * 5;
+export const exec = async (command: string, args: string[], options: SpawnOptionsWithoutStdio = {}): Promise<CommandResult> => {
+    return new Promise<CommandResult>(resolve => {
+        const child = spawn(command, args, options);
+        let stdout = '';
+        let stderr = '';
 
-export const execPromisified = async (command: string, options: ExecOptions = {}) => {
-    return await promisify(execCb)(command, {
-        ...options,
-        maxBuffer: BYTES_5MB,
+        child.stdout.on('data', (data) => stdout += data);
+        child.stderr.on('data', (data) => stderr += data);
+
+        child.on('close', (code) => resolve({ stdout, stderr, code }));
     });
 };
 

@@ -1,14 +1,10 @@
-import { Connection, Diagnostic, DiagnosticSeverity, DiagnosticTag, Range } from 'vscode-languageserver';
+import { Connection, Diagnostic, DiagnosticSeverity, DiagnosticTag, DocumentUri, Range } from 'vscode-languageserver';
 import { Document, DocumentCache } from 'documents';
 import { PreOrderCursorIterator, getNodeRange, getStringNodeValue, isBlockIdentifier, isEmptyEmbedded, isPathInsideTemplateEmbedding } from 'utils/node';
 import { SyntaxNode } from 'web-tree-sitter';
 import { pointToPosition } from 'utils/position';
-import { EmptyEnvironment, IFrameworkTwigEnvironment } from 'twigEnvironment';
-import { IExpressionTypeResolver } from 'typing/IExpressionTypeResolver';
-import { IPhpExecutor } from 'phpInterop/IPhpExecutor';
-import { ExpressionTypeResolver } from 'typing/ExpressionTypeResolver';
-import { ITypeResolver } from 'typing/ITypeResolver';
 import { positionsEqual } from 'utils/position/comparePositions';
+import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
 
 const createDiagnosticFromRange = (
     range: Range,
@@ -32,9 +28,9 @@ const createDiagnostic = (
 
 
 export class DiagnosticProvider {
-    #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
-    #phpExecutor: IPhpExecutor | null = null;
-    #expressionTypeResolver: IExpressionTypeResolver | null = null;
+    #twigCodeStyleFixer: TwigCodeStyleFixer | null = null;
+
+    #lintMap = new Map<DocumentUri, Diagnostic[]>();
 
     constructor(
         private readonly connection: Connection,
@@ -42,14 +38,11 @@ export class DiagnosticProvider {
     ) {
     }
 
-    refresh(
-        environment: IFrameworkTwigEnvironment,
-        phpExecutor: IPhpExecutor | null,
-        typeResolver: ITypeResolver | null,
-    ) {
-        this.#environment = environment;
-        this.#phpExecutor = phpExecutor;
-        this.#expressionTypeResolver = typeResolver ? new ExpressionTypeResolver(typeResolver) : null;
+    refresh(twigCodeStyleFixer: TwigCodeStyleFixer | null) {
+        this.#twigCodeStyleFixer = twigCodeStyleFixer;
+        this.#lintMap.clear();
+
+        void this.lintWorkspace();
     }
 
     async validateNode(node: SyntaxNode, document: Document): Promise<Diagnostic | null> {
@@ -154,6 +147,19 @@ export class DiagnosticProvider {
         return diagnostics;
     }
 
+    async validateReport(document: Document) {
+        const diagnostics = await this.validate(document);
+        const lints = this.#lintMap.get(document.uri) || [];
+
+        await this.connection.sendDiagnostics({
+            uri: document.uri,
+            diagnostics: [
+                ...diagnostics,
+                ...lints,
+            ],
+        });
+    }
+
     async validate(document: Document) {
         const syntaxDiagnostics = await this.validateTree(document);
 
@@ -171,13 +177,51 @@ export class DiagnosticProvider {
             tags: [ DiagnosticTag.Unnecessary ],
         }));
 
+        return [
+            ...syntaxDiagnostics,
+            ...unusedVariablesDiagnostics,
+        ];
+    }
+
+    async lint(uri: DocumentUri) {
+        if (!this.#twigCodeStyleFixer) {
+            return;
+        }
+
+        const lints = await this.#twigCodeStyleFixer.lint(uri) || [];
+
+        if (!lints.length) {
+            this.#lintMap.delete(uri);
+        } else {
+            this.#lintMap.set(uri, lints);
+        }
+
+        const document = await this.documentCache.get(uri);
+        const diagnostics = await this.validate(document);
+
         await this.connection.sendDiagnostics({
-            uri: document.uri,
+            uri,
             diagnostics: [
-                ...syntaxDiagnostics,
-                ...unusedVariablesDiagnostics,
+                ...diagnostics,
+                ...lints,
             ],
         });
     }
 
+    async lintWorkspace() {
+        if (!this.#twigCodeStyleFixer) {
+            return;
+        }
+
+        const lints = await this.#twigCodeStyleFixer.lintWorkspace() || [];
+
+        for (const { uri, diagnostics } of lints) {
+            this.#lintMap.set(uri, diagnostics);
+
+            await this.connection.sendDiagnostics({
+                uri,
+                diagnostics,
+            });
+        }
+    }
 }
