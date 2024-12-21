@@ -42,8 +42,8 @@
         },
         "twiggy.diagnostics.twigCsFixer": {
           "type": "boolean",
-          "default": true,
-          "markdownDescription": "Use VincentLanglet/Twig-CS-Fixer, if installed."
+          "default": false,
+          "markdownDescription": "Use VincentLanglet/Twig-CS-Fixer, if installed. Note: format on save should be disabled since it's buggy."
         },
         "twiggy.inlayHints.macroArguments": {
           "type": "boolean",
