@@ -1,3 +1,26 @@
+## 0.17.0 (2024-12-21)
+* Add twig-cs-fixer. #4
+* Guess `twiggy.framework` using `composer.json`. #56
+- feat: template diagnostic and defintion for block template argument \
+also fixes incorrect reference from defintion of block with template argument
+- feat(lsp): correctly format namespaces and support chained loaders
+- fix: completions and ranges \
+this fixes unstable completions and allows to correctly insert \
+completion inside of string node
+- fix(build): use relative path for wasm module \
+this fixes build on win32
+- fix: update tree-sitter-twig from nan to napi \
+this also (partially) fixes clean builds
+- fix: use custom request instead of workspace/executeCommand
+this fixes thrown exception when custom command in used
+since lsp registers only static name and extension calls dynamic one
+- fix: ctrl+space in block('|')
+- fix: ctrl+space in empty file
+- refactor: add additional logging
+
+Thanks to @Zekfad for the contribution.
+
+
 ## 0.17.0 (2024-11-16)
 * Twig without frameworks. #52
 
