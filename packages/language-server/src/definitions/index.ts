@@ -10,7 +10,7 @@ import { Document, DocumentCache } from '../documents';
 import { getStringNodeValue } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';
-import { documentUriToFsPath } from '../utils/uri';
+import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { findParentByType } from '../utils/node/findParentByType';
 import { SyntaxNode } from 'web-tree-sitter';
@@ -138,7 +138,7 @@ export class DefinitionProvider {
             if (!result?.path) return;
 
             return {
-                uri: result.path,
+                uri: toDocumentUri(result.path),
                 range: getNodeRange(typeIdentifierNode),
             };
         }

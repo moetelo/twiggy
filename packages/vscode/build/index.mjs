@@ -74,7 +74,8 @@ const buildOptions = /** @type {const} @satisfies {esbuild.BuildOptions} */ ({
             assets: [
                 { watch: isDev, from: '../language-server/node_modules/web-tree-sitter/tree-sitter.wasm', to: './dist/' },
                 { watch: isDev, from: grammarWasmPath, to: './dist/' },
-                { watch: isDev, from: '../language-server/phpUtils/**/*', to: './dist/phpUtils/' },
+                { watch: isDev, from: '../language-server/phpUtils/twiggy-php-utils.phar', to: './dist/phpUtils/' },
+                // { watch: isDev, from: '../language-server/phpUtils/**/*', to: './dist/phpUtils/' },
             ],
         }),
     ],

@@ -1,4 +1,4 @@
-import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import { IPhpExecutor } from 'phpInterop/IPhpExecutor';
 import { isFile } from '../utils/files/fileStat';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
 import { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
@@ -11,7 +11,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
 
     #symfonyConsolePath: string | undefined;
 
-    constructor(private readonly _phpExecutor: PhpExecutor) {
+    constructor(private readonly _phpExecutor: IPhpExecutor) {
     }
 
     get environment() {

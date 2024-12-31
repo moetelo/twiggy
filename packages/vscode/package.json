@@ -66,6 +66,12 @@
           "default": "php",
           "markdownDescription": "Points to the PHP executable."
         },
+        "twiggy.autoloaderPath": {
+          "type": "string",
+          "scope": "resource",
+          "default": "vendor/autoload.php",
+          "markdownDescription": "Points to the autoload.php file."
+        },
         "twiggy.framework": {
           "type": "string",
           "scope": "resource",

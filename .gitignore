@@ -3,3 +3,8 @@ packages/vscode/dist
 packages/language-server/dist
 .vscode/settings.json
 *.vsix
+
+pyproject.toml
+requirements.lock
+requirements-dev.lock
+.python-version

@@ -34,6 +34,7 @@ export class ConfigurationManager {
         autoInsertSpaces: true,
         inlayHints: InlayHintProvider.defaultSettings,
         phpExecutable: 'php',
+        autoloaderPath: 'vendor/autoload.php',
         symfonyConsolePath: './bin/console',
         vanillaTwigEnvironmentPath: '',
         framework: PhpFrameworkOption.Symfony,
@@ -82,7 +83,11 @@ export class ConfigurationManager {
             console.info('Guessed `twiggy.framework`: ', config.framework);
         }
 
-        const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
+        const phpExecutor = new PhpExecutor(
+            config.phpExecutable,
+            config.autoloaderPath,
+            workspaceDirectory,
+        );
         const twigCodeStyleFixer = config.diagnostics.twigCsFixer
             ? new TwigCodeStyleFixer(phpExecutor, workspaceDirectory)
             : null;

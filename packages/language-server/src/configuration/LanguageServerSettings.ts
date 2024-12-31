@@ -23,6 +23,7 @@ export type LanguageServerSettings = {
 
     framework?: PhpFrameworkOption,
     phpExecutable: string,
+    autoloaderPath: string,
     symfonyConsolePath: string,
     vanillaTwigEnvironmentPath: string,
     diagnostics: DiagnosticsSettings,
