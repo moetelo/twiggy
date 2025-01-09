@@ -67,7 +67,7 @@ class TwigUtils {
 
 		$framework = $argv[0];
 		$env = $argv[1];
-		
+
 		$twig = null;
 		switch ($framework) {
 			case 'craft':
@@ -104,7 +104,7 @@ class TwigUtils {
 	}
 
 	/**
-	 * @param string[] $argv 
+	 * @param string[] $argv
 	 * @return array
 	 */
 	protected static function getTypeDefinition(array $argv): array {
@@ -122,7 +122,7 @@ class TwigUtils {
 	}
 
 	/**
-	 * @param string[] $argv 
+	 * @param string[] $argv
 	 * @return array
 	 */
 	protected static function getTypeCompletions(array $argv): array {
@@ -144,7 +144,7 @@ class TwigUtils {
 	}
 
 	/**
-	 * @param string[] $argv 
+	 * @param string[] $argv
 	 * @return array
 	 */
 	protected static function getNamespaceCompletions(array $argv): array {
