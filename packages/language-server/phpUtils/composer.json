@@ -21,6 +21,6 @@
         "twig/twig": "4.x-dev"
     },
     "scripts": {
-        "build": "vendor/bin/phar-composer build ."
+        "build": "rm -f twiggy-php-utils.phar && vendor/bin/phar-composer build ."
     }
 }
