@@ -1,8 +1,6 @@
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
-import { PhpUtilPath } from './PhpUtilPath';
 import { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
-import { SymfonyTwigDebugJsonOutput, parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
 import { TwigEnvironment } from './types';
 
 export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
@@ -21,17 +19,13 @@ export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
         this.#environment = await this.#loadEnvironment(workspaceDirectory);
     }
 
-    async #loadEnvironment(workspaceDirectory: string): Promise<TwigEnvironment | null> {
-        const result = await this._phpExecutor.callJson<SymfonyTwigDebugJsonOutput>(
-            PhpUtilPath.getCraftTwig, [
-                workspaceDirectory,
-            ]
-        );
-
-        if (!result) {
+    #loadEnvironment(workspaceDirectory: string): Promise<TwigEnvironment | null> {
+        return this._phpExecutor.getEnvironment(
+            'craft',
+            workspaceDirectory,
+        ).catch((error) => {
+            console.error("Failed to load vanilla twig environment:", error);
             return null;
-        }
-
-        return parseDebugTwigOutput(result);
+        });
     }
 }

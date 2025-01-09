@@ -31,12 +31,15 @@ export const parseFunctionCall = (
         ? nameNode
         : nameNode.childForFieldName('property');
 
+    if (!functionNameNode)
+        return void 0;
+
     const argNodes = node.childForFieldName('arguments')?.namedChildren;
     const args = argNodes?.map(toFunctionCallArgument) || [];
 
     return {
         object: objectNode?.text,
-        name: functionNameNode!.text,
+        name: functionNameNode.text,
         args,
     };
 };

@@ -7,6 +7,7 @@
   },
   "private": true,
   "scripts": {
+    "postinstall": "cd packages/language-server/phpUtils && composer install",
     "build": "pnpm run --dir ./packages/vscode build",
     "dev": "pnpm run --dir ./packages/vscode dev",
     "build-grammar-wasm": "pnpm run --dir ./packages/tree-sitter-twig build-wasm"

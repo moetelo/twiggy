@@ -2,6 +2,7 @@
 
 import { execSync } from 'node:child_process';
 import * as esbuild from 'esbuild';
+import * as chokidar from 'chokidar';
 import { cpSync as cp, rmSync as rm, existsSync } from 'node:fs';
 import copyPlugin from 'esbuild-plugin-copy';
 
@@ -74,7 +75,7 @@ const buildOptions = /** @type {const} @satisfies {esbuild.BuildOptions} */ ({
             assets: [
                 { watch: isDev, from: '../language-server/node_modules/web-tree-sitter/tree-sitter.wasm', to: './dist/' },
                 { watch: isDev, from: grammarWasmPath, to: './dist/' },
-                { watch: isDev, from: '../language-server/phpUtils/**/*', to: './dist/phpUtils/' },
+                { watch: isDev, from: '../language-server/phpUtils/twiggy-php-utils.phar', to: './dist/phpUtils/' },
             ],
         }),
     ],
@@ -94,6 +95,15 @@ async function main() {
 
     const ctx = await esbuild.context(buildOptions);
     if (isDev) {
+        const phpWatcher = chokidar.watch([
+            '../language-server/phpUtils/index.php',
+            '../language-server/phpUtils/src/',
+        ]);
+
+        phpWatcher.on('change', () => {
+            execSync('composer build', { cwd: '../language-server/phpUtils', stdio: 'inherit' });
+        });
+
         await ctx.watch();
         return;
     }

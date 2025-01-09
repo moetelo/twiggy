@@ -66,6 +66,12 @@
           "default": "php",
           "markdownDescription": "Points to the PHP executable."
         },
+        "twiggy.autoloaderPath": {
+          "type": "string",
+          "scope": "resource",
+          "default": "vendor/autoload.php",
+          "markdownDescription": "Points to the autoload.php file."
+        },
         "twiggy.framework": {
           "type": "string",
           "scope": "resource",
@@ -154,6 +160,7 @@
   "devDependencies": {
     "@types/node": "^20.12.7",
     "@types/vscode": "^1.88.0",
+    "chokidar": "^4.0.3",
     "esbuild": "^0.20.2",
     "esbuild-plugin-copy": "^2.1.1",
     "typescript": "^5.4.5"
