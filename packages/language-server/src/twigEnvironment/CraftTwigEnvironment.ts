@@ -1,8 +1,6 @@
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
-import { PhpUtilPath } from './PhpUtilPath';
 import { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
-import { SymfonyTwigDebugJsonOutput, parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
 import { TwigEnvironment } from './types';
 
 export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {

@@ -1,5 +1,5 @@
 import { parseDebugTwigOutput, SymfonyTwigDebugJsonOutput } from 'twigEnvironment/symfony/parseDebugTwigOutput';
-import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
+import { PharUtilPath } from '../twigEnvironment/PharUtilPath';
 import { CommandResult, exec } from '../utils/exec';
 import { IPhpExecutor } from './IPhpExecutor';
 import { ReflectedType } from './ReflectedType';
@@ -35,7 +35,7 @@ export class PhpExecutor implements IPhpExecutor {
             cwd: this._workspaceDirectory
         });
 
-        if (result.stderr && command !== PhpUtilPath.utilsPhar) {
+        if (result.stderr && command !== PharUtilPath) {
             // log errors for non utils phar
             console.error(
                 `Command "${command} ${args.join(' ')}" produced following error message:`,
@@ -63,7 +63,7 @@ export class PhpExecutor implements IPhpExecutor {
     }
 
     private async callUtilsPhar<T>(...args: string[]): Promise<T> {
-        const callResult = await this.call(PhpUtilPath.utilsPhar, args);
+        const callResult = await this.call(PharUtilPath, args);
         if (!callResult) {
             throw new Error('Failed to execute utils phar');
         }
