@@ -4,7 +4,7 @@
   "description": "Twig grammar for tree-sitter",
   "main": "bindings/node",
   "scripts": {
-    "build": "pnpx tree-sitter-cli generate && rm -f ./tree-sitter-twig.wasm",
+    "build": "pnpx tree-sitter-cli generate --abi=14 && rm -f ./tree-sitter-twig.wasm",
     "build-wasm": "pnpm build && pnpx tree-sitter-cli build -w",
     "test": "tree-sitter test"
   },
@@ -13,7 +13,7 @@
     "node-addon-api": "^8.2.2"
   },
   "devDependencies": {
-    "tree-sitter-cli": "^0.20.8"
+    "tree-sitter-cli": "0.25.3"
   },
   "files": [
     "README.md",
