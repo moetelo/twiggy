@@ -1,4 +1,13 @@
-## 0.17.0 (2024-12-21)
+## 0.19.0 (2025-05-21)
+- Try to find Craft installation in workspace subfolders (#67)
+Add functionality to try to find a Craft installation in a subfolder of
+the workspace directory if not found in the workspace directly.
+This also adds Craft's overridable template path defined in
+bootstrap/bootstrap.php to the loader paths. (Fixes #40)
+
+Thanks to @JeroenJRP for the contribution.
+
+## 0.18.0 (2024-12-21)
 * Add twig-cs-fixer. #4
 * Guess `twiggy.framework` using `composer.json`. #56
 - feat: template diagnostic and defintion for block template argument \
