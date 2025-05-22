@@ -1,3 +1,7 @@
+## 0.19.1 (2025-05-22)
+- Collect references from items of array literals
+- Treat `for a, b` variables as unused by default.
+
 ## 0.19.0 (2025-05-21)
 - Try to find Craft installation in workspace subfolders (#67)
 Add functionality to try to find a Craft installation in a subfolder of
