@@ -1,11 +1,8 @@
 import {
-    IWithReferences,
-    IWithReflectedType,
     LocalSymbolInformation,
     TwigBlock,
     TwigMacro,
     TwigVariableDeclaration,
-    hasReflectedType,
     type TwigImport,
 } from './types';
 import { getNodeRange, getStringNodeValue } from '../utils/node';
@@ -19,7 +16,6 @@ const nodesToDiveInto: ReadonlySet<string> = new Set([
     'if',
     'elseif',
     'else',
-    'for',
     'output',
     'primary_expression',
     'unary_expression',
@@ -32,6 +28,7 @@ const nodesToDiveInto: ReadonlySet<string> = new Set([
     'call_expression',
     'arguments',
     'object',
+    'array',
     'pair',
     'source_elements',
 ]);
@@ -102,6 +99,11 @@ export class LocalSymbolCollector {
                     continue;
                 }
 
+                case 'for': {
+                    await this.#visitFor(cursor.currentNode);
+                    continue;
+                }
+
                 case 'variable': {
                     await this.#visitVariable(cursor.currentNode);
                     continue;
@@ -112,7 +114,20 @@ export class LocalSymbolCollector {
         return this.localSymbols;
     }
 
-    async #visitVariable(currentNode: SyntaxNode) {
+    async #visitFor(currentNode: SyntaxNode) {
+        const forVariableNodes = currentNode.childrenForFieldName('variable', currentNode.walk());
+        for (const variable of forVariableNodes) {
+            this.#visitVariable(variable, false);
+        }
+
+        const expr = currentNode.childForFieldName('expr');
+        await this.collect(expr);
+
+        const bodyNode = currentNode.childForFieldName('body');
+        await this.collect(bodyNode);
+    }
+
+    async #visitVariable(currentNode: SyntaxNode, isUsedInPlace = true) {
         const nameRange = getNodeRange(currentNode);
 
         const alreadyDefinedVar = this.localSymbols.variableDefinition.get(currentNode.text);
@@ -129,7 +144,7 @@ export class LocalSymbolCollector {
             // Implicitly defined variables are used in-place.
             // i.e. when you meet a variable for the first time,
             // it's "defined" and used in the same place.
-            references: [ nameRange ],
+            references: isUsedInPlace ? [ nameRange ] : [],
             reflectedType,
         };
         this.localSymbols.variable.push(implicitVariable);
@@ -153,22 +168,17 @@ export class LocalSymbolCollector {
     async #visitVariableDeclaration(currentNode: SyntaxNode) {
         const variableDeclaration = toVariable(currentNode);
 
-        // `set` may be used to define new variables or to change the existing variable value.
-        if (currentNode.type === 'set') {
-            const alreadyDefinedVar = this.localSymbols.variableDefinition.get(variableDeclaration.name);
-            if (alreadyDefinedVar) {
-                const nameRange = getNodeRange(currentNode);
-
-                alreadyDefinedVar.references.push(nameRange);
-                return;
-            }
+        const alreadyDefinedVar = this.localSymbols.variableDefinition.get(variableDeclaration.name);
+        if (alreadyDefinedVar) {
+            const nameRange = getNodeRange(currentNode);
+            alreadyDefinedVar.references.push(nameRange);
+        } else {
+            this.localSymbols.variable.push(variableDeclaration);
+            this.localSymbols.variableDefinition.set(variableDeclaration.name, variableDeclaration);
         }
 
         const valueNode = currentNode.childForFieldName('value');
         variableDeclaration.reflectedType = await this.#reflectVariableDeclarationType(currentNode, true);
-
-        this.localSymbols.variable.push(variableDeclaration);
-        this.localSymbols.variableDefinition.set(variableDeclaration.name, variableDeclaration);
 
         await this.collect(valueNode);
     }

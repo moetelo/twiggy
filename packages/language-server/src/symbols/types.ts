@@ -8,8 +8,8 @@ export interface LocalSymbol {
     range: Range;
 }
 
-export type IWithReferences = { references: Range[] };
-export type IWithReflectedType = {
+type IWithReferences = { references: Range[] };
+type IWithReflectedType = {
     type?: string,
     reflectedType: ReflectedType | null,
 };
