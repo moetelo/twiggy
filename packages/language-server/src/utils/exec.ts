@@ -8,10 +8,16 @@ export const exec = async (command: string, args: string[], options: SpawnOption
         let stdout = '';
         let stderr = '';
 
-        child.stdout.on('data', (data) => stdout += data);
-        child.stderr.on('data', (data) => stderr += data);
+        child.stdout.on('data', (data) => {stdout += data.toString();});
+        child.stderr.on('data', (data) => {stderr += data.toString();});
 
-        child.on('close', (code) => resolve({ stdout, stderr, code }));
+        child.on('close', (code) => {
+            const jsonStart = stdout.search(/[{[]/);
+            if (jsonStart > 0) {
+                stdout = stdout.slice(jsonStart);
+            }
+            resolve({ stdout, stderr, code });
+        });
     });
 };
 
