@@ -17,6 +17,8 @@ import { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 import { ExpressionTypeResolver } from '../typing/ExpressionTypeResolver';
 import { ITypeResolver } from '../typing/ITypeResolver';
 import { IExpressionTypeResolver } from '../typing/IExpressionTypeResolver';
+import { TemplatePathMapping } from '../twigEnvironment/types';
+import { normalizeDirectoryPath } from '../utils/paths/normalizeTemplatePath';
 
 export class CompletionProvider {
     #symfonyRouteNames: string[] = [];
@@ -24,6 +26,9 @@ export class CompletionProvider {
     workspaceFolderPath: string;
     #phpExecutor: IPhpExecutor | null = null;
     #expressionTypeResolver: IExpressionTypeResolver | null = null;
+    #composerRoot: string | undefined;
+    #additionalMappings: TemplatePathMapping[] = [];
+    #normalizedMappingsCache: TemplatePathMapping[] | null = null;
 
     constructor(
         private readonly connection: Connection,
@@ -39,11 +44,39 @@ export class CompletionProvider {
         environment: IFrameworkTwigEnvironment,
         phpExecutor: IPhpExecutor | null,
         typeResolver: ITypeResolver | null,
+        composerRoot?: string,
+        additionalMappings?: TemplatePathMapping[],
     ) {
         this.#environment = environment;
         this.#symfonyRouteNames = Object.keys(environment.routes);
         this.#phpExecutor = phpExecutor;
         this.#expressionTypeResolver = typeResolver ? new ExpressionTypeResolver(typeResolver) : null;
+        this.#composerRoot = composerRoot;
+        this.#additionalMappings = additionalMappings || [];
+        this.#normalizedMappingsCache = null;
+    }
+
+    /**
+     * Gets effective template mappings with normalized paths for completions.
+     */
+    get #effectiveTemplateMappings(): TemplatePathMapping[] {
+        if (this.#normalizedMappingsCache) {
+            return this.#normalizedMappingsCache;
+        }
+
+        const frameworkMappings = this.#environment.templateMappings;
+        const allMappings = [...frameworkMappings, ...this.#additionalMappings];
+
+        this.#normalizedMappingsCache = allMappings.map(({ namespace, directory }) => ({
+            namespace,
+            directory: normalizeDirectoryPath(
+                directory,
+                this.workspaceFolderPath,
+                this.#composerRoot,
+            ),
+        }));
+
+        return this.#normalizedMappingsCache;
     }
 
     async onCompletion(params: CompletionParams) {
@@ -74,7 +107,7 @@ export class CompletionProvider {
                 cursorNode,
                 params.position,
                 this.workspaceFolderPath,
-                this.#environment.templateMappings,
+                this.#effectiveTemplateMappings,
             ),
         ];
     }

@@ -4,7 +4,7 @@ import {
     DidChangeConfigurationParams,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import { LanguageServerSettings, PhpFramework, PhpFrameworkOption } from './LanguageServerSettings';
+import { LanguageServerSettings, PhpFramework, PhpFrameworkOption, TemplatePathConfig } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
 import { DocumentCache } from '../documents';
 import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
@@ -26,6 +26,8 @@ import { readFile } from 'fs/promises';
 import { DiagnosticProvider } from 'diagnostics';
 import { FormattingProvider } from 'formatting/FormattingProvider';
 import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
+import { TemplatePathMapping, TemplateNamespace } from '../twigEnvironment/types';
+import * as path from 'path';
 
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
@@ -64,7 +66,10 @@ export class ConfigurationManager {
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
 
-        this.applySettings(EmptyEnvironment, null, null);
+        // Convert user-configured template paths
+        const additionalMappings = this.#convertTemplatePathConfig(config.templatePaths);
+
+        this.applySettings(EmptyEnvironment, null, null, undefined, additionalMappings);
 
         if (config.framework === PhpFrameworkOption.Ignore) {
             return;
@@ -82,14 +87,25 @@ export class ConfigurationManager {
             console.info('Guessed `twiggy.framework`: ', config.framework);
         }
 
+        // Use composerRoot directly if configured
+        const composerRoot = config.composerRoot?.trim() || undefined;
+        if (composerRoot) {
+            console.info('Using composer root:', composerRoot);
+        }
+
         const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
         const twigCodeStyleFixer = config.diagnostics.twigCsFixer
             ? new TwigCodeStyleFixer(phpExecutor, workspaceDirectory)
             : null;
 
+        // Resolve console path relative to composerRoot if set
+        const effectiveConsolePath = composerRoot
+            ? path.join(composerRoot, config.symfonyConsolePath)
+            : config.symfonyConsolePath;
+
         const twigEnvironment = this.#resolveTwigEnvironment(config.framework, phpExecutor);
         await twigEnvironment.refresh({
-            symfonyConsolePath: config.symfonyConsolePath,
+            symfonyConsolePath: effectiveConsolePath,
             vanillaTwigEnvironmentPath: config.vanillaTwigEnvironmentPath,
             workspaceDirectory,
         });
@@ -101,7 +117,7 @@ export class ConfigurationManager {
             console.debug(twigEnvironment.environment)
         }
 
-        this.applySettings(twigEnvironment, phpExecutor, twigCodeStyleFixer);
+        this.applySettings(twigEnvironment, phpExecutor, twigCodeStyleFixer, composerRoot, additionalMappings);
     }
 
     #resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecutor) {
@@ -134,15 +150,31 @@ export class ConfigurationManager {
         frameworkEnvironment: IFrameworkTwigEnvironment,
         phpExecutor: PhpExecutor | null,
         twigCodeStyleFixer: TwigCodeStyleFixer | null,
+        composerRoot?: string,
+        additionalMappings?: TemplatePathMapping[],
     ) {
         const typeResolver = phpExecutor ? new TypeResolver(phpExecutor) : null;
 
         this.definitionProvider.phpExecutor = phpExecutor;
-        this.completionProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver);
+        this.completionProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver, composerRoot, additionalMappings);
         this.signatureHelpProvider.reindex(frameworkEnvironment);
-        this.documentCache.configure(frameworkEnvironment, typeResolver);
+        this.documentCache.configure(frameworkEnvironment, typeResolver, composerRoot, additionalMappings);
 
         this.diagnosticProvider.refresh(twigCodeStyleFixer);
         this.formattingProvider.refresh(twigCodeStyleFixer);
+    }
+
+    /**
+     * Converts user-configured template paths to internal TemplatePathMapping format.
+     */
+    #convertTemplatePathConfig(configs?: TemplatePathConfig[]): TemplatePathMapping[] {
+        if (!configs || configs.length === 0) {
+            return [];
+        }
+
+        return configs.map(({ namespace, path }) => ({
+            namespace: (namespace.startsWith('@') || namespace === '' ? namespace : `@${namespace}`) as TemplateNamespace,
+            directory: path,
+        }));
     }
 }

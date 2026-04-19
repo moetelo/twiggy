@@ -87,7 +87,33 @@
           "type": "string",
           "scope": "resource",
           "default": "bin/console",
-          "markdownDescription": "Path to the Symfony console. See: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
+          "markdownDescription": "Path to the Symfony console, relative to `composerRoot` (or workspace root if not set).\n\nSee: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
+        },
+        "twiggy.composerRoot": {
+          "type": "string",
+          "scope": "resource",
+          "default": "",
+          "markdownDescription": "Root directory of the PHP/Composer project relative to the workspace.\n\nUse this when your Symfony/Craft application is in a subdirectory (e.g., monorepo setups).\n\n**Example:** If your `composer.json` is at `app/composer.json`, set this to `app`.\n\nWhen set, template paths and the Symfony console will be resolved relative to this directory."
+        },
+        "twiggy.templatePaths": {
+          "type": "array",
+          "scope": "resource",
+          "default": [],
+          "markdownDescription": "Additional template path mappings for custom namespaces.\n\nUseful for:\n- Bundle development where templates use `@BundleName/...` namespace\n- Non-standard project structures\n- Projects where templates aren't auto-detected\n\nExample:\n```json\n[\n  { \"namespace\": \"@MyBundle\", \"path\": \"src/Bundle/templates\" },\n  { \"namespace\": \"\", \"path\": \"custom/templates\" }\n]\n```",
+          "items": {
+            "type": "object",
+            "required": ["namespace", "path"],
+            "properties": {
+              "namespace": {
+                "type": "string",
+                "description": "The namespace prefix (e.g., '@MyBundle' or '' for root namespace)"
+              },
+              "path": {
+                "type": "string",
+                "description": "Directory path relative to the workspace folder"
+              }
+            }
+          }
         }
       }
     },

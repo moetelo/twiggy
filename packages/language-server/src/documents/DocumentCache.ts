@@ -8,10 +8,15 @@ import { parser } from '../utils/parser';
 import { LocalSymbolCollector } from '../symbols/LocalSymbolCollector';
 import { ITypeResolver } from '../typing/ITypeResolver';
 import { readFile } from 'fs/promises';
+import { TemplatePathMapping } from '../twigEnvironment/types';
+import { normalizeDirectoryPath } from '../utils/paths/normalizeTemplatePath';
 
 export class DocumentCache {
     #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
     #typeResolver: ITypeResolver | null = null;
+    #composerRoot: string | undefined;
+    #additionalMappings: TemplatePathMapping[] = [];
+    #normalizedMappingsCache: TemplatePathMapping[] | null = null;
 
     readonly documents: Map<DocumentUri, Document> = new Map();
     readonly workspaceFolderPath: string;
@@ -20,9 +25,42 @@ export class DocumentCache {
         this.workspaceFolderPath = documentUriToFsPath(workspaceFolder.uri);
     }
 
-    configure(frameworkEnvironment: IFrameworkTwigEnvironment, typeResolver: ITypeResolver | null) {
+    configure(
+        frameworkEnvironment: IFrameworkTwigEnvironment,
+        typeResolver: ITypeResolver | null,
+        composerRoot?: string,
+        additionalMappings?: TemplatePathMapping[],
+    ) {
         this.#environment = frameworkEnvironment;
         this.#typeResolver = typeResolver;
+        this.#composerRoot = composerRoot;
+        this.#additionalMappings = additionalMappings || [];
+        this.#normalizedMappingsCache = null; // Clear cache when configuration changes
+    }
+
+    /**
+     * Gets the effective template mappings with normalized paths.
+     * Combines framework mappings with additional user-configured mappings.
+     */
+    get #effectiveTemplateMappings(): TemplatePathMapping[] {
+        if (this.#normalizedMappingsCache) {
+            return this.#normalizedMappingsCache;
+        }
+
+        const frameworkMappings = this.#environment.templateMappings;
+        const allMappings = [...frameworkMappings, ...this.#additionalMappings];
+
+        // Normalize all directory paths
+        this.#normalizedMappingsCache = allMappings.map(({ namespace, directory }) => ({
+            namespace,
+            directory: normalizeDirectoryPath(
+                directory,
+                this.workspaceFolderPath,
+                this.#composerRoot,
+            ),
+        }));
+
+        return this.#normalizedMappingsCache;
     }
 
     async get(documentUri: DocumentUri, text?: string) {
@@ -57,7 +95,7 @@ export class DocumentCache {
     }
 
     async resolveByTwigPath(pathFromTwig: string) {
-        for (const { namespace, directory } of this.#environment.templateMappings) {
+        for (const { namespace, directory } of this.#effectiveTemplateMappings) {
             if (!pathFromTwig.startsWith(namespace)) {
                 continue;
             }
@@ -66,14 +104,28 @@ export class DocumentCache {
                 ? path.join(directory, pathFromTwig)
                 : pathFromTwig.replace(namespace, directory);
 
-            const pathToTwig = path.resolve(this.workspaceFolderPath, includePath);
-            const documentUri = toDocumentUri(pathToTwig);
+            // Try resolving relative to workspace first
+            let pathToTwig = path.resolve(this.workspaceFolderPath, includePath);
+            let documentUri = toDocumentUri(pathToTwig);
 
             if (this.documents.has(documentUri)) {
                 return this.documents.get(documentUri)!;
             }
 
-            const resolvedTemplate = await resolveTemplate(pathToTwig);
+            let resolvedTemplate = await resolveTemplate(pathToTwig);
+
+            // If not found and we have a composer root, try resolving relative to it
+            if (!resolvedTemplate && this.#composerRoot) {
+                pathToTwig = path.resolve(this.workspaceFolderPath, this.#composerRoot, includePath);
+                documentUri = toDocumentUri(pathToTwig);
+
+                if (this.documents.has(documentUri)) {
+                    return this.documents.get(documentUri)!;
+                }
+
+                resolvedTemplate = await resolveTemplate(pathToTwig);
+            }
+
             if (resolvedTemplate) {
                 const newDocument = await this.add(toDocumentUri(resolvedTemplate));
                 return newDocument;
@@ -110,5 +162,17 @@ export class DocumentCache {
         await this.setText(document, text);
         this.documents.set(documentUri, document);
         return document;
+    }
+
+    remove(documentUri: DocumentUri) {
+        this.documents.delete(toDocumentUri(documentUri));
+    }
+
+    async refresh(documentUri: DocumentUri) {
+        const normalizedUri = toDocumentUri(documentUri);
+        const document = this.documents.get(normalizedUri);
+        if (document) {
+            await this.setText(document);
+        }
     }
 }
