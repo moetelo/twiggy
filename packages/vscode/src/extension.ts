@@ -3,7 +3,6 @@ import {
     ExtensionContext,
     window,
     WorkspaceFolder,
-    RelativePattern,
     commands,
     CompletionList,
     Uri,
@@ -46,11 +45,6 @@ async function addWorkspaceFolder(
     context: ExtensionContext
 ): Promise<void> {
     const folderPath = workspaceFolder.uri.fsPath;
-    const fileEvents = workspace.createFileSystemWatcher(
-        new RelativePattern(workspaceFolder, '*.twig'),
-    );
-
-    context.subscriptions.push(fileEvents);
 
     if (clients.has(folderPath)) {
         return;
@@ -89,9 +83,6 @@ async function addWorkspaceFolder(
                 pattern: `${folderPath}/**`,
             },
         ],
-        synchronize: {
-            fileEvents,
-        },
         middleware: {
             async provideCompletionItem(
                 document,

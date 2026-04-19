@@ -111,4 +111,16 @@ export class DocumentCache {
         this.documents.set(documentUri, document);
         return document;
     }
+
+    remove(documentUri: DocumentUri) {
+        this.documents.delete(toDocumentUri(documentUri));
+    }
+
+    async refresh(documentUri: DocumentUri) {
+        const normalizedUri = toDocumentUri(documentUri);
+        const document = this.documents.get(normalizedUri);
+        if (document) {
+            await this.setText(document);
+        }
+    }
 }

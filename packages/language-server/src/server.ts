@@ -1,8 +1,11 @@
 import {
     Connection,
+    DidChangeWatchedFilesNotification,
+    FileChangeType,
     InitializeParams,
     ServerCapabilities,
     TextDocuments,
+    WatchKind,
     WorkspaceFolder,
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -28,6 +31,7 @@ export class Server {
     readonly documents = new TextDocuments(TextDocument);
     documentCache!: DocumentCache;
     workspaceFolder!: WorkspaceFolder;
+    #hasDynamicFileWatcherSupport = false;
 
     definitionProvider!: DefinitionProvider;
     completionProvider!: CompletionProvider;
@@ -42,6 +46,8 @@ export class Server {
     constructor(connection: Connection) {
         connection.onInitialize(async (initializeParams: InitializeParams) => {
             this.workspaceFolder = initializeParams.workspaceFolders![0];
+            this.#hasDynamicFileWatcherSupport =
+                initializeParams.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration ?? false;
 
             const documentCache = new DocumentCache(this.workspaceFolder);
             this.documentCache = documentCache;
@@ -102,6 +108,17 @@ export class Server {
         });
 
         connection.onInitialized(async () => {
+            if (this.#hasDynamicFileWatcherSupport) {
+                await connection.client.register(DidChangeWatchedFilesNotification.type, {
+                    watchers: [
+                        {
+                            globPattern: '**/*.twig',
+                            kind: WatchKind.Create | WatchKind.Change | WatchKind.Delete,
+                        },
+                    ],
+                });
+            }
+
             new ConfigurationManager(
                 connection,
                 this.definitionProvider,
@@ -116,6 +133,16 @@ export class Server {
             );
 
             await this.diagnosticProvider.lintWorkspace();
+        });
+
+        connection.onDidChangeWatchedFiles(async (params) => {
+            for (const change of params.changes) {
+                if (change.type === FileChangeType.Deleted) {
+                    this.documentCache.remove(change.uri);
+                } else {
+                    await this.documentCache.refresh(change.uri);
+                }
+            }
         });
 
         this.documents.onDidSave(async ({ document }) => {
