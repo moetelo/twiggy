@@ -1,4 +1,4 @@
-name: Publish to NPM
+name: Publish
 
 on:
   workflow_dispatch: ~
@@ -8,6 +8,8 @@ on:
 
 env:
   NPM_TOKEN: ${{ secrets.NPM_PAT }}
+  VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+  OVSX_PAT: ${{ secrets.OPEN_VSX_TOKEN }}
 
 jobs:
   deploy:
@@ -21,6 +23,8 @@ jobs:
           run_install: |
             - recursive: true
               args: [--frozen-lockfile, --strict-peer-dependencies]
+            - args: [--global, "@vscode/vsce"]
+            - args: [--global, "ovsx"]
 
       - uses: actions/setup-node@v4
         with:
@@ -29,20 +33,11 @@ jobs:
 
       - run: pnpm build
 
-      - name: Publish to VS Code Marketplace
-        uses: HaaLeo/publish-vscode-extension@v2
-        with:
-          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
-          packagePath: ./packages/vscode
-          dependencies: false
+      - run: vsce publish --no-dependencies
+        working-directory: ./packages/vscode
 
-      - name: Publish to Open VSX
-        uses: HaaLeo/publish-vscode-extension@v2
-        with:
-          pat: ${{ secrets.OPEN_VSX_TOKEN }}
-          registryUrl: https://open-vsx.org
-          packagePath: ./packages/vscode
+      - run: ovsx publish --no-dependencies
+        working-directory: ./packages/vscode
 
       - name: pnpm publish
         working-directory: ./packages/language-server
