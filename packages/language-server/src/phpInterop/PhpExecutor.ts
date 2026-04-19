@@ -19,6 +19,8 @@ export class PhpExecutor implements IPhpExecutor {
         }
 
         const result = await exec(this._phpExecutable, [
+            '-d',
+            'display_errors=stderr',
             command,
             ...args,
         ], {
