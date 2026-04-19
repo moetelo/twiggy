@@ -1,3 +1,8 @@
+## 0.20.0 (2026-04-19)
+- Use HaaLeo/publish-vscode-extension for VS Code and Open VSX publishing (#73)
+- fix: use LSP-compliant dynamic file watcher registration (#75)
+- Fix PHP 8+ deprecation warnings breaking JSON parsing (#72)
+
 ## 0.19.1 (2025-05-22)
 - Collect references from items of array literals
 - Treat `for a, b` variables as unused by default.
