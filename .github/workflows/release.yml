@@ -8,8 +8,6 @@ on:
 
 env:
   NPM_TOKEN: ${{ secrets.NPM_PAT }}
-  VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-  OPEN_VSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
 
 jobs:
   deploy:
