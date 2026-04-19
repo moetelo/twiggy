@@ -32,7 +32,6 @@ jobs:
       - run: pnpm build
 
       - name: Publish to VS Code Marketplace
-        if: ${{ env.VSCE_PAT != '' }}
         uses: HaaLeo/publish-vscode-extension@v2
         with:
           pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
@@ -40,7 +39,6 @@ jobs:
           dependencies: false
 
       - name: Publish to Open VSX
-        if: ${{ env.OPEN_VSX_TOKEN != '' }}
         uses: HaaLeo/publish-vscode-extension@v2
         with:
           pat: ${{ secrets.OPEN_VSX_TOKEN }}
