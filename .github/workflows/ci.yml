@@ -20,6 +20,8 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
+      - run: bun run build-grammar-wasm
+
       - run: bun run typecheck
 
       - run: bun test
