@@ -17,30 +17,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          version: 9.6.0
-          run_install: |
-            - recursive: true
-              args: [--frozen-lockfile, --strict-peer-dependencies]
-            - args: [--global, "@vscode/vsce"]
-            - args: [--global, "ovsx"]
+          bun-version-file: .github/.bun-version
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - run: bun install --frozen-lockfile
 
-      - run: pnpm build
+      - run: bun run build
 
-      - run: vsce publish --no-dependencies
+      - run: bunx @vscode/vsce publish --no-dependencies
         working-directory: ./packages/vscode
 
-      - run: ovsx publish --no-dependencies
+      - run: bunx ovsx publish --no-dependencies
         working-directory: ./packages/vscode
 
-      - name: pnpm publish
+      - name: npm publish language-server
         working-directory: ./packages/language-server
         run: |
             npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
-            pnpm publish --no-git-checks
+            npm publish --access public

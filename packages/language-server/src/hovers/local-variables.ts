@@ -11,7 +11,7 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Hove
         pointToPosition(cursorNode.startPosition),
     );
 
-    const result: TwigImport | TwigVariableDeclaration | undefined = locals.find(({ name }) => name === cursorNode.text);
+    const result = locals.find(({ name }) => name === cursorNode.text) as TwigImport | TwigVariableDeclaration | undefined;
 
     if (!result) return undefined;
 

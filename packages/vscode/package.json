@@ -28,8 +28,10 @@
   "icon": "assets/logo.png",
   "scripts": {
     "vscode:prepublish": "",
-    "build": "node ./build/index.mjs",
-    "dev": "node ./build/index.mjs --dev"
+    "clean": "rm -rf ./dist ./node_modules",
+    "build": "bun ./build/index.mjs",
+    "dev": "bun ./build/index.mjs --dev",
+    "typecheck": "tsc"
   },
   "contributes": {
     "configuration": {
@@ -152,11 +154,11 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "^20.12.7",
+    "@types/node": "^25.6.0",
     "@types/vscode": "^1.88.0",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.28.0",
     "esbuild-plugin-copy": "^2.1.1",
-    "typescript": "^5.4.5"
+    "typescript": "^6.0.3"
   },
   "dependencies": {
     "twiggy-language-server": "workspace:*",

@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
     "composite": true,
+    "skipLibCheck": true,
     "target": "es2020",
     "lib": ["es2021"],
     "module": "commonjs",
-    "moduleResolution": "node",
-    "sourceMap": true,
+    "noEmit": true,
     "strict": true,
     "outDir": "dist",
-    "baseUrl": "./src",
     "esModuleInterop": true,
     "paths": {
+      "*": ["./src/*"],
       "@server": [
         "./src/"
       ],
-    }
+    },
+    "types": ["bun-types"]
   },
   "exclude": ["node_modules"]
 }

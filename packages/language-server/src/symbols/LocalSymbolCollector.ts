@@ -115,7 +115,7 @@ export class LocalSymbolCollector {
     }
 
     async #visitFor(currentNode: SyntaxNode) {
-        const forVariableNodes = currentNode.childrenForFieldName('variable', currentNode.walk());
+        const forVariableNodes = currentNode.childrenForFieldName('variable');
         for (const variable of forVariableNodes) {
             this.#visitVariable(variable, false);
         }

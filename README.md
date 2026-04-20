@@ -35,8 +35,8 @@ Follow [instructions](https://github.com/sublimelsp/LSP-twiggy) ready-to-use cli
 
 
 # Development
-1. Install [pnpm](https://pnpm.io/installation).
-1. `pnpm install` in the project dir.
+1. Install [Bun](https://bun.com).
+1. `bun install` in the project dir.
 1. Press F5 in VS Code to start debugging.
 
 #### Monorepo

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "module": "commonjs",
     "target": "ES2020",
     "outDir": "dist",
@@ -8,6 +9,7 @@
     ],
     "sourceMap": true,
     "rootDir": "src",
+    "noEmit": true,
     "strict": true,
     "paths": {
       "@server": [
@@ -18,9 +20,4 @@
       ]
     },
   },
-  "references": [
-    {
-      "path": "../language-server/tsconfig.json"
-    }
-  ]
 }

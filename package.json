@@ -6,10 +6,21 @@
     "url": "git+https://github.com/moetelo/twiggy.git"
   },
   "private": true,
+  "packageManager": "bun@1.3.12",
+  "workspaces": [
+    "packages/*"
+  ],
+  "trustedDependencies": [
+    "esbuild",
+    "tree-sitter-cli"
+  ],
   "scripts": {
-    "build": "pnpm run --dir ./packages/vscode build",
-    "dev": "pnpm run --dir ./packages/vscode dev",
-    "build-grammar-wasm": "pnpm run --dir ./packages/tree-sitter-twig build-wasm"
+    "build": "bun run --cwd ./packages/vscode build",
+    "dev": "bun run --cwd ./packages/vscode dev",
+    "build-grammar-wasm": "bun run --cwd ./packages/tree-sitter-twig build-wasm",
+    "test": "bun run --cwd ./packages/language-server test",
+    "typecheck": "bun run --cwd ./packages/language-server typecheck && bun run --cwd ./packages/vscode typecheck",
+    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist && bun run --cwd ./packages/tree-sitter-twig clean"
   },
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0"

@@ -1,4 +1,4 @@
-import { describe, test, before } from 'node:test'
+import { describe, test, beforeAll } from 'bun:test'
 import * as assert from 'node:assert/strict'
 import { createDocumentCache, createLengthRange, initializeTestParser } from './utils';
 import Parser from 'web-tree-sitter';
@@ -13,7 +13,7 @@ describe('diagnostics', () => {
 
     let diagnosticProvider = new DiagnosticProvider(null as any, documentCache);
 
-    before(async () => {
+    beforeAll(async () => {
         parser = await initializeTestParser();
     });
 

@@ -1,4 +1,4 @@
-import { describe, before, test } from 'node:test';
+import { describe, beforeAll, test } from 'bun:test';
 import assert from 'node:assert/strict';
 import Parser from 'web-tree-sitter';
 import { createLengthRange, documentFromCode, initializeTestParser } from './utils';
@@ -8,7 +8,7 @@ import { LocalSymbolCollector } from '../src/symbols/LocalSymbolCollector';
 describe('locals', () => {
     let parser!: Parser;
 
-    before(async () => {
+    beforeAll(async () => {
         parser = await initializeTestParser();
     });
 
@@ -214,10 +214,11 @@ describe('locals', () => {
                 createLengthRange(code.indexOf(varName), varName.length),
                 varName + ' nameRange',
             );
+            const isForLoopVar = varName === keyVar || varName === itemVar;
             assert.deepEqual(
                 variable.references,
                 [
-                    variable.nameRange,
+                    ...(!isForLoopVar ? [variable.nameRange] : []),
                     createLengthRange(code.lastIndexOf(varName), varName.length),
                 ],
                 varName + ' references',

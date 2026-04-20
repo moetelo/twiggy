@@ -1,9 +1,9 @@
-import { test, before, describe } from 'node:test'
+import { test, beforeAll, describe } from 'bun:test'
 import * as assert from 'node:assert/strict'
 import { documentFromCode, initializeTestParser } from './utils';
 
 describe('Document.deepestAt', () => {
-    before(initializeTestParser);
+    beforeAll(initializeTestParser);
 
     test('cursor between nodes takes the node before the cursor', async () => {
         const document = await documentFromCode(`{{hello}}{{world}}`);
@@ -52,7 +52,7 @@ describe('Document.deepestAt', () => {
 
 
 describe('Document.deepestAt for incomplete nodes', () => {
-    before(initializeTestParser);
+    beforeAll(initializeTestParser);
 
     test('empty output', async () => {
         const document = await documentFromCode(`{{  }}`);

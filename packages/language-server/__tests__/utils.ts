@@ -34,7 +34,7 @@ export const createDocumentCache = () => new DocumentCache({ name: '', uri: 'fil
 
 export const initializeTestParser = async () => {
     const wasmPath = path.join(
-        require.main!.path,
+        __dirname,
         '..',
         '..',
         'tree-sitter-twig',

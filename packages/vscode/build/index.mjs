@@ -89,7 +89,7 @@ async function main() {
 
     if (!grammarWasmExists) {
         console.info('Building wasm grammar. This may take a while.');
-        execSync('pnpm --workspace-root run build-grammar-wasm', { stdio: 'inherit' })
+        execSync('bun run --cwd ../tree-sitter-twig build-wasm', { stdio: 'inherit' })
     }
 
     const ctx = await esbuild.context(buildOptions);
