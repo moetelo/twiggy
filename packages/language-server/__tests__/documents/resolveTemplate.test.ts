@@ -1,9 +1,9 @@
-import { describe, test } from 'bun:test'
-import * as assert from 'node:assert/strict'
-import { generateResolveSequence } from '../src/utils/files/resolveTemplate';
+import { describe, test } from 'bun:test';
+import * as assert from 'node:assert/strict';
+import { generateResolveSequence } from 'utils/files/resolveTemplate';
 
-describe('Documents', () => {
-    test('resolveTemplate iterates over correct sequence of paths', async () => {
+describe('resolveTemplate', () => {
+    test('iterates over correct sequence of paths', () => {
         const sequence = [...generateResolveSequence('foo/bar')];
 
         assert.deepEqual(

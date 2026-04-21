@@ -1,26 +1,23 @@
-import { test, beforeAll, describe } from 'bun:test'
-import * as assert from 'node:assert/strict'
-import { documentFromCode, initializeTestParser } from './utils';
+import { describe, test, beforeAll } from 'bun:test';
+import * as assert from 'node:assert/strict';
+import { documentFromCode } from '../__helpers__/documentFromCode';
+import { documentWithCursor } from '../__helpers__/fixtures';
+import { initializeTestParser } from '../__helpers__/parser';
 
 describe('Document.deepestAt', () => {
     beforeAll(initializeTestParser);
 
     test('cursor between nodes takes the node before the cursor', async () => {
-        const document = await documentFromCode(`{{hello}}{{world}}`);
+        const { cursorNode } = await documentWithCursor(`{{hello}}$0{{world}}`);
 
-        const node = document.deepestAt({ line: 0, character: `{{hello}}`.length })!;
-
-        assert.equal(node.type, 'embedded_end');
+        assert.equal(cursorNode.type, 'embedded_end');
     });
 
     test('cursor after the space char takes the next node because its startIndex is eq to space idx', async () => {
-        const document = await documentFromCode(`{{ hello }}`);
-        const character = `{{ `.length;
+        const { cursorNode, position } = await documentWithCursor(`{{ $0hello }}`);
 
-        const node = document.deepestAt({ line: 0, character })!;
-
-        assert.equal(node.type, 'variable');
-        assert.equal(node.startIndex, character);
+        assert.equal(cursorNode.type, 'variable');
+        assert.equal(cursorNode.startIndex, position.character);
     });
 
     test('iterate tokens', async () => {
@@ -42,7 +39,7 @@ describe('Document.deepestAt', () => {
             const end = start + nodeText.length;
 
             for (let character = start; character < end; character++) {
-                const node = document.deepestAt({ line: 0, character })!;
+                const node = document.deepestAt({ line: 0, character });
                 assert.equal(node.type, type);
                 assert.equal(node.text, nodeText);
             }
@@ -55,18 +52,14 @@ describe('Document.deepestAt for incomplete nodes', () => {
     beforeAll(initializeTestParser);
 
     test('empty output', async () => {
-        const document = await documentFromCode(`{{  }}`);
+        const { cursorNode } = await documentWithCursor(`{{ $0 }}`);
 
-        const node = document.deepestAt({ line: 0, character: `{{ `.length })!;
-
-        assert.equal(node.type, 'output');
+        assert.equal(cursorNode.type, 'output');
     });
 
     test('empty if condition', async () => {
-        const document = await documentFromCode(`{% if %}{% endif %}`);
+        const { cursorNode } = await documentWithCursor(`{% if$0 %}{% endif %}`);
 
-        const node = document.deepestAt({ line: 0, character: `{% if`.length })!;
-
-        assert.equal(node.parent!.type, 'if');
+        assert.equal(cursorNode.parent!.type, 'if');
     });
 });
