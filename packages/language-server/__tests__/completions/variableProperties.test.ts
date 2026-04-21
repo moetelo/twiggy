@@ -150,7 +150,7 @@ describe('variableProperties (PHP type resolution)', () => {
         assertExpectedType(completions, MockPhpExecutor.classMap['App\\Person']);
     });
 
-    test.todo('completes method return type saved to a set variable', async () => {
+    test('completes method return type saved to a set variable', async () => {
         const completions = await runCompletion(
             `{# @var something \\App\\SomeClass #}
             {% set person = something.getPerson() %}

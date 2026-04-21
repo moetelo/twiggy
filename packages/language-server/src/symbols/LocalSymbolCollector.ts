@@ -187,6 +187,12 @@ export class LocalSymbolCollector {
         if (!this.exprTypeResolver) return null;
 
         if (isDeclaration) {
+            if (varDeclarationNode.type === 'set') {
+                const valueNode = varDeclarationNode.childForFieldName('value');
+                if (!valueNode) return null;
+                return await this.exprTypeResolver.resolveExpression(valueNode, this.localSymbols);
+            }
+
             return await this.exprTypeResolver.resolveExpression(varDeclarationNode, this.localSymbols);
         }
 
