@@ -38,11 +38,18 @@ export class DiagnosticProvider {
     ) {
     }
 
-    refresh(twigCodeStyleFixer: TwigCodeStyleFixer | null) {
+    async refresh(twigCodeStyleFixer: TwigCodeStyleFixer | null) {
         this.#twigCodeStyleFixer = twigCodeStyleFixer;
         this.#lintMap.clear();
 
-        void this.lintWorkspace();
+        await this.lintWorkspace();
+
+        // Environment/template mappings may have just changed — revalidate every
+        // cached document so stale diagnostics (e.g. "Template not found"
+        // emitted against the initial EmptyEnvironment) are cleared on the client.
+        for (const document of this.documentCache.documents.values()) {
+            await this.validateReport(document);
+        }
     }
 
     async validateNode(node: SyntaxNode, document: Document): Promise<Diagnostic | null> {
