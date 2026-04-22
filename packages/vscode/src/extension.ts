@@ -32,11 +32,36 @@ export async function activate(context: ExtensionContext) {
         added.forEach((folder) => addWorkspaceFolder(folder, context));
         removed.forEach((folder) => removeWorkspaceFolder(folder));
     });
+
+    context.subscriptions.push(
+        commands.registerCommand('twiggy.restartLanguageServer', restartLanguageServers),
+    );
 }
 
 export async function deactivate(): Promise<void> {
     for (const client of clients.values()) {
         await client.stop();
+    }
+}
+
+async function restartLanguageServers(): Promise<void> {
+    if (clients.size === 0) {
+        window.showInformationMessage('Twiggy: no active language server to restart.');
+        return;
+    }
+
+    try {
+        await Promise.all(
+            [...clients.entries()].map(async ([folderPath, client]) => {
+                await client.restart();
+                outputChannel.appendLine('Language server restarted for: ' + folderPath);
+            }),
+        );
+        window.showInformationMessage('Twiggy: language server restarted.');
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        outputChannel.appendLine('Failed to restart language server: ' + message);
+        window.showErrorMessage('Twiggy: failed to restart language server: ' + message);
     }
 }
 

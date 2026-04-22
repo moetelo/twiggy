@@ -9,7 +9,8 @@
     "vscode": "^1.88.0"
   },
   "activationEvents": [
-    "onLanguage:twig"
+    "onLanguage:twig",
+    "onCommand:twiggy.restartLanguageServer"
   ],
   "main": "./dist/extension.js",
   "publisher": "moetelo",
@@ -34,6 +35,13 @@
     "typecheck": "tsc"
   },
   "contributes": {
+    "commands": [
+      {
+        "command": "twiggy.restartLanguageServer",
+        "title": "Restart Language Server",
+        "category": "Twiggy"
+      }
+    ],
     "configuration": {
       "title": "Twiggy",
       "properties": {
