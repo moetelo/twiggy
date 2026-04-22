@@ -661,7 +661,9 @@ Types declaration
   (types
     (types_required_declaration
       (variable)
-      (string))))
+      (union_type
+        (primitive_type)
+        (primitive_type)))))
 
 ==================
 Types several declarations
@@ -675,27 +677,37 @@ Types several declarations
   (types
     (types_required_declaration
       (variable)
-      (string))
+      (union_type
+        (primitive_type)
+        (primitive_type)))
     (types_optional_declaration
       (variable)
-      (string))))
+      (primitive_type))))
 
 ==================
 Types enclosed with braces
 ==================
 {% types {
   foo: 'string|bool',
-  score?: 'int',
+  baz?: '\Iterator&\Countable',
 } %}
 ---
 (template
   (types
     (types_required_declaration
       (variable)
-      (string))
+      (union_type
+        (primitive_type)
+        (primitive_type)))
     (types_optional_declaration
       (variable)
-      (string))))
+      (intersection_type
+        (qualified_name
+          (namespace)
+          (php_identifier))
+        (qualified_name
+          (namespace)
+          (php_identifier))))))
 
 ==================
 Use

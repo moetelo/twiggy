@@ -602,13 +602,13 @@ module.exports = grammar({
     types_required_declaration: ($) => seq(
         field('variable', alias($.identifier, $.variable)),
         ':',
-        field('type', $.string),
+        string(field('type', $._type)),
       ),
 
     types_optional_declaration: ($) => seq(
         field('variable', alias($.identifier, $.variable)),
         '?:',
-        field('type', $.string),
+        string(field('type', $._type)),
       ),
 
     use: ($) =>
@@ -706,6 +706,20 @@ function source_elements($, fieldName = 'body') {
  */
 function statement($, ...args) {
   return seq($._statement_start, ...args, $._statement_stop);
+}
+
+/**
+ * Creates a rule to match a single-quoted or double-quoted enclosed rule.
+ *
+ * @param {Rule} rule
+ *
+ * @return {ChoiceRule}
+ */
+function string(rule) {
+  return choice(
+    seq('"', rule, '"'),
+    seq("'", rule, "'"),
+  );
 }
 
 /**
