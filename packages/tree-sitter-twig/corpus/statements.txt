@@ -651,6 +651,52 @@ Set block
       (output
         (variable))
       (content))))
+
+==================
+Types declaration
+==================
+{% types foo: 'string|bool' %}
+---
+(template
+  (types
+    (types_required_declaration
+      (variable)
+      (string))))
+
+==================
+Types several declarations
+==================
+{% types
+  foo: 'string|bool',
+  score?: 'int',
+%}
+---
+(template
+  (types
+    (types_required_declaration
+      (variable)
+      (string))
+    (types_optional_declaration
+      (variable)
+      (string))))
+
+==================
+Types enclosed with braces
+==================
+{% types {
+  foo: 'string|bool',
+  score?: 'int',
+} %}
+---
+(template
+  (types
+    (types_required_declaration
+      (variable)
+      (string))
+    (types_optional_declaration
+      (variable)
+      (string))))
+
 ==================
 Use
 ==================

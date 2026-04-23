@@ -583,6 +583,34 @@ module.exports = grammar({
         alias('endsandbox', 'keyword'),
       ),
 
+    types: ($) =>
+      statement(
+        $,
+        alias('types', 'keyword'),
+        seq(
+          optional('{'),
+          commaSep1(
+            choice(
+              field('types_required_declaration', $.types_required_declaration),
+              field('types_optional_declaration', $.types_optional_declaration),
+            )
+          ),
+          optional('}'),
+        ),
+      ),
+
+    types_required_declaration: ($) => seq(
+        field('variable', alias($.identifier, $.variable)),
+        ':',
+        field('type', $.string),
+      ),
+
+    types_optional_declaration: ($) => seq(
+        field('variable', alias($.identifier, $.variable)),
+        '?:',
+        field('type', $.string),
+      ),
+
     use: ($) =>
       statement(
         $,
@@ -635,6 +663,7 @@ module.exports = grammar({
         $.sandbox,
         $.set,
         $.set_block,
+        $.types,
         $.use,
         $.verbatim,
         $.with,
