@@ -899,7 +899,7 @@
             "name": "meta.hash.twig"
         },
         "twig-keywords": {
-            "match": "(?<=\\s)((?:end)?(?:autoescape|block|embed|filter|for|if|macro|raw|sandbox|set|spaceless|trans|verbatim)|as|do|else|elseif|extends|flush|from|ignore missing|import|include|only|use|with)(?=\\s)",
+            "match": "(?<=\\s)((?:end)?(?:autoescape|block|embed|filter|for|if|macro|raw|sandbox|set|spaceless|trans|verbatim)|as|do|else|elseif|extends|flush|from|ignore missing|import|include|only|types|use|with)(?=\\s)",
             "name": "keyword.control.twig"
         },
         "twig-functions-warg": {
