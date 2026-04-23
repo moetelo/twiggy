@@ -11,12 +11,20 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
     static supportedTypes = new Set([
         'call_expression',
         'member_expression',
+        'types_optional_declaration',
+        'types_required_declaration',
         'variable',
         'var_declaration',
         // TODO: handle these
         // 'subscript_expression',
         // 'filter_expression',
         // 'parenthesized_expression',
+    ]);
+
+    static variableDeclarationTypes = new Set([
+        'types_optional_declaration',
+        'types_required_declaration',
+        'var_declaration',
     ]);
 
     constructor(
@@ -67,7 +75,7 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
             return variable.reflectedType;
         }
 
-        if (expr.type === 'var_declaration') {
+        if (ExpressionTypeResolver.variableDeclarationTypes.has(expr.type)) {
             const typeNode = expr.childForFieldName('type');
 
             if (!typeNode) return null;

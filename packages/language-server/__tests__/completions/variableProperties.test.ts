@@ -110,9 +110,25 @@ describe('variableProperties (PHP type resolution)', () => {
         );
     };
 
-    test('completes properties of a typed variable', async () => {
+    test('completes properties of a typed variable annotation', async () => {
         const completions = await runCompletion(
             `{# @var something \\App\\SomeClass #}
+            {{ something.$0 }}`,
+        );
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\SomeClass']);
+    });
+
+    test('completes properties of a types required variable declaration', async () => {
+        const completions = await runCompletion(
+            `{% types something: '\\App\\SomeClass' %}
+            {{ something.$0 }}`,
+        );
+        assertExpectedType(completions, MockPhpExecutor.classMap['App\\SomeClass']);
+    });
+
+    test('completes properties of a types optional variable declaration', async () => {
+        const completions = await runCompletion(
+            `{% types something?: '\\App\\SomeClass' %}
             {{ something.$0 }}`,
         );
         assertExpectedType(completions, MockPhpExecutor.classMap['App\\SomeClass']);

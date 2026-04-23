@@ -94,6 +94,11 @@ export class LocalSymbolCollector {
                     continue;
                 }
 
+                case 'types': {
+                    await this.#visitTypes(cursor.currentNode);
+                    continue;
+                }
+
                 case 'macro': {
                     await this.#visitMacro(cursor.currentNode);
                     continue;
@@ -163,6 +168,19 @@ export class LocalSymbolCollector {
             symbols: scopedSymbolCollector.localSymbols,
         };
         this.localSymbols.macro.push(macroWithSymbols);
+    }
+
+    async #visitTypes(currentNode: SyntaxNode) {
+        const typesVariableNodes = currentNode.namedChildren;
+        for (const variable of typesVariableNodes) {
+            switch (variable.type) {
+                case 'types_optional_declaration':
+                case 'types_required_declaration': {
+                    this.#visitVariableDeclaration(variable);
+                    continue;
+                }
+            }
+        }
     }
 
     async #visitVariableDeclaration(currentNode: SyntaxNode) {
