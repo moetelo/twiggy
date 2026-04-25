@@ -7,7 +7,6 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 env:
-  NPM_TOKEN: ${{ secrets.NPM_PAT }}
   VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
   OVSX_PAT: ${{ secrets.OPEN_VSX_TOKEN }}
 
@@ -33,6 +32,7 @@ jobs:
 
       - name: npm publish language-server
         working-directory: ./packages/language-server
+        env:
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_PAT }}
         run: |
-            npm config set "//registry.npmjs.org/:_authToken" "${NPM_TOKEN}"
-            npm publish --access public
+          bun publish --access public
