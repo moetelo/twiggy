@@ -1,7 +1,24 @@
+## 26.4.0 (2026-04-25)
+- Add grammar for `types` tag (#77)
+- feat(diagnostics): refresh on environment change (fixes Template not found error in some cases)
+- feat(vscode): add `twiggy.restartLanguageServer` command
+- fix: resolve reflected type for `set` tag declarations
+
+Thanks to @mcaskill for the contribution.
+
+### internal
+- chore: migrate from pnpm to Bun
+- test: add JSON-RPC smoke test; fix export type for IFrameworkTwigEnvironment
+- test: add parser-layer tests (incomplete nodes, token boundaries)
+- test: migrate flat tests to feature subfolders; adopt $0 cursor DSL
+- test: add __helpers__ infrastructure (fixtures DSL, mocks, parser, documentFromCode)
+
 ## 0.20.0 (2026-04-19)
 - Use HaaLeo/publish-vscode-extension for VS Code and Open VSX publishing (#73)
 - fix: use LSP-compliant dynamic file watcher registration (#75)
 - Fix PHP 8+ deprecation warnings breaking JSON parsing (#72)
+
+Thanks to @Swahjak for the contributions.
 
 ## 0.19.1 (2025-05-22)
 - Collect references from items of array literals
