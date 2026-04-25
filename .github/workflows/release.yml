@@ -21,7 +21,7 @@ jobs:
         with:
           bun-version-file: .github/.bun-version
 
-      - run: bun install --frozen-lockfile
+      - run: bun ci
 
       - run: bun run build
 
