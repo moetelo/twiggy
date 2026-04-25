@@ -810,6 +810,7 @@ export const twigKeywords: KeywordCompletionItem[] = [
     { label: 'import' },
     { label: 'include' },
     { label: 'sandbox' },
+    { label: 'types' },
     { label: 'use' },
     { label: 'verbatim' },
     { label: 'with' },

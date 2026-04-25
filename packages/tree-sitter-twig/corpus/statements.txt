@@ -651,6 +651,64 @@ Set block
       (output
         (variable))
       (content))))
+
+==================
+Types declaration
+==================
+{% types foo: 'string|bool' %}
+---
+(template
+  (types
+    (types_required_declaration
+      (variable)
+      (union_type
+        (primitive_type)
+        (primitive_type)))))
+
+==================
+Types several declarations
+==================
+{% types
+  foo: 'string|bool',
+  score?: 'int',
+%}
+---
+(template
+  (types
+    (types_required_declaration
+      (variable)
+      (union_type
+        (primitive_type)
+        (primitive_type)))
+    (types_optional_declaration
+      (variable)
+      (primitive_type))))
+
+==================
+Types enclosed with braces
+==================
+{% types {
+  foo: 'string|bool',
+  baz?: '\Iterator&\Countable',
+} %}
+---
+(template
+  (types
+    (types_required_declaration
+      (variable)
+      (union_type
+        (primitive_type)
+        (primitive_type)))
+    (types_optional_declaration
+      (variable)
+      (intersection_type
+        (qualified_name
+          (namespace)
+          (php_identifier))
+        (qualified_name
+          (namespace)
+          (php_identifier))))))
+
 ==================
 Use
 ==================
