@@ -163,7 +163,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@types/vscode": "^1.116.0",
+    "@types/vscode": "^1.88.0",
     "esbuild": "catalog:",
     "esbuild-plugin-copy": "^2.1.1",
     "typescript": "catalog:"
