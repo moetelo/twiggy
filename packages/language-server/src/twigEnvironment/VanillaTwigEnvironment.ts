@@ -1,8 +1,7 @@
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
-import { PhpUtilPath } from './PhpUtilPath';
 import { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
-import { SymfonyTwigDebugJsonOutput, parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
+import { parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
 import { RouteNameToPathRecord, TemplatePathMapping, TwigEnvironment } from './types';
 
 export class VanillaTwigEnvironment implements IFrameworkTwigEnvironment {
@@ -31,12 +30,7 @@ export class VanillaTwigEnvironment implements IFrameworkTwigEnvironment {
     }
 
     async #loadEnvironment(vanillaTwigEnvironmentPath: string): Promise<TwigEnvironment | null> {
-        const result = await this._phpExecutor.callJson<SymfonyTwigDebugJsonOutput>(
-            PhpUtilPath.printTwigEnvironment, [
-                vanillaTwigEnvironmentPath,
-            ]
-        );
-
+        const result = await this._phpExecutor.printTwigEnvironment(vanillaTwigEnvironmentPath);
         if (!result) {
             return null;
         }

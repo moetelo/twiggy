@@ -1,0 +1,11 @@
+{
+    "name": "twiggy/test-psr4-workspace",
+    "description": "Fixture for phpUtils integration tests.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

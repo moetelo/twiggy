@@ -1,8 +1,7 @@
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { EmptyEnvironment, IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
-import { PhpUtilPath } from './PhpUtilPath';
 import { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
-import { SymfonyTwigDebugJsonOutput, parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
+import { parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
 import { TemplatePathMapping, TwigEnvironment } from './types';
 
 export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
@@ -16,8 +15,8 @@ export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
         return this.#environment;
     }
 
-    async refresh({ workspaceDirectory }: TwigEnvironmentArgs): Promise<void> {
-        this.#environment = await this.#loadEnvironment(workspaceDirectory);
+    async refresh(_args: TwigEnvironmentArgs): Promise<void> {
+        this.#environment = await this.#loadEnvironment();
     }
 
     get templateMappings(): TemplatePathMapping[] {
@@ -26,13 +25,8 @@ export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
             : EmptyEnvironment.templateMappings;
     }
 
-    async #loadEnvironment(workspaceDirectory: string): Promise<TwigEnvironment | null> {
-        const result = await this._phpExecutor.callJson<SymfonyTwigDebugJsonOutput>(
-            PhpUtilPath.getCraftTwig, [
-                workspaceDirectory,
-            ]
-        );
-
+    async #loadEnvironment(): Promise<TwigEnvironment | null> {
+        const result = await this._phpExecutor.printCraftTwigEnvironment();
         if (!result) {
             return null;
         }

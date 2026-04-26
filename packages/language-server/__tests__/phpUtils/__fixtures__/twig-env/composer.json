@@ -1,0 +1,9 @@
+{
+    "name": "twiggy/test-twig-env",
+    "description": "Vanilla Twig environment fixture for phpUtils integration tests.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "twig/twig": "^3.0"
+    }
+}
