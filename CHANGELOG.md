@@ -1,3 +1,8 @@
+## 26.4.1 (2026-04-26)
+- fix(reflectType): language server fatal-erroring on primitives and incorrect types ([#57](https://github.com/moetelo/twiggy/issues/57))
+  - skip trying to require_once a non-existent file
+  - provide an empty json output for non-resolved types.
+
 ## 26.4.0 (2026-04-25)
 - Add grammar for `types` tag (#77)
 - feat(diagnostics): refresh on environment change (fixes Template not found error in some cases)
