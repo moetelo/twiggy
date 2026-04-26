@@ -52,6 +52,10 @@ export class PhpExecutor implements IPhpExecutor {
             return null;
         }
 
+        if (!result.stdout) {
+            return null;
+        }
+
         return JSON.parse(result.stdout) as TResult;
     }
 

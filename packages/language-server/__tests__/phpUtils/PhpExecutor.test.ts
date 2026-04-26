@@ -79,18 +79,10 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         expect(result.properties.find((p) => p.name === 'prop')?.type).toBe('int');
     });
 
-    test('reflectType bubbles a fatal error for unknown classes', async () => {
+    test('reflectType does not bubble a fatal error for unknown classes', async () => {
         requireInstalled();
-        // findFile returns false for unknown classes; reflectType currently
-        // requires the empty result, producing a fatal error and invalid JSON
-        // on stdout. Pin the current behavior so future graceful-failure work
-        // has a regression to update.
-        const errSpy = spyOn(console, 'error').mockImplementation(() => {});
-        try {
-            await expect(executor.reflectType('App\\DoesNotExist')).rejects.toThrow();
-        } finally {
-            errSpy.mockRestore();
-        }
+        expect(() => executor.reflectType('string')).not.toThrow();
+        expect(() => executor.reflectType('App\\DoesNotExist')).not.toThrow();
     });
 
     test('getClassDefinition resolves a PSR-4 class to its source file', async () => {
