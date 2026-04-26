@@ -30,8 +30,8 @@
   "scripts": {
     "vscode:prepublish": "",
     "clean": "rm -rf ./dist ./node_modules",
-    "build": "bun ./build/index.mjs",
-    "dev": "bun ./build/index.mjs --dev",
+    "build": "bun ./build",
+    "dev": "bun ./build --dev",
     "typecheck": "tsc"
   },
   "contributes": {

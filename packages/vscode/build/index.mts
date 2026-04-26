@@ -1,18 +1,14 @@
-// @ts-check
-
 import { execSync } from 'node:child_process';
 import * as esbuild from 'esbuild';
-import { cpSync as cp, rmSync as rm, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
+import { cp, rm } from 'node:fs/promises';
 import copyPlugin from 'esbuild-plugin-copy';
 
 const isDev = process.argv.includes('--dev');
 
 const grammarWasmPath = '../tree-sitter-twig/tree-sitter-twig.wasm';
 
-/**
- * @type {esbuild.Plugin}
- */
-const triggerVscodeDebug = {
+const triggerVscodeDebug: esbuild.Plugin = {
     name: 'trigger-vscode-problem-matcher-debug',
     setup(build) {
         let isFirstBuild = true;
@@ -26,10 +22,7 @@ const triggerVscodeDebug = {
     },
 };
 
-/**
- * @type {esbuild.Plugin}
- */
-const watchLogPlugin = {
+const watchLogPlugin: esbuild.Plugin = {
     name: 'watch-log-plugin',
     setup(build) {
         let start = performance.now();
@@ -46,7 +39,7 @@ const watchLogPlugin = {
     },
 };
 
-const buildOptions = /** @type {const} @satisfies {esbuild.BuildOptions} */ ({
+const buildOptions = {
     entryPoints: {
         extension: './src/extension.ts',
         server: '../language-server/src/index.ts',
@@ -78,11 +71,11 @@ const buildOptions = /** @type {const} @satisfies {esbuild.BuildOptions} */ ({
             ],
         }),
     ],
-});
+} as const satisfies esbuild.BuildOptions;
 
 async function main() {
-    rm('./dist', { force: true, recursive: true });
-    rm('../language-server/dist', { force: true, recursive: true });
+    await rm('./dist', { force: true, recursive: true });
+    await rm('../language-server/dist', { force: true, recursive: true });
 
     const grammarWasmExists = existsSync(grammarWasmPath);
     console.info({ grammarWasmExists });
@@ -101,8 +94,8 @@ async function main() {
     await ctx.rebuild();
     await ctx.dispose();
 
-    cp('./dist', '../language-server/dist', { recursive: true });
-    rm('../language-server/dist/extension.js');
+    await cp('./dist', '../language-server/dist', { recursive: true });
+    await rm('../language-server/dist/extension.js');
 }
 
 main();
