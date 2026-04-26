@@ -164,9 +164,9 @@
   "devDependencies": {
     "@types/node": "^25.6.0",
     "@types/vscode": "^1.116.0",
-    "esbuild": "^0.28.0",
+    "esbuild": "catalog:",
     "esbuild-plugin-copy": "^2.1.1",
-    "typescript": "^6.0.3"
+    "typescript": "catalog:"
   },
   "dependencies": {
     "twiggy-language-server": "workspace:*",

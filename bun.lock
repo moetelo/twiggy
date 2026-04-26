@@ -21,8 +21,8 @@
         "@types/bun": "latest",
         "@types/node": "^25.6.0",
         "bun-types": "^1.3.13",
-        "esbuild": "^0.28.0",
-        "typescript": "^6.0.3",
+        "esbuild": "catalog:",
+        "typescript": "catalog:",
       },
     },
     "packages/tree-sitter-twig": {
@@ -45,9 +45,9 @@
       "devDependencies": {
         "@types/node": "^25.6.0",
         "@types/vscode": "^1.116.0",
-        "esbuild": "^0.28.0",
+        "esbuild": "catalog:",
         "esbuild-plugin-copy": "^2.1.1",
-        "typescript": "^6.0.3",
+        "typescript": "catalog:",
       },
     },
   },
@@ -55,6 +55,10 @@
     "esbuild",
     "tree-sitter-cli",
   ],
+  "catalog": {
+    "esbuild": "^0.28.0",
+    "typescript": "^6.0.3",
+  },
   "packages": {
     "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.28.0", "", { "os": "aix", "cpu": "ppc64" }, "sha512-lhRUCeuOyJQURhTxl4WkpFTjIsbDayJHih5kZC1giwE+MhIzAb7mEsQMqMf18rHLsrb5qI1tafG20mLxEWcWlA=="],
 

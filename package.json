@@ -7,9 +7,15 @@
   },
   "private": true,
   "packageManager": "bun@1.3.12",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "catalog": {
+      "esbuild": "^0.28.0",
+      "typescript": "^6.0.3"
+    }
+  },
   "trustedDependencies": [
     "esbuild",
     "tree-sitter-cli"
