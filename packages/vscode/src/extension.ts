@@ -1,3 +1,4 @@
+import * as path from 'node:path';
 import {
     workspace,
     ExtensionContext,
@@ -75,7 +76,7 @@ async function addWorkspaceFolder(
         return;
     }
 
-    const module = require.resolve('./server');
+    const module = path.join(__dirname, 'server.js');
 
     const serverOptions: ServerOptions = {
         run: { module, transport: TransportKind.ipc },
