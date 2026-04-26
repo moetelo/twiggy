@@ -16,6 +16,12 @@ if (str_starts_with($INSTANCE_CLASS, '\\')) {
 
 $phpFilePath = $loader->findFile($INSTANCE_CLASS);
 if (!$phpFilePath) {
+    $result = [
+        'properties' => [],
+        'methods' => [],
+    ];
+
+    echo json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
     exit(0);
 }
 
