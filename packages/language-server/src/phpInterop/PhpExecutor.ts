@@ -30,17 +30,9 @@ export class PhpExecutor implements IPhpExecutor {
         });
 
         if (result.stderr) {
-            console.error(
-                `Command "${command} ${args.join(' ')}" failed with following message:`,
-                result.stderr,
-            );
-
-            console.error(
-                "stdout:\n",
-                result.stdout,
-                "stderr:\n",
-                result.stderr,
-            );
+            console.error(`${command} ${args.join(' ')}`);
+            console.error('stdout:', result.stdout);
+            console.error('stderr:\n', result.stderr);
         }
 
         return result;

@@ -15,6 +15,10 @@ if (str_starts_with($INSTANCE_CLASS, '\\')) {
 }
 
 $phpFilePath = $loader->findFile($INSTANCE_CLASS);
+if (!$phpFilePath) {
+    exit(0);
+}
+
 require_once $phpFilePath;
 
 $refClass = new \ReflectionClass($INSTANCE_CLASS);
