@@ -12,6 +12,7 @@
       "packages/*"
     ],
     "catalog": {
+      "@types/node": "^20.12.7",
       "esbuild": "^0.28.0",
       "typescript": "^6.0.3"
     }
