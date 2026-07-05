@@ -154,6 +154,7 @@ module.exports = grammar({
       choice(
         $.subscript_expression,
         $.member_expression,
+        $.optional_member_expression,
         $.filter_expression,
         $.parenthesized_expression,
         alias($.identifier, $.variable),
@@ -233,6 +234,16 @@ module.exports = grammar({
         ),
         '=>',
         field('expr', $.expression),
+      ),
+
+    optional_member_expression: ($) =>
+      prec(
+        'member',
+        seq(
+          field('object', choice($.expression, $.primary_expression)),
+          '?.',
+          field('property', alias(choice($.identifier, /[0-9]+/), $.property)),
+        ),
       ),
 
     member_expression: ($) =>
