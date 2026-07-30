@@ -60,6 +60,39 @@ describe('locals', () => {
         assert.deepEqual(variable.references, rangesOf(code, 'variable0'));
     });
 
+    // A variable used only inside one of these tags used to be collected with no
+    // references at all, because `collect()` skipped the tag's whole subtree --
+    // which surfaced as a spurious "Unused variable" diagnostic.
+    const tagsHoldingExpressions: ReadonlyArray<readonly [string, string]> = [
+        ['include', `{% set variable0 = 1 %}{% include 'p' with { key: variable0 } only %}`],
+        ['autoescape', `{% set variable0 = 1 %}{% autoescape %}{{ variable0 }}{% endautoescape %}`],
+        ['sandbox', `{% set variable0 = 1 %}{% sandbox %}{{ variable0 }}{% endsandbox %}`],
+        ['do', `{% set variable0 = 1 %}{% do variable0 %}`],
+        ['deprecated', `{% set variable0 = 1 %}{% deprecated variable0 %}`],
+    ];
+
+    for (const [tag, code] of tagsHoldingExpressions) {
+        test(`collects variable reference inside of ${tag}`, async () => {
+            const locals = await collect(code);
+
+            assert.strictEqual(locals.variable.length, 1);
+            const variable = locals.variable[0];
+            assert.strictEqual(variable.name, 'variable0');
+            assert.deepEqual(variable.nameRange, rangeOf(code, 'variable0'));
+            assert.deepEqual(variable.references, [rangeOf(code, 'variable0', 1)]);
+        });
+    }
+
+    // Guards the exclusion above: `apply` is not walked, so the filter name in
+    // the chained form must not become a local. Adding `apply` to the set
+    // regresses this.
+    test('does not register a filter name from `apply` as a variable', async () => {
+        const code = `{% apply trim|nl2br %}text{% endapply %}`;
+        const locals = await collect(code);
+
+        assert.deepEqual(locals.variable.map((variable) => variable.name), []);
+    });
+
     const testOneVariable = async (varName: string, code: string, scope?: LocalSymbolInformation) => {
         if (!scope) {
             scope = await collect(code);
