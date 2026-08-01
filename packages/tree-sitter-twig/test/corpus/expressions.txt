@@ -320,6 +320,42 @@ Member expression deeper
         (property))
       (property))))
 
+
+==================
+Optional member expression
+==================
+{{ user?.name }}
+---
+(template
+  (output
+    (optional_member_expression
+      (variable)
+      (property))))
+
+==================
+Optional member expression index
+==================
+{{ arr?.0 }}
+---
+(template
+  (output
+    (optional_member_expression
+      (variable)
+      (property))))
+
+==================
+Optional member expression deeper
+==================
+{{ user?.name?.first }}
+---
+(template
+  (output
+    (optional_member_expression
+      (optional_member_expression
+        (variable)
+        (property))
+      (property))))
+
 ==================
 Subscript expression
 ==================
