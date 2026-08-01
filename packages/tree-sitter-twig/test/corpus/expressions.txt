@@ -321,9 +321,7 @@ Member expression deeper
       (property))))
 
 
-==================
 Optional member expression
-==================
 {{ user?.name }}
 ---
 (template
@@ -332,9 +330,7 @@ Optional member expression
       (variable)
       (property))))
 
-==================
 Optional member expression index
-==================
 {{ arr?.0 }}
 ---
 (template
@@ -343,9 +339,7 @@ Optional member expression index
       (variable)
       (property))))
 
-==================
 Optional member expression deeper
-==================
 {{ user?.name?.first }}
 ---
 (template
