@@ -4,7 +4,7 @@
   "description": "Twig language server: autocomplete, go to definition, hovers, inlay hints and diagnostics for Symfony and Craft CMS templates",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
-  "version": "26.4.1",
+  "version": "26.8.0",
   "engines": {
     "vscode": "^1.88.0"
   },

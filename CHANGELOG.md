@@ -1,3 +1,9 @@
+## 26.8.0 (2026-08-01)
+- fix: moved tree-sitter tests from corpus/ to test/corpus for the tree-sitter CLI to pick them up when running tree-sitter test (#80)
+- feat(grammar): #79 null safe member access grammar (#81)
+
+Thanks to @sully-vian for the contributions.
+
 ## 26.4.1 (2026-04-26)
 - fix(reflectType): language server fatal-erroring on primitives and incorrect types ([#57](https://github.com/moetelo/twiggy/issues/57))
   - skip trying to require_once a non-existent file
