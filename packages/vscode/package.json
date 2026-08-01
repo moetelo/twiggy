@@ -1,7 +1,7 @@
 {
   "name": "twiggy",
   "displayName": "Twiggy",
-  "description": "Twig language support for VS Code",
+  "description": "Twig language server: autocomplete, go to definition, hovers, inlay hints and diagnostics for Symfony and Craft CMS templates",
   "author": "Mikhail Gunin <gunka462@gmail.com>",
   "license": "Mozilla Public License 2.0",
   "version": "26.4.1",
@@ -20,7 +20,18 @@
     "directory": "packages/vscode"
   },
   "keywords": [
-    "Twig"
+    "twig",
+    "symfony",
+    "craft cms",
+    "php",
+    "template",
+    "language server",
+    "lsp",
+    "autocomplete",
+    "intellisense",
+    "snippets",
+    "formatter",
+    "linter"
   ],
   "categories": [
     "Programming Languages",

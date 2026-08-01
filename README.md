@@ -6,6 +6,22 @@ VSCode Marketplace: [Twiggy](https://marketplace.visualstudio.com/items?itemName
 
 This is a fork of [kaermorchen/twig-language-server (Modern Twig)](https://github.com/kaermorchen/twig-language-server).
 
+## Why Twiggy?
+
+Twiggy is a real language server for Twig, not just a syntax highlighter.
+
+| | Twiggy | [Twig Language 2](https://marketplace.visualstudio.com/items?itemName=mblode.twig-language-2) | [Twig](https://marketplace.visualstudio.com/items?itemName=whatwedo.twig) |
+|---|:---:|:---:|:---:|
+| Language server (LSP) | ✅ | ❌ | ❌ |
+| Autocomplete, framework-aware (Symfony, Craft CMS) | ✅ | ❌ | ❌ |
+| Go to definition (variables, templates, blocks) | ✅ | ❌ | ❌ |
+| Hovers & signature help | ✅ | hover only | ❌ |
+| Inlay hints | ✅ | ❌ | ❌ |
+| Diagnostics & formatting | [Twig-CS-Fixer](https://github.com/VincentLanglet/Twig-CS-Fixer) | PrettyDiff | ❌ |
+| Syntax highlighting | ✅ + semantic tokens | ✅ | ✅ |
+| Snippets | ✅ | ✅ | ✅ |
+| Neovim / Sublime Text support | ✅ | ❌ | ❌ |
+
 ## Definition
 ![Definition for variables](https://github.com/moetelo/twiggy/assets/17011936/e24c1d26-1606-4354-a5b4-9d28976c983b)
 ![Definition for templates and blocks](https://github.com/moetelo/twiggy/assets/17011936/d192a359-d2c1-471b-bd08-79c847cfeb9e)
