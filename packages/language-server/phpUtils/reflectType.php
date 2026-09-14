@@ -80,7 +80,7 @@ foreach ($methods as $method) {
         $propertyName = getPropertyName($methodName);
         $completionProperties[] = [
             'name' => $propertyName,
-            'type' => $method->getReturnType()?->getName() ?? '',
+            'type' => $method->getReturnType() ? typeToString($method->getReturnType()) : '',
         ];
     }
 
