@@ -31,6 +31,31 @@ const nodesToDiveInto: ReadonlySet<string> = new Set([
     'array',
     'pair',
     'source_elements',
+
+    // Tags whose whole subtree is expressions, and so is safe to walk flat.
+    // Without these the walker skips the tag entirely, so a variable used only
+    // inside one is never marked as referenced and is reported as unused.
+    //
+    // Kept narrow on purpose. A tag belongs here only if it neither introduces a
+    // scope nor has a field that is something other than an expression:
+    //
+    //   `embed`   scopes its body and owns its blocks, so its symbols belong to
+    //             the embedded template, not this one.
+    //   `with`    scopes its body, and its context keys are bindings.
+    //   `apply`   its `filter` field is not an expression scope: in the chained
+    //             form the first filter parses as a `variable`.
+    //   `cache`   its `key` field is an expression, so a bare keyword there --
+    //             `{% cache globally %}` -- would be collected as a local.
+    //   `tag`     the generic node for unknown tags parses every argument as an
+    //             expression, so bare keywords become locals.
+    //   `use`     nothing to find: block-name aliases sit in `as_operator`
+    //             nodes, which are not walked, and its template name is a
+    //             string literal.
+    'include',
+    'autoescape',
+    'sandbox',
+    'do',
+    'deprecated',
 ]);
 
 export class LocalSymbolCollector {
