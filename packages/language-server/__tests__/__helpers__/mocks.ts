@@ -1,3 +1,6 @@
+import { PassThrough } from 'node:stream';
+import type { Connection } from 'vscode-languageserver';
+import { createConnection, StreamMessageReader, StreamMessageWriter } from 'vscode-languageserver/node';
 import type { IPhpExecutor } from 'phpInterop/IPhpExecutor';
 import type { ReflectedType } from 'phpInterop/ReflectedType';
 import type { IFrameworkTwigEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
@@ -7,6 +10,17 @@ export const MockEnvironment: IFrameworkTwigEnvironment = {
     ...EmptyEnvironment,
     templateMappings: [ { namespace: '', directory: '' }],
 };
+
+/**
+ * A real `Connection` over in-memory streams, for tests that need one but do
+ * not exercise it. Nothing reads the output stream; override the methods a
+ * test observes instead of sending through it.
+ * @returns A connection that is never listened on.
+ */
+export const createNullConnection = (): Connection => createConnection(
+    new StreamMessageReader(new PassThrough()),
+    new StreamMessageWriter(new PassThrough()),
+);
 
 export class MockPhpExecutor implements IPhpExecutor {
     static classMap: Record<string, ReflectedType> = {

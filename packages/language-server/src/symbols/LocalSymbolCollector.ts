@@ -59,14 +59,7 @@ const nodesToDiveInto: ReadonlySet<string> = new Set([
 ]);
 
 export class LocalSymbolCollector {
-    localSymbols: LocalSymbolInformation = {
-        variableDefinition: undefined as any, // ctor init
-        extends: undefined,
-        variable: [],
-        macro: [],
-        block: [],
-        imports: [],
-    };
+    localSymbols: LocalSymbolInformation;
 
     private readonly exprTypeResolver: ExpressionTypeResolver | null = null;
 
@@ -75,7 +68,14 @@ export class LocalSymbolCollector {
         private readonly typeResolver: ITypeResolver | null,
         variableDefinitionMap = new Map<string, TwigImport | TwigVariableDeclaration>(),
     ) {
-        this.localSymbols.variableDefinition = variableDefinitionMap;
+        this.localSymbols = {
+            variableDefinition: variableDefinitionMap,
+            extends: undefined,
+            variable: [],
+            macro: [],
+            block: [],
+            imports: [],
+        };
 
         if (this.typeResolver) {
             this.exprTypeResolver = new ExpressionTypeResolver(this.typeResolver);

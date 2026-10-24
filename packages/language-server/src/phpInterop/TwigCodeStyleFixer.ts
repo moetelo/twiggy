@@ -11,6 +11,10 @@ const severityToDiagnosticSeverity = {
     warning: DiagnosticSeverity.Warning,
 };
 
+type ReportSeverity = keyof typeof severityToDiagnosticSeverity;
+
+const isReportSeverity = (value: string): value is ReportSeverity => value in severityToDiagnosticSeverity;
+
 enum TwigCodeStyleAction {
     Lint = 'lint',
     Fix = 'fix',
@@ -53,10 +57,10 @@ export class TwigCodeStyleFixer {
                 continue;
             }
 
-            const [severity, filePath, line, col, message] = match.slice(1) as [
-                keyof typeof severityToDiagnosticSeverity,
-                ...string[],
-            ];
+            const [severity, filePath, line, col, message] = match.slice(1);
+            if (!isReportSeverity(severity)) {
+                continue;
+            }
 
             const fullFilePath = path.join(this._workspaceDirectory, filePath);
             const fileUri = toDocumentUri(fullFilePath);

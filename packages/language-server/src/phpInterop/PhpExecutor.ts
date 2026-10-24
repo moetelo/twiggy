@@ -45,6 +45,7 @@ export class PhpExecutor implements IPhpExecutor {
             return null;
         }
 
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- The caller declares the shape of the PHP script's JSON output; there is no runtime schema.
         return JSON.parse(result.stdout) as TResult;
     }
 

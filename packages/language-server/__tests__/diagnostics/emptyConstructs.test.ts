@@ -4,11 +4,12 @@ import { Document } from 'documents/Document';
 import { DiagnosticProvider } from 'diagnostics';
 import { createDocumentCache } from '../__helpers__/documentFromCode';
 import { parseRange } from '../__helpers__/fixtures';
+import { createNullConnection } from '../__helpers__/mocks';
 import { initializeTestParser } from '../__helpers__/parser';
 
 describe('diagnostics — empty constructs', () => {
     const documentCache = createDocumentCache();
-    const diagnosticProvider = new DiagnosticProvider(null as any, documentCache);
+    const diagnosticProvider = new DiagnosticProvider(createNullConnection(), documentCache);
 
     beforeAll(initializeTestParser);
 

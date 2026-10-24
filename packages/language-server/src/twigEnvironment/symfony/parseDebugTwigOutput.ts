@@ -3,13 +3,14 @@ import type {
     TemplatePathMapping,
     TwigEnvironment,
     TwigFunctionLike,
+    TwigGlobalValue,
     TwigVariable,
 } from '../types';
 
 export interface SymfonyTwigDebugJsonOutput {
     functions: Record<string, string[]>;
     filters: Record<string, string[]>;
-    globals: Record<string, {} | string | number>;
+    globals: Record<string, TwigGlobalValue>;
     loader_paths: Record<string, string[]>;
     tests: string[];
 }
@@ -25,15 +26,18 @@ const toFunctionLike = ([identifier, args]: [string, string[] | null]): TwigFunc
     }),
 });
 
-const toTwigVariable = ([identifier, value]: [string, any]): TwigVariable => ({
+const toTwigVariable = ([identifier, value]: [string, TwigGlobalValue]): TwigVariable => ({
     identifier,
     value,
 });
 
+const isTemplateNamespace = (value: string): value is TemplateNamespace => value === '' || value.startsWith('@');
+
 const toTemplateMappings = ([namespaceRaw, directories]: [string, string[]]): TemplatePathMapping[] => {
-    const namespace: TemplateNamespace = namespaceRaw === '(None)'
-        ? ''
-        : namespaceRaw as TemplateNamespace;
+    // Symfony reports the main namespace as '(None)'.
+    const namespace: TemplateNamespace = isTemplateNamespace(namespaceRaw)
+        ? namespaceRaw
+        : '';
 
     return directories.map((directory) => ({
         namespace,

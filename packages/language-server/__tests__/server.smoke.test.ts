@@ -9,6 +9,9 @@ import { PassThrough } from 'node:stream';
 import { setTimeout as delay } from 'node:timers/promises';
 import type {
     InitializeParams,
+    InitializeResult,
+    CompletionItem,
+    CompletionList,
     CompletionParams,
     DidOpenTextDocumentParams,
 } from 'vscode-languageserver/node';
@@ -55,18 +58,19 @@ describe('server smoke', () => {
 
         const initParams: InitializeParams = {
             processId: null,
+            // oxlint-disable-next-line typescript/no-deprecated -- required by InitializeParams; real clients still send it
             rootUri: 'file:///tmp',
             capabilities: {},
             workspaceFolders: [{ name: 'test', uri: 'file:///tmp' }],
         };
 
-        const result = await clientConn.sendRequest('initialize', initParams);
-        const caps = (result as any).capabilities;
+        const result = await clientConn.sendRequest<Partial<InitializeResult>>('initialize', initParams);
+        const caps = result.capabilities;
 
         assert.ok(caps, 'capabilities missing from initialize result');
         assert.ok(caps.completionProvider, 'completionProvider not advertised');
-        assert.ok(caps.hoverProvider, 'hoverProvider not advertised');
-        assert.ok(caps.definitionProvider, 'definitionProvider not advertised');
+        assert.ok(Boolean(caps.hoverProvider), 'hoverProvider not advertised');
+        assert.ok(Boolean(caps.definitionProvider), 'definitionProvider not advertised');
         assert.ok(caps.semanticTokensProvider, 'semanticTokensProvider not advertised');
 
         clientConn.end();
@@ -106,13 +110,16 @@ describe('server smoke', () => {
             position: { line: 0, character: `{% set variable = 123 %}{{`.length },
         };
 
-        const result = await clientConn.sendRequest('textDocument/completion', completionParams);
-        const items: any[] = Array.isArray(result) ? result : (result as any)?.items ?? [];
+        const result = await clientConn.sendRequest<CompletionList | CompletionItem[] | null>(
+            'textDocument/completion',
+            completionParams,
+        );
+        const items = Array.isArray(result) ? result : result?.items ?? [];
 
         assert.ok(items.length > 0, 'expected at least one completion item');
         assert.ok(
-            items.some((i: any) => i.label === 'variable'),
-            `expected 'variable' in completions, got: ${items.map((i: any) => i.label).slice(0, 10).join(', ')}`,
+            items.some((i) => i.label === 'variable'),
+            `expected 'variable' in completions, got: ${items.map((i) => i.label).slice(0, 10).join(', ')}`,
         );
 
         clientConn.end();

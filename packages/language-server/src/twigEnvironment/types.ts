@@ -8,9 +8,12 @@ export type TwigFunctionLike = {
     arguments: FunctionArgument[],
 };
 
+/** JSON value of a Twig global: a scalar, or an object for non-scalars. */
+export type TwigGlobalValue = string | number | boolean | object;
+
 export type TwigVariable = {
     identifier: string,
-    value: string,
+    value: TwigGlobalValue,
 };
 
 export type TemplateNamespace = `@${string}` | '';

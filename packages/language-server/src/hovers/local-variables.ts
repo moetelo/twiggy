@@ -2,7 +2,6 @@ import type { SyntaxNode } from 'web-tree-sitter';
 import type { Hover } from 'vscode-languageserver';
 import type { Document } from '../documents';
 import { pointToPosition } from '../utils/position';
-import type { TwigImport, TwigVariableDeclaration } from '../symbols/types';
 import { isTwigImport } from '../symbols/types';
 
 export function localVariables(document: Document, cursorNode: SyntaxNode): Hover | undefined {
@@ -12,7 +11,7 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Hove
         pointToPosition(cursorNode.startPosition),
     );
 
-    const result = locals.find(({ name }) => name === cursorNode.text) as TwigImport | TwigVariableDeclaration | undefined;
+    const result = locals.find(({ name }) => name === cursorNode.text);
 
     if (!result) return undefined;
 
@@ -25,7 +24,7 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Hove
         };
     }
 
-    if (result.type) {
+    if ('type' in result && typeof result.type === 'string' && result.type) {
         return {
             contents: {
                 kind: 'markdown',
@@ -34,7 +33,7 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Hove
         };
     }
 
-    if (result.value) {
+    if ('value' in result && typeof result.value === 'string' && result.value) {
         return {
             contents: {
                 kind: 'markdown',

@@ -32,6 +32,64 @@ import type { DiagnosticProvider } from 'diagnostics';
 import type { FormattingProvider } from 'formatting/FormattingProvider';
 import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
 
+/** Settings as the client sends them: fields with a server-side fallback may be missing. */
+type ClientSettings = Omit<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'>
+    & Partial<Pick<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'>>;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null;
+}
+
+function isClientSettings(value: unknown): value is ClientSettings {
+    return isRecord(value);
+}
+
+function readClientSettings(settings: unknown, section: string): ClientSettings | undefined {
+    if (!isRecord(settings)) return undefined;
+
+    const sectionSettings = settings[section];
+    return isClientSettings(sectionSettings) ? sectionSettings : undefined;
+}
+
+function resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecutor) {
+    switch (framework) {
+        case PhpFrameworkOption.Symfony: {
+            return new SymfonyTwigEnvironment(phpExecutor);
+        }
+        case PhpFrameworkOption.Craft: {
+            return new CraftTwigEnvironment(phpExecutor);
+        }
+        case PhpFrameworkOption.Twig: {
+            return new VanillaTwigEnvironment(phpExecutor);
+        }
+        default: {
+            return null;
+        }
+    }
+}
+
+async function tryGuessFramework(workspaceDirectory: string): Promise<PhpFramework | undefined> {
+    const composerJsonPath = `${workspaceDirectory}/composer.json`;
+    if (!await isFile(composerJsonPath)) {
+        return undefined;
+    }
+
+    const composerJson: unknown = JSON.parse(await readFile(composerJsonPath, 'utf8'));
+    const dependencies = isRecord(composerJson) ? composerJson.require : undefined;
+    if (!isRecord(dependencies)) {
+        return undefined;
+    }
+
+    if ('symfony/twig-bundle' in dependencies) {
+        return PhpFrameworkOption.Symfony;
+    }
+    if ('craftcms/cms' in dependencies) {
+        return PhpFrameworkOption.Craft;
+    }
+
+    return undefined;
+}
+
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
 
@@ -59,12 +117,14 @@ export class ConfigurationManager {
         private readonly diagnosticProvider: DiagnosticProvider,
         private readonly formattingProvider: FormattingProvider,
     ) {
-        connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
-        connection.onDidChangeConfiguration(this.onDidChangeConfiguration.bind(this));
+        void connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
+        connection.onDidChangeConfiguration((params) => {
+            void this.onDidChangeConfiguration(params);
+        });
     }
 
     async onDidChangeConfiguration({ settings }: DidChangeConfigurationParams) {
-        const config: LanguageServerSettings = settings?.[this.configurationSection] || this.defaultSettings;
+        const config: ClientSettings = readClientSettings(settings, this.configurationSection) ?? this.defaultSettings;
 
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
@@ -76,10 +136,10 @@ export class ConfigurationManager {
         }
 
         const workspaceDirectory = documentUriToFsPath(this.workspaceFolder.uri);
-        if (!config.framework) {
-            config.framework = await this.#tryGuessFramework(workspaceDirectory);
+        if (config.framework === undefined) {
+            config.framework = await tryGuessFramework(workspaceDirectory);
 
-            if (!config.framework) {
+            if (config.framework === undefined) {
                 console.warn('`twiggy.framework` is required.');
                 return;
             }
@@ -92,7 +152,12 @@ export class ConfigurationManager {
             ? new TwigCodeStyleFixer(phpExecutor, workspaceDirectory)
             : null;
 
-        const twigEnvironment = this.#resolveTwigEnvironment(config.framework, phpExecutor);
+        const twigEnvironment = resolveTwigEnvironment(config.framework, phpExecutor);
+        if (!twigEnvironment) {
+            console.warn(`Unknown \`twiggy.framework\`: ${config.framework}`);
+            return;
+        }
+
         await twigEnvironment.refresh({
             symfonyConsolePath: config.symfonyConsolePath,
             vanillaTwigEnvironmentPath: config.vanillaTwigEnvironmentPath,
@@ -109,35 +174,6 @@ export class ConfigurationManager {
         this.applySettings(twigEnvironment, phpExecutor, twigCodeStyleFixer);
     }
 
-    #resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecutor) {
-        switch (framework) {
-            case PhpFrameworkOption.Symfony: {
-                return new SymfonyTwigEnvironment(phpExecutor);
-            }
-            case PhpFrameworkOption.Craft: {
-                return new CraftTwigEnvironment(phpExecutor);
-            }
-            case PhpFrameworkOption.Twig: {
-                return new VanillaTwigEnvironment(phpExecutor);
-            }
-        }
-    }
-
-    async #tryGuessFramework(workspaceDirectory: string): Promise<PhpFramework | undefined> {
-        const composerJsonPath = `${workspaceDirectory}/composer.json`;
-        if (!await isFile(composerJsonPath)) {
-            return undefined;
-        }
-
-        const composerJson = await readFile(composerJsonPath, 'utf8').then(JSON.parse);
-        if (composerJson.require['symfony/twig-bundle']) {
-            return PhpFrameworkOption.Symfony;
-        }
-        if (composerJson.require['craftcms/cms']) {
-            return PhpFrameworkOption.Craft;
-        }
-    }
-
     private applySettings(
         frameworkEnvironment: IFrameworkTwigEnvironment,
         phpExecutor: PhpExecutor | null,
@@ -150,7 +186,7 @@ export class ConfigurationManager {
         this.signatureHelpProvider.reindex(frameworkEnvironment);
         this.documentCache.configure(frameworkEnvironment, typeResolver);
 
-        this.diagnosticProvider.refresh(twigCodeStyleFixer);
+        void this.diagnosticProvider.refresh(twigCodeStyleFixer);
         this.formattingProvider.refresh(twigCodeStyleFixer);
     }
 }

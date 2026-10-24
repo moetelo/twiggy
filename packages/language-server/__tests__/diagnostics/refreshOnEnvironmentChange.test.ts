@@ -1,12 +1,13 @@
 import { describe, test, beforeAll } from 'bun:test';
 import * as assert from 'node:assert/strict';
 import * as path from 'node:path';
-import type { Connection, Diagnostic, PublishDiagnosticsParams } from 'vscode-languageserver';
+import type { Diagnostic, PublishDiagnosticsParams } from 'vscode-languageserver';
 import { DiagnosticProvider } from 'diagnostics';
 import { DocumentCache } from 'documents/DocumentCache';
 import type { IFrameworkTwigEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
 import { EmptyEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
 import { toDocumentUri } from 'utils/uri';
+import { createNullConnection } from '../__helpers__/mocks';
 import { initializeTestParser } from '../__helpers__/parser';
 
 const FIXTURE_ROOT = path.join(__dirname, '__fixtures__', 'template-refresh');
@@ -15,11 +16,10 @@ const BASE_TWIG = path.join(APP_DIR, 'templates', 'base.html.twig');
 
 const makeSpyConnection = () => {
     const publishes: PublishDiagnosticsParams[] = [];
-    const connection = {
-        sendDiagnostics: async (params: PublishDiagnosticsParams) => {
-            publishes.push(params);
-        },
-    } as unknown as Connection;
+    const connection = createNullConnection();
+    connection.sendDiagnostics = async (params) => {
+        publishes.push(params);
+    };
     return { connection, publishes };
 };
 
