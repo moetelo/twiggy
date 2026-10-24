@@ -27,8 +27,15 @@
     "build-grammar-wasm": "bun run --cwd ./packages/tree-sitter-twig build-wasm",
     "test": "bun run --cwd ./packages/language-server test",
     "typecheck": "bun run --cwd ./packages/language-server typecheck && bun run --cwd ./packages/vscode typecheck",
+    "lint": "oxlint",
+    "knip": "knip && knip --production --strict",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist && bun run --cwd ./packages/tree-sitter-twig clean"
   },
   "author": "Mikhail Gunin <gunka462@gmail.com>",
-  "license": "Mozilla Public License 2.0"
+  "license": "Mozilla Public License 2.0",
+  "devDependencies": {
+    "knip": "^6.43.0",
+    "oxlint": "^1.89.0",
+    "oxlint-tsgolint": "^7.0.2005"
+  }
 }

@@ -53,18 +53,18 @@ function readClientSettings(settings: unknown, section: string): ClientSettings 
 
 function resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecutor) {
     switch (framework) {
-        case PhpFrameworkOption.Symfony: {
+        case PhpFrameworkOption.Symfony:
             return new SymfonyTwigEnvironment(phpExecutor);
-        }
-        case PhpFrameworkOption.Craft: {
+
+        case PhpFrameworkOption.Craft:
             return new CraftTwigEnvironment(phpExecutor);
-        }
-        case PhpFrameworkOption.Twig: {
+
+        case PhpFrameworkOption.Twig:
             return new VanillaTwigEnvironment(phpExecutor);
-        }
-        default: {
+
+        default:
             return null;
-        }
+
     }
 }
 

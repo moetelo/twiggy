@@ -3,3 +3,4 @@ packages/vscode/dist
 packages/language-server/dist
 .vscode/settings.json
 *.vsix
+.claude/

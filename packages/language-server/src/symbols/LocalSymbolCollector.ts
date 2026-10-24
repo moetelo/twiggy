@@ -97,47 +97,47 @@ export class LocalSymbolCollector {
             }
 
             switch (cursor.nodeType) {
-                case 'extends': {
+                case 'extends':
                     this.#visitExtends(cursor.currentNode);
                     continue;
-                }
 
-                case 'import': {
+
+                case 'import':
                     this.#visitImport(cursor.currentNode);
                     continue;
-                }
 
-                case 'block': {
+
+                case 'block':
                     await this.#visitBlock(cursor.currentNode);
                     continue;
-                }
+
 
                 case 'set':
                 case 'set_block':
-                case 'var_declaration': {
+                case 'var_declaration':
                     await this.#visitVariableDeclaration(cursor.currentNode);
                     continue;
-                }
 
-                case 'types': {
+
+                case 'types':
                     await this.#visitTypes(cursor.currentNode);
                     continue;
-                }
 
-                case 'macro': {
+
+                case 'macro':
                     await this.#visitMacro(cursor.currentNode);
                     continue;
-                }
 
-                case 'for': {
+
+                case 'for':
                     await this.#visitFor(cursor.currentNode);
                     continue;
-                }
 
-                case 'variable': {
+
+                case 'variable':
                     await this.#visitVariable(cursor.currentNode);
                     continue;
-                }
+
 
                 // No default
             }
@@ -207,10 +207,10 @@ export class LocalSymbolCollector {
         for (const variable of typesVariableNodes) {
             switch (variable.type) {
                 case 'types_optional_declaration':
-                case 'types_required_declaration': {
+                case 'types_required_declaration':
                     await this.#visitVariableDeclaration(variable);
                     continue;
-                }
+
 
                 // No default
             }
