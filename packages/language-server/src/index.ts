@@ -12,6 +12,4 @@ if (!__DEBUG__) {
     console.error = connection.console.error.bind(connection.console);
 }
 
-new Server(connection);
-
-connection.listen();
+new Server(connection).listen();

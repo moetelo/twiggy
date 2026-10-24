@@ -1,12 +1,17 @@
 import type {
     Connection,
+    DidChangeWatchedFilesParams,
+    InitializeError,
     InitializeParams,
+    InitializeResult,
     ServerCapabilities,
     WorkspaceFolder,
 } from 'vscode-languageserver';
 import {
     DidChangeWatchedFilesNotification,
+    ErrorCodes,
     FileChangeType,
+    ResponseError,
     TextDocuments,
     WatchKind,
 } from 'vscode-languageserver';
@@ -29,6 +34,29 @@ import { ReferenceProvider } from './references/ReferenceProvider';
 import { RenameProvider } from './references/RenameProvider';
 import { FormattingProvider } from 'formatting/FormattingProvider';
 
+const capabilities: ServerCapabilities = {
+    hoverProvider: true,
+    definitionProvider: true,
+    documentSymbolProvider: true,
+    completionProvider: {
+        resolveProvider: true,
+        triggerCharacters: ['<', '"', "'", '|', '.', '{', '\\'],
+    },
+    signatureHelpProvider: {
+        triggerCharacters: ['(', ','],
+    },
+    semanticTokensProvider: {
+        legend: semanticTokensLegend,
+        full: true,
+    },
+    inlayHintProvider: true,
+    referencesProvider: true,
+    documentFormattingProvider: true,
+    renameProvider: {
+        prepareProvider: true,
+    },
+};
+
 export class Server {
     readonly documents = new TextDocuments(TextDocument);
     documentCache!: DocumentCache;
@@ -44,107 +72,21 @@ export class Server {
     renameProvider!: RenameProvider;
     diagnosticProvider!: DiagnosticProvider;
     formattingProvider!: FormattingProvider;
+    semanticTokensProvider!: SemanticTokensProvider;
+    symbolProvider!: SymbolProvider;
+    hoverProvider!: HoverProvider;
+    isInsideHtmlRegionCommandProvider!: IsInsideHtmlRegionCommandProvider;
+    configurationManager!: ConfigurationManager;
 
-    constructor(connection: Connection) {
-        connection.onInitialize(async (initializeParams: InitializeParams) => {
-            this.workspaceFolder = initializeParams.workspaceFolders![0];
-            this.#hasDynamicFileWatcherSupport =
-                initializeParams.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration ?? false;
+    constructor(private readonly connection: Connection) {
+        connection.onInitialize(this.#onInitialize.bind(this));
 
-            const documentCache = new DocumentCache(this.workspaceFolder);
-            this.documentCache = documentCache;
-
-            this.diagnosticProvider = new DiagnosticProvider(connection, documentCache);
-            await initializeParser();
-
-            new SemanticTokensProvider(connection, documentCache);
-            new SymbolProvider(connection, documentCache);
-            new HoverProvider(connection, documentCache);
-            this.signatureHelpProvider = new SignatureHelpProvider(connection, documentCache);
-            this.referenceProvider = new ReferenceProvider(connection, documentCache);
-            this.renameProvider = new RenameProvider(connection, documentCache);
-            this.definitionProvider = new DefinitionProvider(
-                connection,
-                documentCache,
-                this.workspaceFolder,
-            );
-            this.completionProvider = new CompletionProvider(
-                connection,
-                documentCache,
-                this.workspaceFolder,
-            );
-            this.inlayHintProvider = new InlayHintProvider(connection, documentCache);
-            new IsInsideHtmlRegionCommandProvider(connection, documentCache);
-            this.formattingProvider = new FormattingProvider(connection, this.diagnosticProvider);
-            this.bracketSpacesInsertionProvider = new BracketSpacesInsertionProvider(
-                connection,
-                this.documents,
-            );
-
-            const capabilities: ServerCapabilities = {
-                hoverProvider: true,
-                definitionProvider: true,
-                documentSymbolProvider: true,
-                completionProvider: {
-                    resolveProvider: true,
-                    triggerCharacters: ['<', '"', "'", '|', '.', '{', '\\'],
-                },
-                signatureHelpProvider: {
-                    triggerCharacters: ['(', ','],
-                },
-                semanticTokensProvider: {
-                    legend: semanticTokensLegend,
-                    full: true,
-                },
-                inlayHintProvider: true,
-                referencesProvider: true,
-                documentFormattingProvider: true,
-                renameProvider: {
-                    prepareProvider: true,
-                },
-            };
-
-            return {
-                capabilities,
-            };
+        connection.onInitialized(() => {
+            void this.#onInitialized();
         });
 
-        connection.onInitialized(async () => {
-            if (this.#hasDynamicFileWatcherSupport) {
-                await connection.client.register(DidChangeWatchedFilesNotification.type, {
-                    watchers: [
-                        {
-                            globPattern: '**/*.twig',
-                            kind: WatchKind.Create | WatchKind.Change | WatchKind.Delete,
-                        },
-                    ],
-                });
-            }
-
-            new ConfigurationManager(
-                connection,
-                this.definitionProvider,
-                this.inlayHintProvider,
-                this.bracketSpacesInsertionProvider,
-                this.completionProvider,
-                this.signatureHelpProvider,
-                this.documentCache,
-                this.workspaceFolder,
-                this.diagnosticProvider,
-                this.formattingProvider,
-            );
-
-            await this.diagnosticProvider.lintWorkspace();
-        });
-
-        connection.onDidChangeWatchedFiles(async (params) => {
-            for (const change of params.changes) {
-                if (change.type === FileChangeType.Deleted) {
-                    this.documentCache.remove(change.uri);
-                } else {
-                    await this.documentCache.refresh(change.uri);
-                }
-            }
+        connection.onDidChangeWatchedFiles((params) => {
+            void this.#onDidChangeWatchedFiles(params);
         });
 
         this.documents.onDidSave(async ({ document }) => {
@@ -155,7 +97,95 @@ export class Server {
             const doc = await this.documentCache.updateText(document.uri, document.getText());
             await this.diagnosticProvider.validateReport(doc);
         });
+    }
 
-        this.documents.listen(connection);
+    listen() {
+        this.documents.listen(this.connection);
+        this.connection.listen();
+    }
+
+    async #onInitialize(initializeParams: InitializeParams): Promise<InitializeResult | ResponseError<InitializeError>> {
+        const workspaceFolder = initializeParams.workspaceFolders?.at(0);
+        if (!workspaceFolder) {
+            return new ResponseError(ErrorCodes.InvalidParams, 'Twiggy needs a workspace folder.', { retry: false });
+        }
+
+        const { connection } = this;
+        this.workspaceFolder = workspaceFolder;
+        this.#hasDynamicFileWatcherSupport =
+            initializeParams.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration ?? false;
+
+        const documentCache = new DocumentCache(workspaceFolder);
+        this.documentCache = documentCache;
+
+        this.diagnosticProvider = new DiagnosticProvider(connection, documentCache);
+        await initializeParser();
+
+        this.semanticTokensProvider = new SemanticTokensProvider(connection, documentCache);
+        this.symbolProvider = new SymbolProvider(connection, documentCache);
+        this.hoverProvider = new HoverProvider(connection, documentCache);
+        this.signatureHelpProvider = new SignatureHelpProvider(connection, documentCache);
+        this.referenceProvider = new ReferenceProvider(connection, documentCache);
+        this.renameProvider = new RenameProvider(connection, documentCache);
+        this.definitionProvider = new DefinitionProvider(
+            connection,
+            documentCache,
+            workspaceFolder,
+        );
+        this.completionProvider = new CompletionProvider(
+            connection,
+            documentCache,
+            workspaceFolder,
+        );
+        this.inlayHintProvider = new InlayHintProvider(connection, documentCache);
+        this.isInsideHtmlRegionCommandProvider = new IsInsideHtmlRegionCommandProvider(connection, documentCache);
+        this.formattingProvider = new FormattingProvider(connection, this.diagnosticProvider);
+        this.bracketSpacesInsertionProvider = new BracketSpacesInsertionProvider(
+            connection,
+            this.documents,
+        );
+
+        return {
+            capabilities,
+        };
+    }
+
+    async #onInitialized() {
+        if (this.#hasDynamicFileWatcherSupport) {
+            await this.connection.client.register(DidChangeWatchedFilesNotification.type, {
+                watchers: [
+                    {
+                        globPattern: '**/*.twig',
+                        // oxlint-disable-next-line no-bitwise -- WatchKind is a bit set.
+                        kind: WatchKind.Create | WatchKind.Change | WatchKind.Delete,
+                    },
+                ],
+            });
+        }
+
+        this.configurationManager = new ConfigurationManager(
+            this.connection,
+            this.definitionProvider,
+            this.inlayHintProvider,
+            this.bracketSpacesInsertionProvider,
+            this.completionProvider,
+            this.signatureHelpProvider,
+            this.documentCache,
+            this.workspaceFolder,
+            this.diagnosticProvider,
+            this.formattingProvider,
+        );
+
+        await this.diagnosticProvider.lintWorkspace();
+    }
+
+    async #onDidChangeWatchedFiles(params: DidChangeWatchedFilesParams) {
+        for (const change of params.changes) {
+            if (change.type === FileChangeType.Deleted) {
+                this.documentCache.remove(change.uri);
+            } else {
+                await this.documentCache.refresh(change.uri);
+            }
+        }
     }
 }

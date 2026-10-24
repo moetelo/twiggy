@@ -1,21 +1,23 @@
 import * as path from 'node:path';
 import Parser from 'web-tree-sitter';
 
-export let parser!: Parser;
+let parserPromise: Promise<Parser> | null = null;
 
-export const initializeParser = async (wasmPath?: string) => {
-    if (parser) {
-        return parser;
-    }
-
+const loadParser = async (wasmPath: string): Promise<Parser> => {
     await Parser.init();
-    parser = new Parser();
-
-    if (!wasmPath) {
-        wasmPath = path.join(__dirname, 'tree-sitter-twig.wasm');
-    }
-
+    const parser = new Parser();
     parser.setLanguage(await Parser.Language.load(wasmPath));
-
     return parser;
+};
+
+/**
+ * Loads the Twig grammar once; later calls return the same parser.
+ * @param wasmPath Path to `tree-sitter-twig.wasm`. Only the first call's path is used.
+ * @returns The shared parser.
+ */
+export const initializeParser = async (
+    wasmPath = path.join(__dirname, 'tree-sitter-twig.wasm'),
+): Promise<Parser> => {
+    parserPromise ??= loadParser(wasmPath);
+    return parserPromise;
 };

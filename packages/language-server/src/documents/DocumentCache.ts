@@ -5,7 +5,7 @@ import * as path from 'node:path';
 import { resolveTemplate } from '../utils/files/resolveTemplate';
 import type { IFrameworkTwigEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
 import { EmptyEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
-import { parser } from '../utils/parser';
+import { initializeParser } from '../utils/parser';
 import { LocalSymbolCollector } from '../symbols/LocalSymbolCollector';
 import type { ITypeResolver } from '../typing/ITypeResolver';
 import { readFile } from 'node:fs/promises';
@@ -47,6 +47,7 @@ export class DocumentCache {
     async setText(document: Document, text?: string) {
         document.text = text ?? await readFile(documentUriToFsPath(document.uri), 'utf8');
 
+        const parser = await initializeParser();
         document.tree = parser.parse(document.text);
         document.locals = await new LocalSymbolCollector(document.tree.rootNode, this.#typeResolver).collect();
     }

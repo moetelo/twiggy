@@ -52,8 +52,7 @@ describe('server smoke', () => {
     test('initialize returns expected capabilities', async () => {
         const { serverConn, clientConn } = makeInMemoryConnectionPair();
 
-        new Server(serverConn);
-        serverConn.listen();
+        new Server(serverConn).listen();
         clientConn.listen();
 
         const initParams: InitializeParams = {
@@ -80,8 +79,7 @@ describe('server smoke', () => {
     test('textDocument/completion returns items for a simple template', async () => {
         const { serverConn, clientConn } = makeInMemoryConnectionPair();
 
-        new Server(serverConn);
-        serverConn.listen();
+        new Server(serverConn).listen();
         clientConn.listen();
 
         await clientConn.sendRequest('initialize', {
