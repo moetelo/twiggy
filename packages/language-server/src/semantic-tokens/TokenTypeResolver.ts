@@ -20,7 +20,7 @@ export class TokenTypeResolver {
     }
 
     get methodTokenType() {
-        return this.#tokenTypes.get(SemanticTokenTypes.method)!;
+        return this.#tokenTypes.get(SemanticTokenTypes.method);
     }
 
     resolve(node: TreeCursor) {
@@ -36,7 +36,7 @@ export class TokenTypeResolver {
 
         if (
             node.nodeType === 'property' &&
-            node.currentNode.parent!.nextSibling?.type === 'arguments'
+            node.currentNode.parent?.nextSibling?.type === 'arguments'
         ) {
             return this.methodTokenType;
         }

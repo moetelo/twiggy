@@ -8,8 +8,9 @@ import type {
 import { getNodeRange, getStringNodeValue } from '../utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 
-export function toBlock(node: SyntaxNode): Omit<TwigBlock, 'symbols'> {
-    const nameNode = node.childForFieldName('name')!;
+export function toBlock(node: SyntaxNode): Omit<TwigBlock, 'symbols'> | undefined {
+    const nameNode = node.childForFieldName('name');
+    if (!nameNode) return undefined;
 
     return {
         name: nameNode.text,
@@ -18,8 +19,9 @@ export function toBlock(node: SyntaxNode): Omit<TwigBlock, 'symbols'> {
     };
 }
 
-export function toVariable(node: SyntaxNode): TwigVariableDeclaration {
-    const variableNode = node.childForFieldName('variable')!;
+export function toVariable(node: SyntaxNode): TwigVariableDeclaration | undefined {
+    const variableNode = node.childForFieldName('variable');
+    if (!variableNode) return undefined;
 
     const type = node.type === 'set_block'
         ? 'string'
@@ -36,8 +38,10 @@ export function toVariable(node: SyntaxNode): TwigVariableDeclaration {
     };
 }
 
-export function toMacro(node: SyntaxNode): Omit<TwigMacro, 'symbols'> {
-    const nameNode = node.childForFieldName('name')!;
+export function toMacro(node: SyntaxNode): Omit<TwigMacro, 'symbols'> | undefined {
+    const nameNode = node.childForFieldName('name');
+    if (!nameNode) return undefined;
+
     const argumentsNode = node.childForFieldName('arguments');
 
     const variableArgs = argumentsNode?.descendantsOfType('variable')
@@ -45,21 +49,23 @@ export function toMacro(node: SyntaxNode): Omit<TwigMacro, 'symbols'> {
             name: argumentNode.text,
             nameRange: getNodeRange(argumentNode),
             range: getNodeRange(argumentNode),
-        })) || [];
+        })) ?? [];
 
     const namedArgs = argumentsNode
         ?.descendantsOfType('named_argument')
-        .map((argumentNode): FunctionArgument => {
-            const argNameNode = argumentNode.childForFieldName('key')!;
-            const value = argumentNode.childForFieldName('value')!.text;
+        .flatMap((argumentNode): FunctionArgument[] => {
+            const argNameNode = argumentNode.childForFieldName('key');
+            if (!argNameNode) return [];
 
-            return {
+            const value = argumentNode.childForFieldName('value')?.text;
+
+            return [{
                 name: argNameNode.text,
                 nameRange: getNodeRange(argNameNode),
                 value,
                 range: getNodeRange(argumentNode),
-            };
-        }) || [];
+            }];
+        }) ?? [];
 
     return {
         name: nameNode.text,
@@ -77,9 +83,10 @@ function resolveImportPath(pathNode: SyntaxNode) {
     return undefined;
 }
 
-export function toImport(node: SyntaxNode): TwigImport {
-    const pathNode = node.childForFieldName('expr')!;
-    const aliasNode = node.childForFieldName('variable')!;
+export function toImport(node: SyntaxNode): TwigImport | undefined {
+    const pathNode = node.childForFieldName('expr');
+    const aliasNode = node.childForFieldName('variable');
+    if (!pathNode || !aliasNode) return undefined;
 
     return {
         name: aliasNode.text,

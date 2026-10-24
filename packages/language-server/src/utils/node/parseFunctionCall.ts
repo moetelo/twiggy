@@ -24,19 +24,21 @@ export const parseFunctionCall = (
     const isCall = !!node && node.type === 'call_expression';
     if (!isCall) return undefined;
 
-    const nameNode = node.childForFieldName('name')!;
+    const nameNode = node.childForFieldName('name');
+    if (!nameNode) return undefined;
 
     const objectNode = nameNode.childForFieldName('object');
     const functionNameNode = nameNode.type === 'function'
         ? nameNode
         : nameNode.childForFieldName('property');
+    if (!functionNameNode) return undefined;
 
     const argNodes = node.childForFieldName('arguments')?.namedChildren;
     const args = argNodes?.map((argNode) => toFunctionCallArgument(argNode)) ?? [];
 
     return {
         object: objectNode?.text,
-        name: functionNameNode!.text,
+        name: functionNameNode.text,
         args,
     };
 };

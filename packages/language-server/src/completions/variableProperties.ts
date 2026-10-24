@@ -33,7 +33,7 @@ const getVariableNode = (cursorNode: SyntaxNode) => {
         cursorNode.parent?.type === 'subscript_expression'
         && cursorNode.type === 'string'
     ) {
-        return cursorNode.parent.childForFieldName('object')!;
+        return cursorNode.parent.childForFieldName('object');
     }
 
     return null;
@@ -106,7 +106,7 @@ export async function variableProperties(
         if (!exprTypeResolver || !variable.reflectedType) return [];
 
         return reflectedTypeToCompletions(variable.reflectedType, {
-            includeMethods: cursorNode.parent!.type !== 'subscript_expression',
+            includeMethods: cursorNode.parent?.type !== 'subscript_expression',
         });
     }
 

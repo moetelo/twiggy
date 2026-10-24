@@ -20,7 +20,7 @@ const isInStringInsideOfPathCall = (cursorNode: SyntaxNode): boolean => {
         return false;
     }
 
-    const functionName = cursorNode.parent.parent!.childForFieldName('name')?.text;
+    const functionName = cursorNode.parent.parent?.childForFieldName('name')?.text;
     if (!functionName) return false;
 
     return ['path', 'is_route'].includes(functionName);

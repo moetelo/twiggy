@@ -6,8 +6,10 @@ const outputNodesToNamedChildCount = new Map([
     ['for', 2],
 ]);
 
-export const isEmptyEmbedded = (node: SyntaxNode) => outputNodesToNamedChildCount.has(node.type)
-    && node.namedChildCount < outputNodesToNamedChildCount.get(node.type)!;
+export const isEmptyEmbedded = (node: SyntaxNode) => {
+    const minNamedChildCount = outputNodesToNamedChildCount.get(node.type);
+    return minNamedChildCount !== undefined && node.namedChildCount < minNamedChildCount;
+};
 
 export const isInExpressionScope = (node: SyntaxNode) => isEmptyEmbedded(node)
     // Cursor might be in the `embedded_begin` node.

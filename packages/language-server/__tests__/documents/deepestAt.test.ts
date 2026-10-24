@@ -59,7 +59,9 @@ describe('Document.deepestAt for incomplete nodes', () => {
 
     test('empty if condition', async () => {
         const { cursorNode } = await documentWithCursor(`{% if$0 %}{% endif %}`);
+        const { parent } = cursorNode;
 
-        assert.equal(cursorNode.parent!.type, 'if');
+        assert.ok(parent);
+        assert.equal(parent.type, 'if');
     });
 });

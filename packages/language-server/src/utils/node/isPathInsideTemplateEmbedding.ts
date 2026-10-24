@@ -3,12 +3,13 @@ import type { SyntaxNode } from 'web-tree-sitter';
 import { parseFunctionCall } from './parseFunctionCall';
 
 export const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
-    if (node.type !== 'string' || !node.parent) {
+    const { parent } = node;
+    if (node.type !== 'string' || !parent) {
         return false;
     }
 
     const isInsideStatement = templateUsingStatements.includes(
-        node.parent.type,
+        parent.type,
     );
 
     if (isInsideStatement) {
@@ -16,9 +17,9 @@ export const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
     }
 
     const isInsideFunctionCall =
-        node.parent?.type === 'arguments' &&
+        parent.type === 'arguments' &&
         templateUsingFunctions.some((func) =>
-            parseFunctionCall(node.parent!.parent)?.name === func,
+            parseFunctionCall(parent.parent)?.name === func,
         );
 
     return isInsideFunctionCall;

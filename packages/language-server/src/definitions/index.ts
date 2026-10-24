@@ -109,7 +109,8 @@ export class DefinitionProvider {
 
         if (cursorNode.type === 'property') {
             const macroName = cursorNode.text;
-            const importName = cursorNode.parent!.firstChild!.text;
+            const importName = cursorNode.parent?.firstChild?.text;
+            if (importName === undefined) return undefined;
 
             const importedDocument = await this.documentCache.resolveImport(document, importName, params.position);
             if (!importedDocument) return undefined;

@@ -6,9 +6,10 @@ import type { SyntaxNode } from 'web-tree-sitter';
 import type { InlayHintSettings } from '../configuration/LanguageServerSettings';
 import type { DocumentCache } from '../documents';
 
-const toInlayHint = (node: SyntaxNode): InlayHint => {
+const toInlayHint = (node: SyntaxNode): InlayHint | undefined => {
     const range = getNodeRange(node);
-    const nameNode = node.childForFieldName('name')!;
+    const nameNode = node.childForFieldName('name');
+    if (!nameNode) return undefined;
 
     return {
         position: range.end,
@@ -73,7 +74,7 @@ export class InlayHintProvider {
                 && node.startPosition.row !== node.endPosition.row
             ) {
                 const hint = toInlayHint(node.currentNode);
-                inlayHints.push(hint);
+                if (hint) inlayHints.push(hint);
             }
         }
 

@@ -71,7 +71,7 @@ export class LocalSymbolCollector {
     private readonly exprTypeResolver: ExpressionTypeResolver | null = null;
 
     constructor(
-        private readonly tree: SyntaxNode,
+        private readonly tree: SyntaxNode | null,
         private readonly typeResolver: ITypeResolver | null,
         variableDefinitionMap = new Map<string, TwigImport | TwigVariableDeclaration>(),
     ) {
@@ -168,11 +168,14 @@ export class LocalSymbolCollector {
             return;
         }
 
+        const { parent } = currentNode;
+        if (!parent) return;
+
         const reflectedType = await this.#reflectVariableDeclarationType(currentNode);
         const implicitVariable: TwigVariableDeclaration = {
             name: currentNode.text,
             nameRange,
-            range: getNodeRange(currentNode.parent!),
+            range: getNodeRange(parent),
             // Implicitly defined variables are used in-place.
             // i.e. when you meet a variable for the first time,
             // it's "defined" and used in the same place.
@@ -185,7 +188,9 @@ export class LocalSymbolCollector {
 
     async #visitMacro(currentNode: SyntaxNode) {
         const macro = toMacro(currentNode);
-        const bodyNode = currentNode.childForFieldName('body')!;
+        if (!macro) return;
+
+        const bodyNode = currentNode.childForFieldName('body');
 
         const scopedSymbolCollector = new LocalSymbolCollector(bodyNode, this.typeResolver);
         await scopedSymbolCollector.collect();
@@ -214,6 +219,7 @@ export class LocalSymbolCollector {
 
     async #visitVariableDeclaration(currentNode: SyntaxNode) {
         const variableDeclaration = toVariable(currentNode);
+        if (!variableDeclaration) return;
 
         const alreadyDefinedVar = this.localSymbols.variableDefinition.get(variableDeclaration.name);
         if (alreadyDefinedVar) {
@@ -268,7 +274,9 @@ export class LocalSymbolCollector {
 
     async #visitBlock(currentNode: SyntaxNode) {
         const block = toBlock(currentNode);
-        const bodyNode = currentNode.childForFieldName('body')!;
+        if (!block) return;
+
+        const bodyNode = currentNode.childForFieldName('body');
 
         const scopedSymbolCollector = new LocalSymbolCollector(bodyNode, this.typeResolver, this.localSymbols.variableDefinition);
 
@@ -281,6 +289,8 @@ export class LocalSymbolCollector {
 
     #visitImport(currentNode: SyntaxNode) {
         const twigImport = toImport(currentNode);
+        if (!twigImport) return;
+
         this.localSymbols.imports.push(twigImport);
         this.localSymbols.variableDefinition.set(twigImport.name, twigImport);
     }

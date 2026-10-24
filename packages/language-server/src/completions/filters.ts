@@ -18,7 +18,7 @@ export function filters(cursorNode: SyntaxNode, environmentFilters: TwigFunction
     if (
         cursorNode.text === '|' ||
         (cursorNode.type === 'function' &&
-            cursorNode.parent!.type === 'filter_expression')
+            cursorNode.parent?.type === 'filter_expression')
     ) {
         const completionsPhp = environmentFilters.map(
             (func): CompletionItem => ({
