@@ -5,7 +5,7 @@
  */
 import { describe, test, beforeAll, expect } from 'bun:test';
 import assert from 'node:assert/strict';
-import { PassThrough } from 'stream';
+import { PassThrough } from 'node:stream';
 import type {
     InitializeParams,
     CompletionParams,

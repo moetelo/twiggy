@@ -1,7 +1,7 @@
-import type { Stats } from 'fs';
-import { stat } from 'fs/promises';
+import type { Stats } from 'node:fs';
+import { stat } from 'node:fs/promises';
 
-export const fileStat = (fsPath: string): Promise<Stats | null> => stat(fsPath).catch(() => null);
+export const fileStat = async (fsPath: string): Promise<Stats | null> => stat(fsPath).catch(() => null);
 
 export const isFile = async (fsPath: string): Promise<boolean> => {
     const stats = await fileStat(fsPath);

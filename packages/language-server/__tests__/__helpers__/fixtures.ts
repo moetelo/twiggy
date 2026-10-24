@@ -13,10 +13,10 @@ export const offsetToPosition = (text: string, offset: number): Position => {
 
 export const parseCursor = (src: string): { text: string; position: Position } => {
     const offset = src.indexOf(CURSOR);
-    if (offset < 0) {
+    if (offset === -1) {
         throw new Error('fixture missing `$0` cursor marker');
     }
-    if (src.indexOf(CURSOR, offset + CURSOR.length) >= 0) {
+    if (src.includes(CURSOR, offset + CURSOR.length)) {
         throw new Error('fixture has multiple `$0` markers; use parseRange for a pair');
     }
     const text = src.slice(0, offset) + src.slice(offset + CURSOR.length);
@@ -25,11 +25,11 @@ export const parseCursor = (src: string): { text: string; position: Position } =
 
 export const parseRange = (src: string): { text: string; range: Range } => {
     const first = src.indexOf(CURSOR);
-    if (first < 0) {
+    if (first === -1) {
         throw new Error('fixture missing `$0` markers');
     }
     const second = src.indexOf(CURSOR, first + CURSOR.length);
-    if (second < 0) {
+    if (second === -1) {
         throw new Error('fixture needs two `$0` markers for a range');
     }
     const text =

@@ -1,6 +1,6 @@
-import type { Dirent } from 'fs';
-import fs from 'fs/promises';
-import path from 'path';
+import type { Dirent } from 'node:fs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 const getFullPath = (dir: string, file: Dirent) => path.join(dir, file.name);
 

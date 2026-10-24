@@ -4,7 +4,7 @@ export type InlayHintSettings = {
     block: boolean,
 };
 
-export const enum PhpFrameworkOption {
+export enum PhpFrameworkOption {
     Ignore = 'ignore',
     Twig = 'twig',
     Symfony = 'symfony',

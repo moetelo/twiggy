@@ -63,7 +63,7 @@ describe('locals', () => {
     // A variable used only inside one of these tags used to be collected with no
     // references at all, because `collect()` skipped the tag's whole subtree --
     // which surfaced as a spurious "Unused variable" diagnostic.
-    const tagsHoldingExpressions: ReadonlyArray<readonly [string, string]> = [
+    const tagsHoldingExpressions: readonly (readonly [string, string])[] = [
         ['include', `{% set variable0 = 1 %}{% include 'p' with { key: variable0 } only %}`],
         ['autoescape', `{% set variable0 = 1 %}{% autoescape %}{{ variable0 }}{% endautoescape %}`],
         ['sandbox', `{% set variable0 = 1 %}{% sandbox %}{{ variable0 }}{% endsandbox %}`],
@@ -162,15 +162,15 @@ describe('locals', () => {
             const variable = locals.variable[i];
             const varName = varNames[i];
 
-            assert.strictEqual(variable.name, varName, varName + ' name');
-            assert.deepEqual(variable.nameRange, rangeOf(code, varName), varName + ' nameRange');
+            assert.strictEqual(variable.name, varName, `${varName} name`);
+            assert.deepEqual(variable.nameRange, rangeOf(code, varName), `${varName} nameRange`);
 
             // for-loop key/item declarations don't show up in `references`; other vars do
             const isForLoopVar = varName === keyVar || varName === itemVar;
             const expected = isForLoopVar
                 ? rangesOf(code, varName).slice(1)
                 : rangesOf(code, varName);
-            assert.deepEqual(variable.references, expected, varName + ' references');
+            assert.deepEqual(variable.references, expected, `${varName} references`);
         }
     });
 });

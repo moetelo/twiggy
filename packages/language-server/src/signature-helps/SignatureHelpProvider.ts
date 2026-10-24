@@ -64,7 +64,7 @@ export class SignatureHelpProvider {
         return {
             signatures: [signatureInformation],
             activeParameter,
-        } as SignatureHelp;
+        };
     }
 
     async getSignatureInformation(document: Document, functionName: string): Promise<SignatureInformation | undefined> {

@@ -27,7 +27,7 @@ import {
 } from '../twigEnvironment';
 import { TypeResolver } from '../typing/TypeResolver';
 import { isFile } from '../utils/files/fileStat';
-import { readFile } from 'fs/promises';
+import { readFile } from 'node:fs/promises';
 import type { DiagnosticProvider } from 'diagnostics';
 import type { FormattingProvider } from 'formatting/FormattingProvider';
 import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
@@ -84,7 +84,7 @@ export class ConfigurationManager {
                 return;
             }
 
-            console.info('Guessed `twiggy.framework`: ', config.framework);
+            console.info('Guessed `twiggy.framework`:', config.framework);
         }
 
         const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
@@ -99,7 +99,7 @@ export class ConfigurationManager {
             workspaceDirectory,
         });
 
-        if (null === twigEnvironment.environment) {
+        if (twigEnvironment.environment === null) {
             console.warn('Failed to load Twig environment.')
         } else {
             console.info('Successfully loaded Twig environment.')
@@ -111,12 +111,15 @@ export class ConfigurationManager {
 
     #resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecutor) {
         switch (framework) {
-            case PhpFrameworkOption.Symfony:
+            case PhpFrameworkOption.Symfony: {
                 return new SymfonyTwigEnvironment(phpExecutor);
-            case PhpFrameworkOption.Craft:
+            }
+            case PhpFrameworkOption.Craft: {
                 return new CraftTwigEnvironment(phpExecutor);
-            case PhpFrameworkOption.Twig:
+            }
+            case PhpFrameworkOption.Twig: {
                 return new VanillaTwigEnvironment(phpExecutor);
+            }
         }
     }
 
@@ -126,7 +129,7 @@ export class ConfigurationManager {
             return undefined;
         }
 
-        const composerJson = await readFile(composerJsonPath, 'utf-8').then(JSON.parse);
+        const composerJson = await readFile(composerJsonPath, 'utf8').then(JSON.parse);
         if (composerJson.require['symfony/twig-bundle']) {
             return PhpFrameworkOption.Symfony;
         }

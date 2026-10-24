@@ -55,23 +55,23 @@ export class MockPhpExecutor implements IPhpExecutor {
         },
     };
 
-    call(command: string, args: string[]): Promise<{ stdout: string; stderr: string; } | null> {
+    async call(command: string, args: string[]): Promise<{ stdout: string; stderr: string; } | null> {
         throw new Error('Method not implemented.');
     }
 
-    callJson<TResult>(command: string, args: string[]): Promise<TResult | null> {
+    async callJson<TResult>(command: string, args: string[]): Promise<TResult | null> {
         throw new Error('Method not implemented.');
     }
 
-    getClassDefinition(className: string): Promise<{ path: string | null; } | null> {
+    async getClassDefinition(className: string): Promise<{ path: string | null; } | null> {
         throw new Error('Method not implemented.');
     }
 
-    getClassCompletion(className: string): Promise<string[]> {
+    async getClassCompletion(className: string): Promise<string[]> {
         throw new Error('Method not implemented.');
     }
 
-    reflectType(className: string): Promise<ReflectedType | null> {
+    async reflectType(className: string): Promise<ReflectedType | null> {
         if (className.startsWith('\\')) {
             className = className.slice(1);
         }

@@ -75,7 +75,7 @@ export class LocalSymbolCollector {
     constructor(
         private readonly tree: SyntaxNode,
         private readonly typeResolver: ITypeResolver | null,
-        variableDefinitionMap: Map<string, TwigImport | TwigVariableDeclaration> = new Map(),
+        variableDefinitionMap = new Map<string, TwigImport | TwigVariableDeclaration>(),
     ) {
         this.localSymbols.variableDefinition = variableDefinitionMap;
 
@@ -235,15 +235,15 @@ export class LocalSymbolCollector {
             if (varDeclarationNode.type === 'set') {
                 const valueNode = varDeclarationNode.childForFieldName('value');
                 if (!valueNode) return null;
-                return await this.exprTypeResolver.resolveExpression(valueNode, this.localSymbols);
+                return this.exprTypeResolver.resolveExpression(valueNode, this.localSymbols);
             }
 
-            return await this.exprTypeResolver.resolveExpression(varDeclarationNode, this.localSymbols);
+            return this.exprTypeResolver.resolveExpression(varDeclarationNode, this.localSymbols);
         }
 
         const valueNode = varDeclarationNode.childForFieldName('value');
         if (valueNode) {
-            return await this.exprTypeResolver.resolveExpression(
+            return this.exprTypeResolver.resolveExpression(
                 valueNode,
                 this.localSymbols,
             );

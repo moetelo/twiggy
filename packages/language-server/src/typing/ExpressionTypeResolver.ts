@@ -30,15 +30,14 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
 
     constructor(
         private readonly typeResolver: ITypeResolver,
-    ) {
-    }
+    ) {}
 
     async resolveExpression(expr: SyntaxNode, locals: LocalSymbolInformation): Promise<ReflectedType | null> {
         if (expr.type === 'call_expression') {
             const memberExpr = expr.childForFieldName('name');
             if (!memberExpr) return null;
 
-            return await this.resolveExpression(memberExpr, locals);
+            return this.resolveExpression(memberExpr, locals);
         }
 
         if (expr.type === 'member_expression') {
@@ -66,7 +65,7 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
                 return null;
             }
 
-            return await this.typeResolver.reflectType(propertyOrMethod.type);
+            return this.typeResolver.reflectType(propertyOrMethod.type);
         }
 
         if (expr.type === 'variable') {
@@ -94,7 +93,7 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
                     methods: [],
                     arrayType: {
                         itemType: arrayItemType,
-                        itemReflectedType: itemReflectedType,
+                        itemReflectedType,
                     },
                 };
 

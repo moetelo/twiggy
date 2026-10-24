@@ -67,7 +67,7 @@ export class DefinitionProvider {
                     ? getStringNodeValue(cursorNode)
                     : cursorNode.text;
 
-                return await this.#resolveBlockSymbol(blockName, document, cursorNode);
+                return this.#resolveBlockSymbol(blockName, document, cursorNode);
             }
 
             if (cursorNode.parent.type === 'arguments') {
@@ -78,7 +78,7 @@ export class DefinitionProvider {
                     : blockNameArgNode.text;
 
                 if (!templatePathArgNode) {
-                    return await this.#resolveBlockSymbol(blockName, document, cursorNode);
+                    return this.#resolveBlockSymbol(blockName, document, cursorNode);
                 }
 
                 const path = getStringNodeValue(templatePathArgNode);
@@ -90,7 +90,7 @@ export class DefinitionProvider {
                 }
 
                 if (!cursorNode.equals(templatePathArgNode)) {
-                    return await this.#resolveBlockSymbol(blockName, resolvedDocument, cursorNode);
+                    return this.#resolveBlockSymbol(blockName, resolvedDocument, cursorNode);
                 }
 
                 return {
@@ -167,6 +167,6 @@ export class DefinitionProvider {
             return undefined;
         }
 
-        return await this.documentCache.resolveByTwigPath(document.locals.extends);
+        return this.documentCache.resolveByTwigPath(document.locals.extends);
     }
 }

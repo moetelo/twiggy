@@ -2,11 +2,11 @@ import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFilters } from '../staticCompletionInfo';
 import type { Hover } from 'vscode-languageserver';
 
-const nodeTypes = [ 'variable', 'function' ];
+const nodeTypes = new Set([ 'variable', 'function' ]);
 
 export function filters(cursorNode: SyntaxNode): Hover | undefined {
     if (
-        !nodeTypes.includes(cursorNode.type)
+        !nodeTypes.has(cursorNode.type)
         && cursorNode.previousSibling?.text !== '|'
     ) {
         return;

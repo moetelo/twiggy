@@ -8,7 +8,7 @@ import { getNodeRange } from '../utils/node';
 
 class TreeNotParsedError extends Error {
     get message() {
-        return 'Document tree is not parsed yet. File: ' + documentUriToFsPath(this.uri);
+        return `Document tree is not parsed yet. File: ${documentUriToFsPath(this.uri)}`;
     }
 
     constructor(readonly uri: DocumentUri) {

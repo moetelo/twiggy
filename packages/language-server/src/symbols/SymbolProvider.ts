@@ -3,30 +3,28 @@ import { SymbolKind } from 'vscode-languageserver';
 import type { LocalSymbolInformation } from './types';
 import type { DocumentCache } from '../documents';
 
-const mapLocalsToSymbols = (locals: LocalSymbolInformation): DocumentSymbol[] => {
-    return [
-        ...locals.variable.map((item): DocumentSymbol => ({
-            name: item.name,
-            kind: SymbolKind.Variable,
-            range: item.range,
-            selectionRange: item.nameRange,
-        })),
-        ...locals.macro.map((item): DocumentSymbol => ({
-            name: 'macro ' + item.name,
-            kind: SymbolKind.Function,
-            range: item.range,
-            selectionRange: item.nameRange,
-            children: mapLocalsToSymbols(item.symbols),
-        })),
-        ...locals.block.map((item): DocumentSymbol => ({
-            name: 'block ' + item.name,
-            kind: SymbolKind.Property,
-            range: item.range,
-            selectionRange: item.nameRange,
-            children: mapLocalsToSymbols(item.symbols),
-        })),
-    ];
-};
+const mapLocalsToSymbols = (locals: LocalSymbolInformation): DocumentSymbol[] => [
+    ...locals.variable.map((item): DocumentSymbol => ({
+        name: item.name,
+        kind: SymbolKind.Variable,
+        range: item.range,
+        selectionRange: item.nameRange,
+    })),
+    ...locals.macro.map((item): DocumentSymbol => ({
+        name: `macro ${item.name}`,
+        kind: SymbolKind.Function,
+        range: item.range,
+        selectionRange: item.nameRange,
+        children: mapLocalsToSymbols(item.symbols),
+    })),
+    ...locals.block.map((item): DocumentSymbol => ({
+        name: `block ${item.name}`,
+        kind: SymbolKind.Property,
+        range: item.range,
+        selectionRange: item.nameRange,
+        children: mapLocalsToSymbols(item.symbols),
+    })),
+];
 
 export class SymbolProvider {
     constructor(

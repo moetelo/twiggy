@@ -13,8 +13,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
 
     #symfonyConsolePath: string | undefined;
 
-    constructor(private readonly _phpExecutor: PhpExecutor) {
-    }
+    constructor(private readonly _phpExecutor: PhpExecutor) {}
 
     get environment() {
         return this.#environment;
@@ -71,7 +70,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
             return null;
         }
 
-        return await this._phpExecutor.callJson<TResult>(this.#symfonyConsolePath, [
+        return this._phpExecutor.callJson<TResult>(this.#symfonyConsolePath, [
             command,
             '--format',
             'json',

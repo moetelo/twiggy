@@ -11,13 +11,13 @@ const severityToDiagnosticSeverity = {
     warning: DiagnosticSeverity.Warning,
 };
 
-const enum TwigCodeStyleAction {
+enum TwigCodeStyleAction {
     Lint = 'lint',
     Fix = 'fix',
 }
 
 export class TwigCodeStyleFixer {
-    #executablePath: string;
+    readonly #executablePath: string;
 
     constructor(
         readonly _phpExecutor: IPhpExecutor | null,

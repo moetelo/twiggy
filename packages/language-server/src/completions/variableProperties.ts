@@ -56,7 +56,7 @@ const reflectedTypeToCompletions = (reflectedType: ReflectedType, options: { inc
         label: prop.name,
         detail: prop.type,
         kind: CompletionItemKind.Property
-    }) as CompletionItem));
+    })));
 
     if (!options.includeMethods) return properties;
 
@@ -71,7 +71,7 @@ const reflectedTypeToCompletions = (reflectedType: ReflectedType, options: { inc
             insertText: !method.parameters.length
                 ? `${method.name}()$0`
                 : `${method.name}($1)$0`,
-        }) as CompletionItem)),
+        }))),
     ];
 }
 

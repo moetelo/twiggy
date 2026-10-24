@@ -42,7 +42,7 @@ export async function phpClasses(
 
     const classNames = await phpExecutor.getClassCompletion(typeNode?.text || '');
     const classes = classNames.map(fullClassName => {
-        fullClassName = '\\' + fullClassName;
+        fullClassName = `\\${fullClassName}`;
         const parts = fullClassName.split('\\');
         const className = parts[parts.length - 1];
         return toCompletionItem({ fullClassName, className });

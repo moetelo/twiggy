@@ -1,8 +1,7 @@
 import type { TreeCursor } from 'web-tree-sitter';
 
 export class PreOrderCursorIterator {
-  constructor(private readonly cursor: TreeCursor) {
-  }
+  constructor(private readonly cursor: TreeCursor) {}
 
   public *[Symbol.iterator](): Generator<TreeCursor> {
     const constructor = this.constructor as typeof PreOrderCursorIterator;

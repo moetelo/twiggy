@@ -23,15 +23,15 @@ describe('diagnostics — empty constructs', () => {
         assert.deepEqual(diagnostics[0].range, range);
     };
 
-    test('empty output', () => testDiagnostic(`$0{{ }}$0`));
-    test('empty if condition', () => testDiagnostic(`$0{% if %}$0<input>{% endif %}`));
-    test('empty for element', () => testDiagnostic(`$0{% for %}$0<input>{% endfor %}`));
+    test('empty output', async () => testDiagnostic(`$0{{ }}$0`));
+    test('empty if condition', async () => testDiagnostic(`$0{% if %}$0<input>{% endif %}`));
+    test('empty for element', async () => testDiagnostic(`$0{% for %}$0<input>{% endfor %}`));
 
-    test('empty if condition (multiline)', () => testDiagnostic(
+    test('empty if condition (multiline)', async () => testDiagnostic(
         `$0{% if %}$0\n<input>\n{% endif %}`,
     ));
 
-    test('empty output nested in if block', () => testDiagnostic(
+    test('empty output nested in if block', async () => testDiagnostic(
         `{% if true %}$0{{ }}$0{% endif %}`,
     ));
 });

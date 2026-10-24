@@ -7,10 +7,9 @@ import type { RouteNameToPathRecord, TemplatePathMapping, TwigEnvironment } from
 
 export class VanillaTwigEnvironment implements IFrameworkTwigEnvironment {
     #environment: TwigEnvironment | null = null;
-    #routes: RouteNameToPathRecord = {};
+    readonly #routes: RouteNameToPathRecord = {};
 
-    constructor(private readonly _phpExecutor: PhpExecutor) {
-    }
+    constructor(private readonly _phpExecutor: PhpExecutor) {}
 
     get environment() {
         return this.#environment;

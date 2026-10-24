@@ -49,7 +49,7 @@ export class PhpExecutor implements IPhpExecutor {
     }
 
     async getClassDefinition(className: string) {
-        return await this.callJson<{ path: string | null }>(this._phpUtilPath.getDefinitionPhp, [
+        return this.callJson<{ path: string | null }>(this._phpUtilPath.getDefinitionPhp, [
             this._workspaceDirectory,
             className,
         ]);
@@ -63,20 +63,20 @@ export class PhpExecutor implements IPhpExecutor {
     }
 
     async reflectType(className: string) {
-        return await this.callJson<ReflectedType>(this._phpUtilPath.reflectType, [
+        return this.callJson<ReflectedType>(this._phpUtilPath.reflectType, [
             this._workspaceDirectory,
             className,
         ]);
     }
 
     async printTwigEnvironment(twigEnvironmentFile: string) {
-        return await this.callJson<SymfonyTwigDebugJsonOutput>(this._phpUtilPath.printTwigEnvironment, [
+        return this.callJson<SymfonyTwigDebugJsonOutput>(this._phpUtilPath.printTwigEnvironment, [
             twigEnvironmentFile,
         ]);
     }
 
     async printCraftTwigEnvironment() {
-        return await this.callJson<SymfonyTwigDebugJsonOutput>(this._phpUtilPath.getCraftTwig, [
+        return this.callJson<SymfonyTwigDebugJsonOutput>(this._phpUtilPath.getCraftTwig, [
             this._workspaceDirectory,
         ]);
     }

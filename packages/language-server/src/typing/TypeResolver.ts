@@ -3,12 +3,11 @@ import type { ITypeResolver } from './ITypeResolver';
 import type { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 
 export class TypeResolver implements ITypeResolver {
-    #typeCache = new Map<string, ReflectedType | null>();
+    readonly #typeCache = new Map<string, ReflectedType | null>();
 
     constructor(
         private readonly phpExecutor: IPhpExecutor,
-    ) {
-    }
+    ) {}
 
     async reflectType(typeName: string): Promise<ReflectedType | null> {
         if (!typeName) return null;

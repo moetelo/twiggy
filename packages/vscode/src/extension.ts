@@ -29,13 +29,13 @@ const outputChannel = window.createOutputChannel('Twiggy Language Server');
 const clients = new Map<string, LanguageClient>();
 
 export async function activate(context: ExtensionContext) {
-    workspace.workspaceFolders?.forEach((folder) =>
+    workspace.workspaceFolders?.forEach(async (folder) =>
         addWorkspaceFolder(folder, context)
     );
 
     workspace.onDidChangeWorkspaceFolders(({ added, removed }) => {
-        added.forEach((folder) => addWorkspaceFolder(folder, context));
-        removed.forEach((folder) => removeWorkspaceFolder(folder));
+        added.forEach(async (folder) => addWorkspaceFolder(folder, context));
+        removed.forEach(async (folder) => removeWorkspaceFolder(folder));
     });
 
     context.subscriptions.push(
@@ -59,14 +59,14 @@ async function restartLanguageServers(): Promise<void> {
         await Promise.all(
             [...clients.entries()].map(async ([folderPath, client]) => {
                 await client.restart();
-                outputChannel.appendLine('Language server restarted for: ' + folderPath);
+                outputChannel.appendLine(`Language server restarted for: ${folderPath}`);
             }),
         );
         window.showInformationMessage('Twiggy: language server restarted.');
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        outputChannel.appendLine('Failed to restart language server: ' + message);
-        window.showErrorMessage('Twiggy: failed to restart language server: ' + message);
+        outputChannel.appendLine(`Failed to restart language server: ${message}`);
+        window.showErrorMessage(`Twiggy: failed to restart language server: ${message}`);
     }
 }
 
@@ -138,7 +138,7 @@ async function addWorkspaceFolder(
 
                 const encodedUri = encodeURIComponent(originalUri);
                 const vdocUri = Uri.parse(`embedded-content://html/${encodedUri}.html`);
-                const htmlCompletionList = await commands.executeCommand<CompletionList<CompletionItem>>(
+                const htmlCompletionList = await commands.executeCommand<CompletionList>(
                     'vscode.executeCompletionItemProvider',
                     vdocUri,
                     position,
@@ -167,8 +167,8 @@ async function addWorkspaceFolder(
     };
 
     const client = new LanguageClient(
-        'twiggy-language-server ' + workspaceUri,
-        'Twiggy Language Server ' + workspaceUri,
+        `twiggy-language-server ${workspaceUri}`,
+        `Twiggy Language Server ${workspaceUri}`,
         serverOptions,
         clientOptions,
     );
@@ -182,7 +182,7 @@ async function addWorkspaceFolder(
 
     await client.start();
 
-    outputChannel.appendLine('Language server started for: ' + folderPath);
+    outputChannel.appendLine(`Language server started for: ${folderPath}`);
 }
 
 async function removeWorkspaceFolder(

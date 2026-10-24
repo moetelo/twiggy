@@ -1,20 +1,20 @@
 import type { DocumentUri, Position, WorkspaceFolder } from 'vscode-languageserver';
 import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
-import * as path from 'path';
+import * as path from 'node:path';
 import { resolveTemplate } from '../utils/files/resolveTemplate';
 import type { IFrameworkTwigEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
 import { EmptyEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
 import { parser } from '../utils/parser';
 import { LocalSymbolCollector } from '../symbols/LocalSymbolCollector';
 import type { ITypeResolver } from '../typing/ITypeResolver';
-import { readFile } from 'fs/promises';
+import { readFile } from 'node:fs/promises';
 
 export class DocumentCache {
     #environment: IFrameworkTwigEnvironment = EmptyEnvironment;
     #typeResolver: ITypeResolver | null = null;
 
-    readonly documents: Map<DocumentUri, Document> = new Map();
+    readonly documents = new Map<DocumentUri, Document>();
     readonly workspaceFolderPath: string;
 
     constructor(workspaceFolder: WorkspaceFolder) {
@@ -30,7 +30,7 @@ export class DocumentCache {
         const document = this.documents.get(documentUri);
 
         if (!document) {
-            return await this.add(documentUri, text);
+            return this.add(documentUri, text);
         }
 
         if (document.text === null || text !== undefined) {
@@ -41,7 +41,7 @@ export class DocumentCache {
     }
 
     async updateText(documentUri: DocumentUri, text?: string) {
-        return await this.get(documentUri, text);
+        return this.get(documentUri, text);
     }
 
     async setText(document: Document, text?: string) {
@@ -49,7 +49,7 @@ export class DocumentCache {
             document.text = text;
         } else {
             const fsPath = documentUriToFsPath(document.uri);
-            const text = await readFile(fsPath, 'utf-8');
+            const text = await readFile(fsPath, 'utf8');
             document.text = text;
         }
 
@@ -87,7 +87,7 @@ export class DocumentCache {
     async resolveImport(document: Document, variableName: string, pos?: Position) {
         if (variableName === '_self') return document;
 
-        const imports = document.locals.imports;
+        const { imports } = document.locals;
         if (pos !== undefined) {
             const scopedImports = document.getScopeAt(pos)?.imports;
             if (scopedImports) {
@@ -101,7 +101,7 @@ export class DocumentCache {
 
         if (!twigImport.path) return document;
 
-        return await this.resolveByTwigPath(twigImport.path)!;
+        return this.resolveByTwigPath(twigImport.path);
     }
 
     private async add(documentUri: DocumentUri, text?: string) {

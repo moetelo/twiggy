@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from 'node:path';
 import { initializeParser } from 'utils/parser';
 
 export const initializeTestParser = async () => {
@@ -10,5 +10,5 @@ export const initializeTestParser = async () => {
         'tree-sitter-twig',
         'tree-sitter-twig.wasm',
     );
-    return await initializeParser(wasmPath);
+    return initializeParser(wasmPath);
 };

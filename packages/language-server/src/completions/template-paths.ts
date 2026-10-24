@@ -1,6 +1,6 @@
 import type { CompletionItem, Position, Range } from 'vscode-languageserver';
 import { CompletionItemKind } from 'vscode-languageserver';
-import path from 'path';
+import path from 'node:path';
 import type { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,

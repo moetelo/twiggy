@@ -31,13 +31,12 @@ const createDiagnostic = (
 export class DiagnosticProvider {
     #twigCodeStyleFixer: TwigCodeStyleFixer | null = null;
 
-    #lintMap = new Map<DocumentUri, Diagnostic[]>();
+    readonly #lintMap = new Map<DocumentUri, Diagnostic[]>();
 
     constructor(
         private readonly connection: Connection,
         private readonly documentCache: DocumentCache,
-    ) {
-    }
+    ) {}
 
     async refresh(twigCodeStyleFixer: TwigCodeStyleFixer | null) {
         this.#twigCodeStyleFixer = twigCodeStyleFixer;

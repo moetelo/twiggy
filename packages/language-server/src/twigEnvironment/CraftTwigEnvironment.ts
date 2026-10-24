@@ -9,8 +9,7 @@ export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
     #environment: TwigEnvironment | null = null;
     readonly routes = Object.freeze({});
 
-    constructor(private readonly _phpExecutor: PhpExecutor) {
-    }
+    constructor(private readonly _phpExecutor: PhpExecutor) {}
 
     get environment() {
         return this.#environment;

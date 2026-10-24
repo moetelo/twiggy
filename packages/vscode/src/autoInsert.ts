@@ -23,7 +23,7 @@ export async function activate(
 			return;
 		}
 
-		const document = editor.document;
+		const { document } = editor;
 		if (!active(document)) {
 			return;
 		}
@@ -77,7 +77,7 @@ export async function activate(
 			clearTimeout(timeout);
 			timeout = undefined;
 		}
-		const version = document.version;
+		const { version } = document;
 		timeout = setTimeout(() => {
 			const rangeStart = lastChange.range.start;
 			const position = new vscode.Position(rangeStart.line, rangeStart.character + lastChange.text.length);
@@ -91,7 +91,7 @@ export async function activate(
 				if (document !== activeDocument || activeDocument.version !== version) return;
 
 				if (typeof text === 'string') {
-					const selections = activeEditor.selections;
+					const { selections } = activeEditor;
 					if (selections.length && selections.some(s => s.active.isEqual(position))) {
 						activeEditor.insertSnippet(new vscode.SnippetString(text), selections.map(s => s.active));
 					}

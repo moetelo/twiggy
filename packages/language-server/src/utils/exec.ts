@@ -9,8 +9,12 @@ export const exec = async (command: string, args: string[], options: SpawnOption
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (data) => stdout += data);
-    child.stderr.on('data', (data) => stderr += data);
+    child.stdout.on('data', (data) => {
+        stdout += data;
+    });
+    child.stderr.on('data', (data) => {
+        stderr += data;
+    });
 
     // `close` is emitted with `child.exitCode` as its first argument.
     await once(child, 'close');
@@ -18,6 +22,5 @@ export const exec = async (command: string, args: string[], options: SpawnOption
     return { stdout, stderr, code: child.exitCode };
 };
 
-export const isProcessError = (error: any): error is Error & CommandResult => {
-    return error instanceof Error && 'stderr' in error && 'stdout' in error;
-};
+export const isProcessError = (error: unknown): error is Error & CommandResult =>
+    error instanceof Error && 'stderr' in error && 'stdout' in error;

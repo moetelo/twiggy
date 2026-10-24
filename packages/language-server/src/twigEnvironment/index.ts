@@ -1,4 +1,4 @@
-export * from './types';
+export type * from './types';
 export { EmptyEnvironment } from './IFrameworkTwigEnvironment';
 export { CraftTwigEnvironment } from './CraftTwigEnvironment';
 export { VanillaTwigEnvironment } from './VanillaTwigEnvironment';

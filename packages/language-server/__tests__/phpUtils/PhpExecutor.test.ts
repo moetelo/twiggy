@@ -81,8 +81,8 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
 
     test('reflectType does not bubble a fatal error for unknown classes', async () => {
         requireInstalled();
-        expect(() => executor.reflectType('string')).not.toThrow();
-        expect(() => executor.reflectType('App\\DoesNotExist')).not.toThrow();
+        expect(async () => executor.reflectType('string')).not.toThrow();
+        expect(async () => executor.reflectType('App\\DoesNotExist')).not.toThrow();
     });
 
     test('getClassDefinition resolves a PSR-4 class to its source file', async () => {
