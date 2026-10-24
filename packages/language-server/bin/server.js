@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-void import('../dist/server.js');
+require('../dist/server.js');
