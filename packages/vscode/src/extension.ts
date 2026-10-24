@@ -3,7 +3,6 @@ import type {
     ExtensionContext,
     WorkspaceFolder,
     CompletionList,
-    CompletionItem,
 } from 'vscode';
 import {
     workspace,
@@ -29,13 +28,17 @@ const outputChannel = window.createOutputChannel('Twiggy Language Server');
 const clients = new Map<string, LanguageClient>();
 
 export async function activate(context: ExtensionContext) {
-    workspace.workspaceFolders?.forEach(async (folder) =>
-        addWorkspaceFolder(folder, context)
-    );
+    for (const folder of workspace.workspaceFolders ?? []) {
+        void addWorkspaceFolder(folder);
+    }
 
     workspace.onDidChangeWorkspaceFolders(({ added, removed }) => {
-        added.forEach(async (folder) => addWorkspaceFolder(folder, context));
-        removed.forEach(async (folder) => removeWorkspaceFolder(folder));
+        for (const folder of added) {
+            void addWorkspaceFolder(folder);
+        }
+        for (const folder of removed) {
+            void removeWorkspaceFolder(folder);
+        }
     });
 
     context.subscriptions.push(
@@ -70,9 +73,20 @@ async function restartLanguageServers(): Promise<void> {
     }
 }
 
+async function isInsideHtmlRegion(
+    folderPath: string,
+    params: IsInsideHtmlRegionRequest.ParamsType,
+): Promise<IsInsideHtmlRegionRequest.ResponseType> {
+    const client = clients.get(folderPath);
+    if (!client) {
+        return false;
+    }
+
+    return client.sendRequest<IsInsideHtmlRegionRequest.ResponseType>(IsInsideHtmlRegionRequest.type, params);
+}
+
 async function addWorkspaceFolder(
     workspaceFolder: WorkspaceFolder,
-    context: ExtensionContext
 ): Promise<void> {
     const folderPath = workspaceFolder.uri.fsPath;
 
@@ -123,14 +137,14 @@ async function addWorkspaceFolder(
             ) {
                 const originalUri = document.uri.toString(true);
 
-                const isInsideHtmlRegion = await client.sendRequest<IsInsideHtmlRegionRequest.ResponseType>(IsInsideHtmlRegionRequest.type, {
+                const isInsideHtml = await isInsideHtmlRegion(folderPath, {
                     textDocument: { uri: originalUri },
                     position,
-                } as IsInsideHtmlRegionRequest.ParamsType);
+                });
 
-                const result = await unwrapCompletionArray(next(document, position, context, token)) as ProtocolCompletionItem[];
+                const result = await unwrapCompletionArray(next(document, position, context, token));
 
-                if (!isInsideHtmlRegion) {
+                if (!isInsideHtml) {
                     return result;
                 }
 
