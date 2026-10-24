@@ -84,53 +84,58 @@ export class DiagnosticProvider {
             return null;
         }
 
-        if (isBlockIdentifier(node)) {
-            if (node.parent?.type !== 'block') {
-                let extendedDocument: Document | undefined = document;
-                let documentName = "this document";
+        if (isBlockIdentifier(node) && node.parent?.type !== 'block') {
+            return this.#validateBlockCallArgument(node, document);
+        }
 
-                const blockArgumentNode = node.parent!.namedChildren[0];
-                const templateArgumentNode = node.parent!.namedChildren[1];
+        return null;
+    }
 
-                if (templateArgumentNode) {
-                    const path = getStringNodeValue(templateArgumentNode);
-                    const document = await this.documentCache.resolveByTwigPath(path);
+    async #validateBlockCallArgument(node: SyntaxNode, document: Document): Promise<Diagnostic | null> {
+        const { parent } = node;
+        if (!parent) return null;
 
-                    if (node.equals(templateArgumentNode)) {
-                        if (!document) {
-                            return createDiagnostic(templateArgumentNode, `Template "${path}" not found`, DiagnosticSeverity.Error)
-                        }
-                        // found template, no errors
-                        // block existence will be checked in next pass
-                        return null;
-                    }
+        let extendedDocument: Document | undefined = document;
+        let documentName = "this document";
 
-                    extendedDocument = document;
-                    documentName = path;
+        const blockArgumentNode = parent.namedChildren[0];
+        const templateArgumentNode = parent.namedChildren.at(1);
+
+        if (templateArgumentNode) {
+            const path = getStringNodeValue(templateArgumentNode);
+            const templateDocument = await this.documentCache.resolveByTwigPath(path);
+
+            if (node.equals(templateArgumentNode)) {
+                if (!templateDocument) {
+                    return createDiagnostic(templateArgumentNode, `Template "${path}" not found`, DiagnosticSeverity.Error)
                 }
-
-                const blockName = blockArgumentNode.type === 'string'
-                    ? getStringNodeValue(blockArgumentNode)
-                    : blockArgumentNode.text;
-
-                let found = false;
-                while (extendedDocument) {
-                    const blockSymbol = extendedDocument.getBlock(blockName);
-                    if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(blockArgumentNode).start)) {
-                        if (!extendedDocument.locals.extends) {
-                            extendedDocument = void 0;
-                        } else {
-                            extendedDocument = await this.documentCache.resolveByTwigPath(extendedDocument.locals.extends);
-                        }
-                        continue;
-                    }
-                    found = true;
-                    break;
-                }
-                if (!found) {
-                    return createDiagnostic(blockArgumentNode, `Block "${blockName}" not found in ${documentName}`, DiagnosticSeverity.Error)
-                }
+                // found template, no errors
+                // block existence will be checked in next pass
+                return null;
             }
+
+            extendedDocument = templateDocument;
+            documentName = path;
+        }
+
+        const blockName = blockArgumentNode.type === 'string'
+            ? getStringNodeValue(blockArgumentNode)
+            : blockArgumentNode.text;
+
+        let found = false;
+        while (extendedDocument) {
+            const blockSymbol = extendedDocument.getBlock(blockName);
+            if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(blockArgumentNode).start)) {
+                extendedDocument = extendedDocument.locals.extends
+                    ? await this.documentCache.resolveByTwigPath(extendedDocument.locals.extends)
+                    : undefined;
+                continue;
+            }
+            found = true;
+            break;
+        }
+        if (!found) {
+            return createDiagnostic(blockArgumentNode, `Block "${blockName}" not found in ${documentName}`, DiagnosticSeverity.Error)
         }
 
         return null;

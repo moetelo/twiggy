@@ -10,6 +10,29 @@ import { getTwigFiles } from '../utils/getTwigFiles';
 import type { TemplatePathMapping } from '../twigEnvironment/types';
 import { getStringNodeValue } from 'utils/node';
 
+function isTemplatePathString(node: SyntaxNode, cursorNode: SyntaxNode): boolean {
+    // {% import "forms.html" as forms %}
+    // {% from "macros.twig" import hello %}
+    // {% include 'template.html' %}
+    // {% extends 'template.html' %}
+    // {% use 'template.html' %}
+    if (templateUsingStatements.includes(node.type)) return true;
+
+    if (node.type !== 'arguments') return false;
+
+    const functionName = node.parent?.childForFieldName('name')?.text;
+
+    // {{ include('template.html') }}
+    // {{ source('template.html') }}
+    if (templateUsingFunctions.includes(functionName ?? '')) return true;
+
+    // {{ block("title", "common_blocks.twig") }}
+    const secondArgument = node.namedChildren.at(1);
+    return functionName === 'block'
+        && secondArgument !== undefined
+        && cursorNode.equals(secondArgument);
+}
+
 export async function templatePaths(
     cursorNode: SyntaxNode,
     position: Position,
@@ -37,25 +60,7 @@ export async function templatePaths(
         return [];
     }
 
-    if (
-        // {% import "forms.html" as forms %}
-        // {% from "macros.twig" import hello %}
-        // {% include 'template.html' %}
-        // {% extends 'template.html' %}
-        // {% use 'template.html' %}
-        templateUsingStatements.includes(node.type) ||
-        // {{ include('template.html') }}
-        // {{ source('template.html') }}
-        (node.type === 'arguments' &&
-            templateUsingFunctions.includes(
-                node.parent?.childForFieldName('name')?.text || '',
-            )) ||
-        // {{ block("title", "common_blocks.twig") }}
-        (node.type === 'arguments'
-            && node.parent?.childForFieldName('name')?.text === 'block'
-            && node.namedChildren[1]
-            && cursorNode?.equals(node.namedChildren[1]))
-    ) {
+    if (isTemplatePathString(node, cursorNode)) {
         const completions: CompletionItem[] = [];
 
         const nodeStringStart = cursorNode.startPosition.column + 1;

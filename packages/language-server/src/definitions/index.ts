@@ -49,48 +49,7 @@ export class DefinitionProvider {
         }
 
         if (isBlockIdentifier(cursorNode)) {
-            if (!cursorNode.parent) {
-                return;
-            }
-
-            if (cursorNode.parent.type === 'block') {
-                const blockName = cursorNode.type === 'string'
-                    ? getStringNodeValue(cursorNode)
-                    : cursorNode.text;
-
-                return this.#resolveBlockSymbol(blockName, document, cursorNode);
-            }
-
-            if (cursorNode.parent.type === 'arguments') {
-                const [blockNameArgNode, templatePathArgNode] = cursorNode.parent.namedChildren;
-
-                const blockName = blockNameArgNode.type === 'string'
-                    ? getStringNodeValue(blockNameArgNode)
-                    : blockNameArgNode.text;
-
-                if (!templatePathArgNode) {
-                    return this.#resolveBlockSymbol(blockName, document, cursorNode);
-                }
-
-                const path = getStringNodeValue(templatePathArgNode);
-                const resolvedDocument = await this.documentCache.resolveByTwigPath(path);
-
-                if (!resolvedDocument) {
-                    // target template not found
-                    return;
-                }
-
-                if (!cursorNode.equals(templatePathArgNode)) {
-                    return this.#resolveBlockSymbol(blockName, resolvedDocument, cursorNode);
-                }
-
-                return {
-                    uri: resolvedDocument.uri,
-                    range: Range.create(0, 0, 0, 0),
-                };
-            }
-
-            return;
+            return this.#resolveBlockIdentifier(document, cursorNode);
         }
 
         if (cursorNode.type === 'variable') {
@@ -136,6 +95,55 @@ export class DefinitionProvider {
                 range: getNodeRange(typeIdentifierNode),
             };
         }
+
+        return undefined;
+    }
+
+    async #resolveBlockIdentifier(document: Document, cursorNode: SyntaxNode): Promise<Definition | undefined> {
+        if (!cursorNode.parent) {
+            return undefined;
+        }
+
+        if (cursorNode.parent.type === 'block') {
+            const blockName = cursorNode.type === 'string'
+                ? getStringNodeValue(cursorNode)
+                : cursorNode.text;
+
+            return this.#resolveBlockSymbol(blockName, document, cursorNode);
+        }
+
+        if (cursorNode.parent.type === 'arguments') {
+            const { namedChildren } = cursorNode.parent;
+            const [blockNameArgNode] = namedChildren;
+            const templatePathArgNode = namedChildren.at(1);
+
+            const blockName = blockNameArgNode.type === 'string'
+                ? getStringNodeValue(blockNameArgNode)
+                : blockNameArgNode.text;
+
+            if (!templatePathArgNode) {
+                return this.#resolveBlockSymbol(blockName, document, cursorNode);
+            }
+
+            const path = getStringNodeValue(templatePathArgNode);
+            const resolvedDocument = await this.documentCache.resolveByTwigPath(path);
+
+            if (!resolvedDocument) {
+                // target template not found
+                return undefined;
+            }
+
+            if (!cursorNode.equals(templatePathArgNode)) {
+                return this.#resolveBlockSymbol(blockName, resolvedDocument, cursorNode);
+            }
+
+            return {
+                uri: resolvedDocument.uri,
+                range: Range.create(0, 0, 0, 0),
+            };
+        }
+
+        return undefined;
     }
 
     async #resolveBlockSymbol(blockName: string, initialDocument: Document, cursorNode: SyntaxNode) {
