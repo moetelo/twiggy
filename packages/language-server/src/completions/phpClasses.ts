@@ -1,6 +1,7 @@
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
-import { SyntaxNode } from 'web-tree-sitter';
-import { IPhpExecutor } from '../phpInterop/IPhpExecutor';
+import type { CompletionItem } from 'vscode-languageserver/node';
+import { CompletionItemKind } from 'vscode-languageserver/node';
+import type { SyntaxNode } from 'web-tree-sitter';
+import type { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 import { primitives } from '../phpInterop/primitives';
 import { closestByPredicate } from '../utils/node';
 

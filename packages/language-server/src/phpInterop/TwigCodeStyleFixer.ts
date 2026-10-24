@@ -1,5 +1,6 @@
-import { Diagnostic, DiagnosticSeverity, DocumentUri, Range } from 'vscode-languageserver';
-import { IPhpExecutor } from './IPhpExecutor';
+import type { Diagnostic, DocumentUri } from 'vscode-languageserver';
+import { DiagnosticSeverity, Range } from 'vscode-languageserver';
+import type { IPhpExecutor } from './IPhpExecutor';
 import { isFile } from 'utils/files/fileStat';
 import path from 'node:path';
 import { documentUriToFsPath, toDocumentUri } from 'utils/uri';

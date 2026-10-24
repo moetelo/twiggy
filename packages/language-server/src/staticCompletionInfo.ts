@@ -1,8 +1,10 @@
+import type {
+    CompletionItem,
+    SignatureInformation,
+} from 'vscode-languageserver';
 import {
     MarkupKind,
-    CompletionItem,
     CompletionItemKind,
-    SignatureInformation,
 } from 'vscode-languageserver';
 
 export const twigGlobalVariables = [

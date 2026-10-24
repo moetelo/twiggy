@@ -1,5 +1,5 @@
-import { Connection, Range, ReferenceParams } from 'vscode-languageserver/node';
-import { DocumentCache } from '../documents/DocumentCache';
+import type { Connection, Range, ReferenceParams } from 'vscode-languageserver/node';
+import type { DocumentCache } from '../documents/DocumentCache';
 import { hasReferences } from '../symbols/types';
 
 const rangeToLocation = (range: Range, uri: string) => ({ uri, range });

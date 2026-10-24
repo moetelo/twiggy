@@ -1,4 +1,5 @@
-import { SemanticTokenTypes, SemanticTokensLegend } from 'vscode-languageserver';
+import type { SemanticTokensLegend } from 'vscode-languageserver';
+import { SemanticTokenTypes } from 'vscode-languageserver';
 
 export const semanticTokensLegend: SemanticTokensLegend = {
   tokenTypes: [

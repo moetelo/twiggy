@@ -1,6 +1,6 @@
-import { ReflectedType } from '../phpInterop/ReflectedType';
-import { ITypeResolver } from './ITypeResolver';
-import { IPhpExecutor } from '../phpInterop/IPhpExecutor';
+import type { ReflectedType } from '../phpInterop/ReflectedType';
+import type { ITypeResolver } from './ITypeResolver';
+import type { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 
 export class TypeResolver implements ITypeResolver {
     #typeCache = new Map<string, ReflectedType | null>();

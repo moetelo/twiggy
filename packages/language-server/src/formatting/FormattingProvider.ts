@@ -1,6 +1,6 @@
-import { Connection, DocumentFormattingParams } from 'vscode-languageserver';
-import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
-import { DiagnosticProvider } from 'diagnostics';
+import type { Connection, DocumentFormattingParams } from 'vscode-languageserver';
+import type { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
+import type { DiagnosticProvider } from 'diagnostics';
 
 export class FormattingProvider {
     #twigCodeStyleFixer: TwigCodeStyleFixer | null = null;

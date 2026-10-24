@@ -1,5 +1,5 @@
 import { templateUsingFunctions, templateUsingStatements } from 'constants/template-usage';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { parseFunctionCall } from './parseFunctionCall';
 
 export const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {

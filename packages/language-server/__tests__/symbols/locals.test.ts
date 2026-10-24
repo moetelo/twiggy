@@ -1,8 +1,8 @@
 import { describe, beforeAll, test } from 'bun:test';
 import assert from 'node:assert/strict';
-import Parser from 'web-tree-sitter';
+import type Parser from 'web-tree-sitter';
 import { LocalSymbolCollector } from 'symbols/LocalSymbolCollector';
-import { LocalSymbolInformation } from 'symbols/types';
+import type { LocalSymbolInformation } from 'symbols/types';
 import { documentFromCode } from '../__helpers__/documentFromCode';
 import { rangeOf, rangesOf } from '../__helpers__/fixtures';
 import { initializeTestParser } from '../__helpers__/parser';

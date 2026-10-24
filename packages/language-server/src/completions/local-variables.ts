@@ -1,7 +1,9 @@
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
-import { SyntaxNode } from 'web-tree-sitter';
-import { Document } from '../documents';
-import { FunctionArgument, hasReflectedType, TwigVariableDeclaration } from '../symbols/types';
+import type { CompletionItem } from 'vscode-languageserver/node';
+import { CompletionItemKind } from 'vscode-languageserver/node';
+import type { SyntaxNode } from 'web-tree-sitter';
+import type { Document } from '../documents';
+import type { FunctionArgument, TwigVariableDeclaration } from '../symbols/types';
+import { hasReflectedType } from '../symbols/types';
 import { isInExpressionScope } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';

@@ -1,12 +1,13 @@
-import { CompletionItem, CompletionItemKind, Position, Range } from 'vscode-languageserver';
+import type { CompletionItem, Position, Range } from 'vscode-languageserver';
+import { CompletionItemKind } from 'vscode-languageserver';
 import path from 'path';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import {
     templateUsingFunctions,
     templateUsingStatements,
 } from '../constants/template-usage';
 import getTwigFiles from '../utils/getTwigFiles';
-import { TemplatePathMapping } from '../twigEnvironment/types';
+import type { TemplatePathMapping } from '../twigEnvironment/types';
 import { getStringNodeValue } from 'utils/node';
 
 export async function templatePaths(

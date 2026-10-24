@@ -1,6 +1,7 @@
-import { IPhpExecutor } from 'phpInterop/IPhpExecutor';
-import { ReflectedType } from 'phpInterop/ReflectedType';
-import { EmptyEnvironment, IFrameworkTwigEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
+import type { IPhpExecutor } from 'phpInterop/IPhpExecutor';
+import type { ReflectedType } from 'phpInterop/ReflectedType';
+import type { IFrameworkTwigEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
+import { EmptyEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
 
 export const MockEnvironment: IFrameworkTwigEnvironment = {
     ...EmptyEnvironment,

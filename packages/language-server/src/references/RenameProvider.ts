@@ -1,5 +1,6 @@
-import { Connection, PrepareRenameParams, Range, ReferenceParams, RenameParams } from 'vscode-languageserver/node';
-import { DocumentCache } from '../documents/DocumentCache';
+import type { Connection, PrepareRenameParams, RenameParams } from 'vscode-languageserver/node';
+import { Range, ReferenceParams } from 'vscode-languageserver/node';
+import type { DocumentCache } from '../documents/DocumentCache';
 import { hasReferences } from '../symbols/types';
 
 export class RenameProvider {

@@ -1,11 +1,13 @@
-import {
+import type {
     CompletionItem,
+} from 'vscode-languageserver/node';
+import {
     CompletionItemKind,
     InsertTextFormat,
 } from 'vscode-languageserver/node';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../staticCompletionInfo';
-import { TwigFunctionLike } from '../twigEnvironment/types';
+import type { TwigFunctionLike } from '../twigEnvironment/types';
 import { isInExpressionScope } from '../utils/node';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
 

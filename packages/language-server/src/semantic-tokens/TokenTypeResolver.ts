@@ -1,5 +1,6 @@
-import { SemanticTokenTypes, SemanticTokensLegend } from 'vscode-languageserver';
-import { TreeCursor } from 'web-tree-sitter';
+import type { SemanticTokensLegend } from 'vscode-languageserver';
+import { SemanticTokenTypes } from 'vscode-languageserver';
+import type { TreeCursor } from 'web-tree-sitter';
 
 const aliasedNodes = new Map([
     ['comment_begin', SemanticTokenTypes.comment],

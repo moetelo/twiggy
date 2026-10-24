@@ -1,12 +1,13 @@
-import { DocumentUri, Position, WorkspaceFolder } from 'vscode-languageserver';
+import type { DocumentUri, Position, WorkspaceFolder } from 'vscode-languageserver';
 import { documentUriToFsPath, toDocumentUri } from '../utils/uri';
 import { Document } from './Document';
 import * as path from 'path';
 import { resolveTemplate } from '../utils/files/resolveTemplate';
-import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
+import type { IFrameworkTwigEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
+import { EmptyEnvironment } from '../twigEnvironment/IFrameworkTwigEnvironment';
 import { parser } from '../utils/parser';
 import { LocalSymbolCollector } from '../symbols/LocalSymbolCollector';
-import { ITypeResolver } from '../typing/ITypeResolver';
+import type { ITypeResolver } from '../typing/ITypeResolver';
 import { readFile } from 'fs/promises';
 
 export class DocumentCache {

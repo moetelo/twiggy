@@ -1,4 +1,4 @@
-import { CompletionItem, CompletionList, ProviderResult } from 'vscode';
+import type { CompletionItem, CompletionList, ProviderResult } from 'vscode';
 
 export const unwrapCompletionArray = async (
     completionProviderResult: ProviderResult<CompletionItem[] | CompletionList>,

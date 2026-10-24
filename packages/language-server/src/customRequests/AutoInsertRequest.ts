@@ -1,4 +1,4 @@
-import { Range, TextDocumentPositionParams, TextEdit } from 'vscode-languageserver';
+import type { Range, TextDocumentPositionParams, TextEdit } from 'vscode-languageserver';
 
 export namespace AutoInsertRequest {
 	export type ParamsType = TextDocumentPositionParams & {

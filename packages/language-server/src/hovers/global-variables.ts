@@ -1,6 +1,6 @@
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { twigGlobalVariables } from '../staticCompletionInfo';
-import { Hover } from 'vscode-languageserver';
+import type { Hover } from 'vscode-languageserver';
 
 export function globalVariables(cursorNode: SyntaxNode): Hover | undefined {
     if (cursorNode.type !== 'variable') return;

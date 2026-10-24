@@ -1,4 +1,4 @@
-import { TreeCursor } from 'web-tree-sitter';
+import type { TreeCursor } from 'web-tree-sitter';
 
 export class PreOrderCursorIterator {
   constructor(private readonly cursor: TreeCursor) {

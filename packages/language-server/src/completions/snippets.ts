@@ -1,7 +1,9 @@
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { commonCompletionItem as commonFunctionCompletionItem } from './functions';
-import { SnippetLike, miscSnippets, twigFunctions, twigKeywords } from '../staticCompletionInfo';
-import { CompletionItem, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver';
+import type { SnippetLike } from '../staticCompletionInfo';
+import { miscSnippets, twigFunctions, twigKeywords } from '../staticCompletionInfo';
+import type { CompletionItem } from 'vscode-languageserver';
+import { CompletionItemKind, InsertTextFormat } from 'vscode-languageserver';
 import { commonCompletionItem as commonKeywordCompletionItem } from './keywords';
 import { triggerCompletion } from './triggerCompletionCommand';
 

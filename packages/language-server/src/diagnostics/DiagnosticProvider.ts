@@ -1,10 +1,11 @@
-import { Connection, Diagnostic, DiagnosticSeverity, DiagnosticTag, DocumentUri, Range } from 'vscode-languageserver';
-import { Document, DocumentCache } from 'documents';
+import type { Connection, Diagnostic, DocumentUri, Range } from 'vscode-languageserver';
+import { DiagnosticSeverity, DiagnosticTag } from 'vscode-languageserver';
+import type { Document, DocumentCache } from 'documents';
 import { PreOrderCursorIterator, getNodeRange, getStringNodeValue, isBlockIdentifier, isEmptyEmbedded, isPathInsideTemplateEmbedding } from 'utils/node';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { pointToPosition } from 'utils/position';
 import { positionsEqual } from 'utils/position/comparePositions';
-import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
+import type { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
 
 const createDiagnosticFromRange = (
     range: Range,

@@ -1,5 +1,5 @@
-import { SignatureInformation } from 'vscode-languageserver';
-import { TwigEnvironment, TwigFunctionLike } from '../twigEnvironment';
+import type { SignatureInformation } from 'vscode-languageserver';
+import type { TwigEnvironment, TwigFunctionLike } from '../twigEnvironment';
 
 export class SignatureIndex {
     #index: Map<string, SignatureInformation>;

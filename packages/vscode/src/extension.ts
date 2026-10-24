@@ -1,20 +1,24 @@
 import * as path from 'node:path';
-import {
-    workspace,
+import type {
     ExtensionContext,
-    window,
     WorkspaceFolder,
-    commands,
     CompletionList,
-    Uri,
     CompletionItem,
 } from 'vscode';
+import {
+    workspace,
+    window,
+    commands,
+    Uri,
+} from 'vscode';
 import * as autoInsert from './autoInsert';
+import type {
+    LanguageClientOptions,
+    ServerOptions,
+} from 'vscode-languageclient/node';
 import {
     LanguageClient,
-    LanguageClientOptions,
     MarkupKind,
-    ServerOptions,
     TransportKind,
 } from 'vscode-languageclient/node';
 import { unwrapCompletionArray } from './utils/unwrapCompletionArray';

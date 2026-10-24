@@ -1,22 +1,23 @@
-import { CompletionParams, Connection, WorkspaceFolder } from 'vscode-languageserver/node';
+import type { CompletionParams, Connection, WorkspaceFolder } from 'vscode-languageserver/node';
 import { templatePaths } from './template-paths';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
 import { functions } from './functions';
 import { filters } from './filters';
 import { forLoop } from './for-loop';
-import { EmptyEnvironment, IFrameworkTwigEnvironment } from '../twigEnvironment';
+import type { IFrameworkTwigEnvironment } from '../twigEnvironment';
+import { EmptyEnvironment } from '../twigEnvironment';
 import { variableProperties } from './variableProperties';
 import { snippets } from './snippets';
 import { keywords } from './keywords';
-import { DocumentCache } from '../documents';
+import type { DocumentCache } from '../documents';
 import { symfonyRouteNames } from './routes';
 import { phpClasses } from './phpClasses';
 import { documentUriToFsPath } from '../utils/uri';
-import { IPhpExecutor } from '../phpInterop/IPhpExecutor';
+import type { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 import { ExpressionTypeResolver } from '../typing/ExpressionTypeResolver';
-import { ITypeResolver } from '../typing/ITypeResolver';
-import { IExpressionTypeResolver } from '../typing/IExpressionTypeResolver';
+import type { ITypeResolver } from '../typing/ITypeResolver';
+import type { IExpressionTypeResolver } from '../typing/IExpressionTypeResolver';
 
 export class CompletionProvider {
     #symfonyRouteNames: string[] = [];

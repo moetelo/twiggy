@@ -1,19 +1,21 @@
-import {
+import type {
     Connection,
     Definition,
     DefinitionParams,
-    Range,
     WorkspaceFolder,
 } from 'vscode-languageserver';
+import {
+    Range,
+} from 'vscode-languageserver';
 import { getNodeRange, isBlockIdentifier, isPathInsideTemplateEmbedding } from '../utils/node';
-import { Document, DocumentCache } from '../documents';
+import type { Document, DocumentCache } from '../documents';
 import { getStringNodeValue } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';
 import { documentUriToFsPath } from '../utils/uri';
-import { PhpExecutor } from '../phpInterop/PhpExecutor';
+import type { PhpExecutor } from '../phpInterop/PhpExecutor';
 import { findParentByType } from '../utils/node/findParentByType';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 
 export class DefinitionProvider {
     workspaceFolderPath: string;

@@ -1,5 +1,6 @@
-import { CompletionItem, CompletionItemKind } from 'vscode-languageserver/node';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { CompletionItem } from 'vscode-languageserver/node';
+import { CompletionItemKind } from 'vscode-languageserver/node';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { twigKeywords } from '../staticCompletionInfo';
 import { isInsideStatement } from '../utils/node/isInsideStatement';
 

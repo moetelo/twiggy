@@ -1,4 +1,4 @@
-import {
+import type {
     FunctionArgument,
     TwigBlock,
     TwigImport,
@@ -6,7 +6,7 @@ import {
     TwigVariableDeclaration,
 } from './types';
 import { getNodeRange, getStringNodeValue } from '../utils/node';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 
 export function toBlock(node: SyntaxNode): Omit<TwigBlock, 'symbols'> {
     const nameNode = node.childForFieldName('name')!;

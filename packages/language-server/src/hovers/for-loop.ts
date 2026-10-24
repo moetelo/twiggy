@@ -1,7 +1,7 @@
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { forLoopProperties } from '../staticCompletionInfo';
 import { findParentByType } from '../utils/node';
-import { Hover } from 'vscode-languageserver';
+import type { Hover } from 'vscode-languageserver';
 
 export function forLoop(cursorNode: SyntaxNode): Hover | undefined {
     if (!findParentByType(cursorNode, 'for')) {

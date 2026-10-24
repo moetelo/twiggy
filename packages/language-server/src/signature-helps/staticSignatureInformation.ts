@@ -1,4 +1,4 @@
-import { SignatureInformation } from 'vscode-languageserver';
+import type { SignatureInformation } from 'vscode-languageserver';
 import { twigFunctions } from '../staticCompletionInfo';
 
 export const twigFunctionsSignatureInformation = new Map<

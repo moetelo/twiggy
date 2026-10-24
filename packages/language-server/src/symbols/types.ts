@@ -1,5 +1,5 @@
-import { Range } from 'vscode-languageserver/node';
-import { ReflectedType } from '../phpInterop/ReflectedType';
+import type { Range } from 'vscode-languageserver/node';
+import type { ReflectedType } from '../phpInterop/ReflectedType';
 
 export interface LocalSymbol {
     name: string;

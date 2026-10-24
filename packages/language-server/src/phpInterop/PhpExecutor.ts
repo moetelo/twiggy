@@ -1,8 +1,9 @@
-import { PhpUtilPath, PhpUtilPathTable } from '../twigEnvironment/PhpUtilPath';
-import { SymfonyTwigDebugJsonOutput } from '../twigEnvironment/symfony/parseDebugTwigOutput';
+import type { PhpUtilPathTable } from '../twigEnvironment/PhpUtilPath';
+import { PhpUtilPath } from '../twigEnvironment/PhpUtilPath';
+import type { SymfonyTwigDebugJsonOutput } from '../twigEnvironment/symfony/parseDebugTwigOutput';
 import { exec } from '../utils/exec';
-import { IPhpExecutor } from './IPhpExecutor';
-import { ReflectedType } from './ReflectedType';
+import type { IPhpExecutor } from './IPhpExecutor';
+import type { ReflectedType } from './ReflectedType';
 
 export class PhpExecutor implements IPhpExecutor {
     constructor(

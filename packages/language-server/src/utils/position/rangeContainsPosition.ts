@@ -1,4 +1,4 @@
-import { Position, Range } from 'vscode-languageserver/node';
+import type { Position, Range } from 'vscode-languageserver/node';
 import { comparePositions } from './comparePositions';
 
 export function rangeContainsPosition(

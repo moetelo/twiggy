@@ -1,12 +1,14 @@
-import {
+import type {
     Connection,
-    DidChangeWatchedFilesNotification,
-    FileChangeType,
     InitializeParams,
     ServerCapabilities,
+    WorkspaceFolder,
+} from 'vscode-languageserver';
+import {
+    DidChangeWatchedFilesNotification,
+    FileChangeType,
     TextDocuments,
     WatchKind,
-    WorkspaceFolder,
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { DiagnosticProvider } from './diagnostics';

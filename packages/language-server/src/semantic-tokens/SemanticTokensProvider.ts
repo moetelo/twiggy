@@ -1,13 +1,15 @@
-import {
+import type {
     SemanticTokensParams,
     SemanticTokens,
-    SemanticTokensBuilder,
     Connection,
+} from 'vscode-languageserver';
+import {
+    SemanticTokensBuilder,
 } from 'vscode-languageserver';
 import { PreOrderCursorIterator } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { semanticTokensLegend } from './tokens-provider';
-import { DocumentCache } from '../documents';
+import type { DocumentCache } from '../documents';
 import { TokenTypeResolver } from './TokenTypeResolver';
 
 export class SemanticTokensProvider {

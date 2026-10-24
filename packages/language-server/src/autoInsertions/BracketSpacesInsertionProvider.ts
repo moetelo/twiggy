@@ -1,6 +1,6 @@
-import { Connection, TextDocuments } from 'vscode-languageserver';
+import type { Connection, TextDocuments } from 'vscode-languageserver';
 import { AutoInsertRequest } from '../customRequests/AutoInsertRequest';
-import { TextDocument } from 'vscode-languageserver-textdocument';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
 
 export class BracketSpacesInsertionProvider {
     isEnabled = true;

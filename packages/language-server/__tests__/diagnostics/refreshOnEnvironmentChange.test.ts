@@ -4,7 +4,8 @@ import * as path from 'node:path';
 import type { Connection, Diagnostic, PublishDiagnosticsParams } from 'vscode-languageserver';
 import { DiagnosticProvider } from 'diagnostics';
 import { DocumentCache } from 'documents/DocumentCache';
-import { EmptyEnvironment, IFrameworkTwigEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
+import type { IFrameworkTwigEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
+import { EmptyEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
 import { toDocumentUri } from 'utils/uri';
 import { initializeTestParser } from '../__helpers__/parser';
 

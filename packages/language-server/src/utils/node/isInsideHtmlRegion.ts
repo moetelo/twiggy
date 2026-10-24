@@ -1,5 +1,5 @@
-import { Position } from 'vscode-languageserver';
-import { Document } from '../../documents';
+import type { Position } from 'vscode-languageserver';
+import type { Document } from '../../documents';
 
 export async function isInsideHtmlRegion(
     document: Document,

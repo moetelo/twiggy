@@ -1,8 +1,8 @@
-import { Connection, SignatureHelp, SignatureHelpParams, SignatureInformation } from 'vscode-languageserver';
+import type { Connection, SignatureHelp, SignatureHelpParams, SignatureInformation } from 'vscode-languageserver';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctionsSignatureInformation } from './staticSignatureInformation';
-import { Document, DocumentCache } from '../documents';
-import { IFrameworkTwigEnvironment } from '../twigEnvironment';
+import type { Document, DocumentCache } from '../documents';
+import type { IFrameworkTwigEnvironment } from '../twigEnvironment';
 import { SignatureIndex } from './SignatureIndex';
 
 export class SignatureHelpProvider {

@@ -6,14 +6,16 @@
 import { describe, test, beforeAll, expect } from 'bun:test';
 import assert from 'node:assert/strict';
 import { PassThrough } from 'stream';
+import type {
+    InitializeParams,
+    CompletionParams,
+    DidOpenTextDocumentParams,
+} from 'vscode-languageserver/node';
 import {
     createConnection,
     createProtocolConnection,
     StreamMessageReader,
     StreamMessageWriter,
-    InitializeParams,
-    CompletionParams,
-    DidOpenTextDocumentParams,
     ProtocolNotificationType,
 } from 'vscode-languageserver/node';
 import { Server } from 'server';

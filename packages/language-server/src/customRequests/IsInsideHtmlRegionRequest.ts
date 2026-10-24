@@ -1,4 +1,4 @@
-import { TextDocumentPositionParams } from 'vscode-languageserver';
+import type { TextDocumentPositionParams } from 'vscode-languageserver';
 
 export namespace IsInsideHtmlRegionRequest {
     export type ParamsType = TextDocumentPositionParams;

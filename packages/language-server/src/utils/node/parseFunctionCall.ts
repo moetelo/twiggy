@@ -1,5 +1,5 @@
-import { Range } from 'vscode-languageserver';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { Range } from 'vscode-languageserver';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { getNodeRange } from './getNodeRange';
 
 type FunctionCallArgument = {

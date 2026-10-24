@@ -1,6 +1,6 @@
-import { Connection } from 'vscode-languageserver';
+import type { Connection } from 'vscode-languageserver';
 import { isInsideHtmlRegion } from '../utils/node';
-import { DocumentCache } from '../documents';
+import type { DocumentCache } from '../documents';
 import { IsInsideHtmlRegionRequest } from 'customRequests/IsInsideHtmlRegionRequest';
 
 export class IsInsideHtmlRegionCommandProvider {

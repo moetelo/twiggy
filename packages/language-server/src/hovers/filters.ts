@@ -1,6 +1,6 @@
-import { SyntaxNode } from 'web-tree-sitter';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFilters } from '../staticCompletionInfo';
-import { Hover } from 'vscode-languageserver';
+import type { Hover } from 'vscode-languageserver';
 
 const nodeTypes = [ 'variable', 'function' ];
 

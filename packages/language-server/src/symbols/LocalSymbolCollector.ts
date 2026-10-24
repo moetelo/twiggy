@@ -1,13 +1,15 @@
-import {
+import type {
     LocalSymbolInformation,
     TwigBlock,
     TwigMacro,
     TwigVariableDeclaration,
+} from './types';
+import {
     type TwigImport,
 } from './types';
 import { getNodeRange, getStringNodeValue } from '../utils/node';
-import { SyntaxNode } from 'web-tree-sitter';
-import { ITypeResolver } from '../typing/ITypeResolver';
+import type { SyntaxNode } from 'web-tree-sitter';
+import type { ITypeResolver } from '../typing/ITypeResolver';
 import { ExpressionTypeResolver } from '../typing/ExpressionTypeResolver';
 import { toMacro, toVariable, toBlock, toImport } from './nodeToSymbolMapping';
 import type { ReflectedType } from '../phpInterop/ReflectedType';

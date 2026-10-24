@@ -1,6 +1,6 @@
 import type { Position, Range } from 'vscode-languageserver';
 import { documentFromCode, documentFromCodeWithTypeResolver, type DocumentWithText } from './documentFromCode';
-import { TypeResolver } from 'typing/TypeResolver';
+import type { TypeResolver } from 'typing/TypeResolver';
 
 const CURSOR = '$0';
 

@@ -1,4 +1,5 @@
-import { spawn, SpawnOptionsWithoutStdio } from 'node:child_process';
+import type { SpawnOptionsWithoutStdio } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 
 export type CommandResult = { stdout: string, stderr: string, code: number | null };

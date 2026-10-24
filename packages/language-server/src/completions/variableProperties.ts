@@ -1,13 +1,14 @@
-import { CompletionItem, CompletionItemKind, InsertTextFormat } from 'vscode-languageserver/node';
-import { SyntaxNode } from 'web-tree-sitter';
+import type { CompletionItem } from 'vscode-languageserver/node';
+import { CompletionItemKind, InsertTextFormat } from 'vscode-languageserver/node';
+import type { SyntaxNode } from 'web-tree-sitter';
 import { forLoopProperties } from '../staticCompletionInfo';
-import { Document, DocumentCache } from '../documents';
+import type { Document, DocumentCache } from '../documents';
 import { triggerParameterHints } from '../signature-helps/triggerParameterHintsCommand';
-import { TwigMacro } from '../symbols/types';
+import type { TwigMacro } from '../symbols/types';
 import { pointToPosition } from '../utils/position';
-import { Position } from 'vscode-languageserver-textdocument';
-import { ReflectedType } from '../phpInterop/ReflectedType';
-import { IExpressionTypeResolver } from '../typing/IExpressionTypeResolver';
+import type { Position } from 'vscode-languageserver-textdocument';
+import type { ReflectedType } from '../phpInterop/ReflectedType';
+import type { IExpressionTypeResolver } from '../typing/IExpressionTypeResolver';
 import { ExpressionTypeResolver } from '../typing/ExpressionTypeResolver';
 
 const macroToCompletionItem = (macro: TwigMacro) => ({

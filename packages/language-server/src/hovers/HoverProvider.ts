@@ -1,10 +1,10 @@
-import { Connection, HoverParams } from 'vscode-languageserver';
+import type { Connection, HoverParams } from 'vscode-languageserver';
 import { globalVariables } from './global-variables';
 import { localVariables } from './local-variables';
 import { forLoop } from './for-loop';
 import { functions } from './functions';
 import { filters } from './filters';
-import { DocumentCache } from '../documents';
+import type { DocumentCache } from '../documents';
 
 export class HoverProvider {
     constructor(

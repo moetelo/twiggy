@@ -1,4 +1,4 @@
-import { ReflectedType } from './ReflectedType';
+import type { ReflectedType } from './ReflectedType';
 
 export interface IPhpExecutor {
     call(command: string, args: string[]): Promise<{

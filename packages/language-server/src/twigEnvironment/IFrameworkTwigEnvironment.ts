@@ -1,4 +1,4 @@
-import { RouteNameToPathRecord, TemplatePathMapping, TwigEnvironment } from './types';
+import type { RouteNameToPathRecord, TemplatePathMapping, TwigEnvironment } from './types';
 
 export interface IFrameworkTwigEnvironment {
     get environment(): TwigEnvironment | null;

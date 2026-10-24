@@ -1,8 +1,9 @@
-import { PhpExecutor } from '../phpInterop/PhpExecutor';
-import { EmptyEnvironment, IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
-import { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
+import type { PhpExecutor } from '../phpInterop/PhpExecutor';
+import type { IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';
+import { EmptyEnvironment } from './IFrameworkTwigEnvironment';
+import type { TwigEnvironmentArgs } from './TwigEnvironmentArgs';
 import { parseDebugTwigOutput } from './symfony/parseDebugTwigOutput';
-import { RouteNameToPathRecord, TemplatePathMapping, TwigEnvironment } from './types';
+import type { RouteNameToPathRecord, TemplatePathMapping, TwigEnvironment } from './types';
 
 export class VanillaTwigEnvironment implements IFrameworkTwigEnvironment {
     #environment: TwigEnvironment | null = null;

@@ -1,8 +1,9 @@
-import { SyntaxNode } from 'web-tree-sitter';
-import { ReflectedType } from '../phpInterop/ReflectedType';
-import { ITypeResolver } from './ITypeResolver';
-import { LocalSymbolInformation, hasReflectedType } from '../symbols/types';
-import { IExpressionTypeResolver } from './IExpressionTypeResolver';
+import type { SyntaxNode } from 'web-tree-sitter';
+import type { ReflectedType } from '../phpInterop/ReflectedType';
+import type { ITypeResolver } from './ITypeResolver';
+import type { LocalSymbolInformation } from '../symbols/types';
+import { hasReflectedType } from '../symbols/types';
+import type { IExpressionTypeResolver } from './IExpressionTypeResolver';
 import { primitives } from '../phpInterop/primitives';
 
 // TODO: provide Twig environment, resolve type for `{{ something() }}`

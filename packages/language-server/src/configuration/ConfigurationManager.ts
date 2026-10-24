@@ -1,20 +1,25 @@
-import {
+import type {
     Connection,
-    DidChangeConfigurationNotification,
     DidChangeConfigurationParams,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import { LanguageServerSettings, PhpFramework, PhpFrameworkOption } from './LanguageServerSettings';
+import {
+    DidChangeConfigurationNotification,
+} from 'vscode-languageserver';
+import type { LanguageServerSettings, PhpFramework } from './LanguageServerSettings';
+import { PhpFrameworkOption } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
-import { DocumentCache } from '../documents';
-import { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
-import { CompletionProvider } from '../completions/CompletionProvider';
-import { SignatureHelpProvider } from '../signature-helps/SignatureHelpProvider';
-import { DefinitionProvider } from '../definitions';
+import type { DocumentCache } from '../documents';
+import type { BracketSpacesInsertionProvider } from '../autoInsertions/BracketSpacesInsertionProvider';
+import type { CompletionProvider } from '../completions/CompletionProvider';
+import type { SignatureHelpProvider } from '../signature-helps/SignatureHelpProvider';
+import type { DefinitionProvider } from '../definitions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
-import {
+import type {
     IFrameworkTwigEnvironment,
+} from '../twigEnvironment';
+import {
     SymfonyTwigEnvironment,
     CraftTwigEnvironment,
     VanillaTwigEnvironment,
@@ -23,8 +28,8 @@ import {
 import { TypeResolver } from '../typing/TypeResolver';
 import { isFile } from '../utils/files/fileStat';
 import { readFile } from 'fs/promises';
-import { DiagnosticProvider } from 'diagnostics';
-import { FormattingProvider } from 'formatting/FormattingProvider';
+import type { DiagnosticProvider } from 'diagnostics';
+import type { FormattingProvider } from 'formatting/FormattingProvider';
 import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
 
 export class ConfigurationManager {

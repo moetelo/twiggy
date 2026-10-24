@@ -1,6 +1,7 @@
-import { Connection, DocumentSymbol, DocumentSymbolParams, SymbolKind } from 'vscode-languageserver';
-import { LocalSymbolInformation } from './types';
-import { DocumentCache } from '../documents';
+import type { Connection, DocumentSymbol, DocumentSymbolParams } from 'vscode-languageserver';
+import { SymbolKind } from 'vscode-languageserver';
+import type { LocalSymbolInformation } from './types';
+import type { DocumentCache } from '../documents';
 
 const mapLocalsToSymbols = (locals: LocalSymbolInformation): DocumentSymbol[] => {
     return [

@@ -1,9 +1,10 @@
-import { Connection, InlayHint, InlayHintKind, InlayHintParams } from 'vscode-languageserver';
+import type { Connection, InlayHint, InlayHintParams } from 'vscode-languageserver';
+import { InlayHintKind } from 'vscode-languageserver';
 import { PreOrderCursorIterator, getNodeRange } from '../utils/node';
 import { parseFunctionCall } from '../utils/node/parseFunctionCall';
-import { SyntaxNode } from 'web-tree-sitter';
-import { InlayHintSettings } from '../configuration/LanguageServerSettings';
-import { DocumentCache } from '../documents';
+import type { SyntaxNode } from 'web-tree-sitter';
+import type { InlayHintSettings } from '../configuration/LanguageServerSettings';
+import type { DocumentCache } from '../documents';
 
 const toInlayHint = (node: SyntaxNode): InlayHint => {
     const range = getNodeRange(node);

@@ -1,6 +1,7 @@
-import { DocumentUri, Position } from 'vscode-languageserver';
-import Parser, { SyntaxNode } from 'web-tree-sitter';
-import { LocalSymbol, LocalSymbolInformation, TwigBlock } from '../symbols/types';
+import type { DocumentUri, Position } from 'vscode-languageserver';
+import type { SyntaxNode } from 'web-tree-sitter';
+import type Parser from 'web-tree-sitter';
+import type { LocalSymbol, LocalSymbolInformation, TwigBlock } from '../symbols/types';
 import { documentUriToFsPath } from '../utils/uri';
 import { pointToPosition, rangeContainsPosition } from '../utils/position';
 import { getNodeRange } from '../utils/node';
