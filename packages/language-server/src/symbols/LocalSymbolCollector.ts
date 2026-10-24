@@ -147,7 +147,7 @@ export class LocalSymbolCollector {
     async #visitFor(currentNode: SyntaxNode) {
         const forVariableNodes = currentNode.childrenForFieldName('variable');
         for (const variable of forVariableNodes) {
-            this.#visitVariable(variable, false);
+            await this.#visitVariable(variable, false);
         }
 
         const expr = currentNode.childForFieldName('expr');
@@ -201,7 +201,7 @@ export class LocalSymbolCollector {
             switch (variable.type) {
                 case 'types_optional_declaration':
                 case 'types_required_declaration': {
-                    this.#visitVariableDeclaration(variable);
+                    await this.#visitVariableDeclaration(variable);
                     continue;
                 }
             }
