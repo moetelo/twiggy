@@ -6,7 +6,7 @@ import {
     templateUsingFunctions,
     templateUsingStatements,
 } from '../constants/template-usage';
-import getTwigFiles from '../utils/getTwigFiles';
+import { getTwigFiles } from '../utils/getTwigFiles';
 import type { TemplatePathMapping } from '../twigEnvironment/types';
 import { getStringNodeValue } from 'utils/node';
 
@@ -66,7 +66,7 @@ export async function templatePaths(
         };
 
         const searchText = getStringNodeValue(cursorNode)
-            .substring(0, position.character - nodeStringStart);
+            .slice(0, Math.max(0, position.character - nodeStringStart));
 
         for (const { namespace, directory } of templateMappings) {
             const templatesDirectory = path.resolve(workspaceFolderDirectory, directory)

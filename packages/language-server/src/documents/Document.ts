@@ -2,31 +2,17 @@ import type { DocumentUri, Position } from 'vscode-languageserver';
 import type { SyntaxNode } from 'web-tree-sitter';
 import type Parser from 'web-tree-sitter';
 import type { LocalSymbol, LocalSymbolInformation, TwigBlock } from '../symbols/types';
-import { documentUriToFsPath } from '../utils/uri';
 import { pointToPosition, rangeContainsPosition } from '../utils/position';
 import { getNodeRange } from '../utils/node';
-
-class TreeNotParsedError extends Error {
-    get message() {
-        return `Document tree is not parsed yet. File: ${documentUriToFsPath(this.uri)}`;
-    }
-
-    constructor(readonly uri: DocumentUri) {
-        super();
-    }
-}
+import { TreeNotParsedError } from './TreeNotParsedError';
 
 export class Document {
-    readonly uri: DocumentUri;
-
     text: string | null = null;
 
     #tree?: Parser.Tree;
     #locals?: LocalSymbolInformation;
 
-    constructor(uri: DocumentUri) {
-        this.uri = uri;
-    }
+    constructor(readonly uri: DocumentUri) {}
 
     get tree() {
         if (!this.#tree) throw new TreeNotParsedError(this.uri);
@@ -64,7 +50,7 @@ export class Document {
         ];
 
         return scopes.find((scope) => rangeContainsPosition(scope.range, pos))?.symbols
-            || this.locals;
+            ?? this.locals;
     }
 
     getLocalsAt(cursorPosition: Position): LocalSymbol[] {
@@ -83,8 +69,8 @@ export class Document {
 
     variableAt(pos: Position): LocalSymbol | undefined {
         const cursorNode = this.deepestAt(pos);
-        if (!cursorNode || cursorNode.type !== 'variable') {
-            return;
+        if (cursorNode.type !== 'variable') {
+            return undefined;
         }
 
         const variableName = cursorNode.text;
@@ -98,7 +84,7 @@ export class Document {
     deepestAt(pos: Position): SyntaxNode {
         let node = this.tree.rootNode;
         while (node.childCount > 0) {
-            const foundNode = node.children.find((n) => rangeContainsPosition(getNodeRange(n), pos))!;
+            const foundNode = node.children.find((n) => rangeContainsPosition(getNodeRange(n), pos));
 
             if (!foundNode) return node;
 

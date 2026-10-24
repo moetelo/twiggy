@@ -26,7 +26,6 @@ describe('Document.deepestAt — incomplete output expressions', () => {
 
     test('empty output', async () => {
         const { cursorNode, document } = await documentWithCursor(`{{ $0 }}`);
-        assert.ok(cursorNode);
         assertAncestor(cursorNode, 'output');
         assert.doesNotThrow(() => document.locals);
     });
@@ -36,28 +35,24 @@ describe('Document.deepestAt — incomplete output expressions', () => {
     // not throw when walking / collecting locals on them.
     test('dangling member access lands in ERROR node (no throw)', async () => {
         const { cursorNode, document } = await documentWithCursor(`{{ user.$0 }}`);
-        assert.ok(cursorNode);
         assertAncestor(cursorNode, 'ERROR');
         assert.doesNotThrow(() => document.locals);
     });
 
     test('deep dangling member access lands in ERROR node (no throw)', async () => {
         const { cursorNode, document } = await documentWithCursor(`{{ user.getFoo().$0 }}`);
-        assert.ok(cursorNode);
         assertAncestor(cursorNode, 'ERROR');
         assert.doesNotThrow(() => document.locals);
     });
 
     test('in-flight filter slot lands in ERROR node (no throw)', async () => {
         const { cursorNode, document } = await documentWithCursor(`{{ name|$0 }}`);
-        assert.ok(cursorNode);
         assertAncestor(cursorNode, 'ERROR');
         assert.doesNotThrow(() => document.locals);
     });
 
     test('chained in-flight filter slot lands in ERROR node (no throw)', async () => {
         const { cursorNode, document } = await documentWithCursor(`{{ name|upper|$0 }}`);
-        assert.ok(cursorNode);
         assertAncestor(cursorNode, 'ERROR');
         assert.doesNotThrow(() => document.locals);
     });
@@ -67,34 +62,33 @@ describe('Document.deepestAt — incomplete tag headers', () => {
     beforeAll(initializeTestParser);
 
     test('{% set $0 %}', async () => {
-        const { cursorNode } = await documentWithCursor(`{% set $0 %}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% set $0 %}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('{% set x = $0 %}', async () => {
-        const { cursorNode } = await documentWithCursor(`{% set x = $0 %}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% set x = $0 %}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('{% if $0 %}{% endif %}', async () => {
         const { cursorNode } = await documentWithCursor(`{% if $0 %}{% endif %}`);
-        assert.ok(cursorNode);
         assertAncestor(cursorNode, 'if');
     });
 
     test('{% for $0 %}', async () => {
-        const { cursorNode } = await documentWithCursor(`{% for $0 %}{% endfor %}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% for $0 %}{% endfor %}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('{% for u in $0 %}', async () => {
-        const { cursorNode } = await documentWithCursor(`{% for u in $0 %}{% endfor %}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% for u in $0 %}{% endfor %}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test("{% import '...' as $0 %}", async () => {
-        const { cursorNode } = await documentWithCursor(`{% import 'components.html.twig' as $0 %}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% import 'components.html.twig' as $0 %}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 });
 
@@ -102,20 +96,20 @@ describe('Document.deepestAt — unclosed constructs', () => {
     beforeAll(initializeTestParser);
 
     test('unterminated output expression', async () => {
-        const { cursorNode, document } = await documentWithCursor(`{{ foo$0`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{{ foo$0`);
+        assert.doesNotThrow(() => document.deepestAt(position));
         assert.doesNotThrow(() => document.locals);
     });
 
     test('if with no endif', async () => {
-        const { cursorNode, document } = await documentWithCursor(`{% if cond %}body$0`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% if cond %}body$0`);
+        assert.doesNotThrow(() => document.deepestAt(position));
         assert.doesNotThrow(() => document.locals);
     });
 
     test('cursor inside unterminated block', async () => {
-        const { cursorNode, document } = await documentWithCursor(`{% block name %}$0`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% block name %}$0`);
+        assert.doesNotThrow(() => document.deepestAt(position));
         assert.doesNotThrow(() => document.locals);
     });
 });
@@ -129,17 +123,17 @@ describe('Document.deepestAt — comments, text, object/array literals', () => {
     });
 
     test('cursor inside raw text between tags', async () => {
-        const { cursorNode } = await documentWithCursor(`<div>hello $0 world</div>{{ x }}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`<div>hello $0 world</div>{{ x }}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('cursor in object literal value slot', async () => {
-        const { cursorNode } = await documentWithCursor(`{% set x = { key: $0 } %}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% set x = { key: $0 } %}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('cursor in array literal slot', async () => {
-        const { cursorNode } = await documentWithCursor(`{% set x = [ $0 ] %}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{% set x = [ $0 ] %}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 });

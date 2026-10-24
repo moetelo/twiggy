@@ -9,12 +9,12 @@ export function filters(cursorNode: SyntaxNode): Hover | undefined {
         !nodeTypes.has(cursorNode.type)
         && cursorNode.previousSibling?.text !== '|'
     ) {
-        return;
+        return undefined;
     }
 
     const filter = twigFilters.find(item => item.label === cursorNode.text);
 
-    if (!filter?.documentation) return;
+    if (filter?.documentation === undefined) return undefined;
 
     return {
         contents: filter.documentation,

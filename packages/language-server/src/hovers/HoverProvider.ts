@@ -16,20 +16,12 @@ export class HoverProvider {
 
     async onHover(params: HoverParams) {
         const document = await this.documentCache.get(params.textDocument.uri);
-
-        if (!document) {
-            return;
-        }
-
         const cursorNode = document.deepestAt(params.position);
-        if (!cursorNode) {
-            return;
-        }
 
         return globalVariables(cursorNode)
-            || localVariables(document, cursorNode)
-            || functions(cursorNode)
-            || filters(cursorNode)
-            || forLoop(cursorNode);
+            ?? localVariables(document, cursorNode)
+            ?? functions(cursorNode)
+            ?? filters(cursorNode)
+            ?? forLoop(cursorNode);
     }
 }

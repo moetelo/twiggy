@@ -43,8 +43,8 @@ export interface TwigImport extends LocalSymbol, IWithReferences {
     path?: string;
 }
 
-export namespace TwigImport {
-    export const is = (node: LocalSymbol): node is TwigImport => 'path' in node;
+export function isTwigImport(node: LocalSymbol): node is TwigImport {
+    return 'path' in node;
 }
 
 export type LocalSymbolInformation = {

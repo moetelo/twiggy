@@ -1,6 +1,5 @@
 export type * from './types';
-export { EmptyEnvironment } from './IFrameworkTwigEnvironment';
+export * from './IFrameworkTwigEnvironment';
 export { CraftTwigEnvironment } from './CraftTwigEnvironment';
 export { VanillaTwigEnvironment } from './VanillaTwigEnvironment';
 export { SymfonyTwigEnvironment } from './SymfonyTwigEnvironment';
-export type { IFrameworkTwigEnvironment } from './IFrameworkTwigEnvironment';

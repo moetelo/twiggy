@@ -7,7 +7,7 @@ export const twigFunctionsSignatureInformation = new Map<
 >(
     twigFunctions.map(item => {
         const { label } = item;
-        const params = item.parameters?.map(item => item.label).join(', ');
+        const params = item.parameters?.map(parameter => parameter.label).join(', ');
         const signatureInformation: SignatureInformation = {
             label: `${item.label}(${params ?? ''})`,
             parameters: item.parameters,

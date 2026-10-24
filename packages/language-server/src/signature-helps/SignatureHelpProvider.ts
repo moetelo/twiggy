@@ -25,33 +25,27 @@ export class SignatureHelpProvider {
         params: SignatureHelpParams,
     ): Promise<SignatureHelp | undefined> {
         const document = await this.documentCache.get(params.textDocument.uri);
-
-        if (!document) {
-            return undefined;
-        }
-
         const cursorNode = document.deepestAt(params.position);
-        if (!cursorNode) return;
 
         const argumentsNode = cursorNode.parent;
-        if (argumentsNode?.type !== 'arguments') return;
+        if (argumentsNode?.type !== 'arguments') return undefined;
 
         const callExpression = argumentsNode.parent;
-        if (!callExpression || callExpression.type !== 'call_expression') return;
+        if (callExpression?.type !== 'call_expression') return undefined;
 
         const callName = callExpression.childForFieldName('name')?.text;
 
-        if (!callName) return;
+        if (!callName) return undefined;
 
         const signatureInformation = await this.getSignatureInformation(document, callName);
-        if (!signatureInformation?.parameters?.length) return;
+        if (!signatureInformation?.parameters?.length) return undefined;
 
         let activeParameter = 0;
 
         let node: SyntaxNode | null = argumentsNode.firstChild;
         while (node) {
             if (node.text === ',') {
-                activeParameter++;
+                activeParameter += 1;
             }
 
             if (node.equals(cursorNode)) {
@@ -78,10 +72,10 @@ export class SignatureHelpProvider {
             const [ importName, macroName ] = functionName.split('.');
 
             const importedDocument = await this.documentCache.resolveImport(document, importName);
-            if (!importedDocument) return;
+            if (!importedDocument) return undefined;
 
-            const macro = importedDocument.locals.macro.find(macro => macro.name === macroName);
-            if (!macro) return;
+            const macro = importedDocument.locals.macro.find(candidate => candidate.name === macroName);
+            if (!macro) return undefined;
 
             const argsStr = macro.args
                 .map(({ name, value }) => value ? `${name} = ${value}` : name)

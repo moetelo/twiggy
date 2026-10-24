@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const getFullPath = (dir: string, file: Dirent) => path.join(dir, file.name);
 
-export default async function getTwigFiles(dir: string) {
+export async function getTwigFiles(dir: string) {
     const dirFiles = await fs.readdir(dir, { withFileTypes: true });
 
     const twigFiles: string[] = [];

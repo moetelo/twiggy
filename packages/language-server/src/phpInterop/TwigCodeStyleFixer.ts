@@ -26,7 +26,7 @@ export class TwigCodeStyleFixer {
         this.#executablePath = path.join(this._workspaceDirectory, 'vendor/bin/twig-cs-fixer');
     }
 
-    async #call(action: TwigCodeStyleAction, uri: DocumentUri | '' = '') {
+    async #call(action: TwigCodeStyleAction, uri: DocumentUri = '') {
         if (!this._phpExecutor || !await isFile(this.#executablePath)) {
             return null;
         }
@@ -48,7 +48,7 @@ export class TwigCodeStyleFixer {
         const reportLines = lintResult.stdout.split('\n');
         for (const reportLine of reportLines) {
             // ::error file=templates/template.html.twig,line=20,col=81::Expecting 0 whitespace after "|"; found 1.
-            const match = reportLine.match(/::(error|notice|warning) file=(.*),line=(.*),col=(.*):(.*)/);
+            const match = /::(error|notice|warning) file=(.*),line=(.*),col=(.*):(.*)/u.exec(reportLine);
             if (!match) {
                 continue;
             }
@@ -59,19 +59,17 @@ export class TwigCodeStyleFixer {
             ];
 
             const fullFilePath = path.join(this._workspaceDirectory, filePath);
-            const uri = toDocumentUri(fullFilePath);
+            const fileUri = toDocumentUri(fullFilePath);
 
-            if (!uriToDiagnostics.has(uri)) {
-                uriToDiagnostics.set(uri, []);
-            }
+            const diagnostics = uriToDiagnostics.get(fileUri) ?? [];
+            uriToDiagnostics.set(fileUri, diagnostics);
 
-            const diagnostics = uriToDiagnostics.get(uri)!;
             diagnostics.push({
                 message,
                 severity: severityToDiagnosticSeverity[severity],
                 range: Range.create(
-                    parseInt(line) - 1, parseInt(col) - 1,
-                    parseInt(line) - 1, parseInt(col),
+                    Number(line) - 1, Number(col) - 1,
+                    Number(line) - 1, Number(col),
                 ),
             });
         }
@@ -81,7 +79,7 @@ export class TwigCodeStyleFixer {
 
     async lint(uri: DocumentUri) {
         const result = await this.#call(TwigCodeStyleAction.Lint, uri);
-        return result?.get(uri)! || [];
+        return result?.get(uri) ?? [];
     }
 
     async fix(uri: DocumentUri) {

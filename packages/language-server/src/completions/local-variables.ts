@@ -30,5 +30,5 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Comp
         && positionsEqual(local.nameRange.end, pointToPosition(cursorNode.endPosition)))
     );
 
-    return localsWithoutCurrentVariable.map(toCompletionItem);
+    return localsWithoutCurrentVariable.map((variable) => toCompletionItem(variable));
 }

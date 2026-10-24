@@ -5,23 +5,25 @@ import type { Hover } from 'vscode-languageserver';
 
 export function forLoop(cursorNode: SyntaxNode): Hover | undefined {
     if (!findParentByType(cursorNode, 'for')) {
-        return;
+        return undefined;
     }
 
     if (
         cursorNode.type === 'property' &&
         cursorNode.previousSibling?.text === '.' &&
-        cursorNode.previousSibling?.previousSibling?.type === 'variable' &&
-        cursorNode.previousSibling?.previousSibling?.text === 'loop'
+        cursorNode.previousSibling.previousSibling?.type === 'variable' &&
+        cursorNode.previousSibling.previousSibling.text === 'loop'
     ) {
         const property = forLoopProperties.find(
             item => item.label === cursorNode.text,
         );
 
-        if (!property?.detail) return;
+        if (!property?.detail) return undefined;
 
         return {
             contents: property.detail,
         };
     }
+
+    return undefined;
 }

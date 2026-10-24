@@ -6,5 +6,5 @@ export async function isInsideHtmlRegion(
     position: Position,
 ): Promise<boolean> {
     const node = document.deepestAt(position);
-    return node?.type === 'content';
+    return node.type === 'content';
 }

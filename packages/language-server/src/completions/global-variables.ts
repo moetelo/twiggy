@@ -25,7 +25,7 @@ export function globalVariables(cursorNode: SyntaxNode, globals: TwigVariable[])
 
         return [
             ...completions,
-            ...completionsPhp.filter(comp => !completions.find(item => item.label === comp.label)),
+            ...completionsPhp.filter(comp => !completions.some(item => item.label === comp.label)),
         ];
     }
 

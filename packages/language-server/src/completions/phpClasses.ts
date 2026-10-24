@@ -40,11 +40,10 @@ export async function phpClasses(
 
     if (!phpExecutor) return primitiveCompletions;
 
-    const classNames = await phpExecutor.getClassCompletion(typeNode?.text || '');
-    const classes = classNames.map(fullClassName => {
-        fullClassName = `\\${fullClassName}`;
-        const parts = fullClassName.split('\\');
-        const className = parts[parts.length - 1];
+    const classNames = await phpExecutor.getClassCompletion(typeNode?.text ?? '');
+    const classes = classNames.map(name => {
+        const fullClassName = `\\${name}`;
+        const className = fullClassName.slice(fullClassName.lastIndexOf('\\') + 1);
         return toCompletionItem({ fullClassName, className });
     });
 

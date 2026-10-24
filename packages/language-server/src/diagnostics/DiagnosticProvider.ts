@@ -74,9 +74,9 @@ export class DiagnosticProvider {
 
         if (isPathInsideTemplateEmbedding(node)) {
             const path = getStringNodeValue(node);
-            const document = await this.documentCache.resolveByTwigPath(path);
+            const templateDocument = await this.documentCache.resolveByTwigPath(path);
 
-            if (!document) {
+            if (!templateDocument) {
                 return createDiagnostic(node, `Template "${path}" not found`, DiagnosticSeverity.Error)
             }
 
@@ -156,7 +156,7 @@ export class DiagnosticProvider {
 
     async validateReport(document: Document) {
         const diagnostics = await this.validate(document);
-        const lints = this.#lintMap.get(document.uri) || [];
+        const lints = this.#lintMap.get(document.uri) ?? [];
 
         await this.connection.sendDiagnostics({
             uri: document.uri,
@@ -195,9 +195,9 @@ export class DiagnosticProvider {
             return;
         }
 
-        const lints = await this.#twigCodeStyleFixer.lint(uri) || [];
+        const lints = await this.#twigCodeStyleFixer.lint(uri);
 
-        if (!lints.length) {
+        if (lints.length === 0) {
             this.#lintMap.delete(uri);
         } else {
             this.#lintMap.set(uri, lints);
@@ -220,7 +220,7 @@ export class DiagnosticProvider {
             return;
         }
 
-        const lints = await this.#twigCodeStyleFixer.lintWorkspace() || [];
+        const lints = await this.#twigCodeStyleFixer.lintWorkspace();
 
         for (const { uri, diagnostics } of lints) {
             this.#lintMap.set(uri, diagnostics);

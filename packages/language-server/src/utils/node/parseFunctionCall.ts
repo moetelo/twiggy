@@ -22,7 +22,7 @@ export const parseFunctionCall = (
     node: SyntaxNode | null,
 ): FunctionCall | undefined => {
     const isCall = !!node && node.type === 'call_expression';
-    if (!isCall) return;
+    if (!isCall) return undefined;
 
     const nameNode = node.childForFieldName('name')!;
 
@@ -32,7 +32,7 @@ export const parseFunctionCall = (
         : nameNode.childForFieldName('property');
 
     const argNodes = node.childForFieldName('arguments')?.namedChildren;
-    const args = argNodes?.map(toFunctionCallArgument) || [];
+    const args = argNodes?.map((argNode) => toFunctionCallArgument(argNode)) ?? [];
 
     return {
         object: objectNode?.text,

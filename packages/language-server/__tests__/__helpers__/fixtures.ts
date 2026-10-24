@@ -1,12 +1,13 @@
 import type { Position, Range } from 'vscode-languageserver';
-import { documentFromCode, documentFromCodeWithTypeResolver, type DocumentWithText } from './documentFromCode';
+import { documentFromCode, documentFromCodeWithTypeResolver } from './documentFromCode';
+import type { DocumentWithText } from './documentFromCode';
 import type { TypeResolver } from 'typing/TypeResolver';
 
 const CURSOR = '$0';
 
 export const offsetToPosition = (text: string, offset: number): Position => {
     const pre = text.slice(0, offset);
-    const line = (pre.match(/\n/g) ?? []).length;
+    const line = (pre.match(/\n/gu) ?? []).length;
     const character = offset - (pre.lastIndexOf('\n') + 1);
     return { line, character };
 };

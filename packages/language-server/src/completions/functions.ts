@@ -24,9 +24,9 @@ const completions: CompletionItem[] = twigFunctions.map((item) => ({
     insertText: `${item.label}($1)$0`,
 }));
 
-export function functions(cursorNode: SyntaxNode, functions: TwigFunctionLike[]): CompletionItem[] {
+export function functions(cursorNode: SyntaxNode, environmentFunctions: TwigFunctionLike[]): CompletionItem[] {
     if (['variable', 'function'].includes(cursorNode.type) || isInExpressionScope(cursorNode)) {
-        const completionsPhp = functions.map((func): CompletionItem => ({
+        const completionsPhp = environmentFunctions.map((func): CompletionItem => ({
             ...commonCompletionItem,
             label: func.identifier,
             insertText: `${func.identifier}($1)$0`,
@@ -34,7 +34,7 @@ export function functions(cursorNode: SyntaxNode, functions: TwigFunctionLike[])
 
         return [
             ...completions,
-            ...completionsPhp.filter(comp => !completions.find(item => item.label === comp.label)),
+            ...completionsPhp.filter(comp => !completions.some(item => item.label === comp.label)),
         ];
     }
 

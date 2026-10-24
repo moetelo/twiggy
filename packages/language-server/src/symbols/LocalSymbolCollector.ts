@@ -1,11 +1,9 @@
 import type {
     LocalSymbolInformation,
     TwigBlock,
+    TwigImport,
     TwigMacro,
     TwigVariableDeclaration,
-} from './types';
-import {
-    type TwigImport,
 } from './types';
 import { getNodeRange, getStringNodeValue } from '../utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
@@ -140,6 +138,8 @@ export class LocalSymbolCollector {
                     await this.#visitVariable(cursor.currentNode);
                     continue;
                 }
+
+                // No default
             }
         } while (cursor.gotoNextSibling());
 
@@ -206,6 +206,8 @@ export class LocalSymbolCollector {
                     await this.#visitVariableDeclaration(variable);
                     continue;
                 }
+
+                // No default
             }
         }
     }
@@ -250,14 +252,15 @@ export class LocalSymbolCollector {
         }
 
         const forLoopArrayNode = varDeclarationNode.parent?.type === 'for'
-            && varDeclarationNode.nextNamedSibling;
+            ? varDeclarationNode.nextNamedSibling
+            : null;
         if (forLoopArrayNode) {
             const forLoopArrayType = await this.exprTypeResolver.resolveExpression(
                 forLoopArrayNode,
                 this.localSymbols,
             );
 
-            return forLoopArrayType?.arrayType?.itemReflectedType || null;
+            return forLoopArrayType?.arrayType?.itemReflectedType ?? null;
         }
 
         return null;

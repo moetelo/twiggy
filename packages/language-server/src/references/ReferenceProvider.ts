@@ -14,17 +14,14 @@ export class ReferenceProvider {
 
     async onReferences(params: ReferenceParams) {
         const document = await this.documentCache.get(params.textDocument.uri);
-        if (!document) {
-            return;
-        }
 
         const variable = document.variableAt(params.position);
         if (!variable) {
-            return;
+            return undefined;
         }
 
         if (!hasReferences(variable)) {
-            return;
+            return undefined;
         }
 
         return [

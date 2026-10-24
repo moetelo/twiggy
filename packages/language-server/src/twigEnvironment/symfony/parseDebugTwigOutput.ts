@@ -16,10 +16,10 @@ export interface SymfonyTwigDebugJsonOutput {
 
 const toFunctionLike = ([identifier, args]: [string, string[] | null]): TwigFunctionLike => ({
     identifier,
-    arguments: (args || []).map((arg) => {
-        const [identifier, defaultValue] = arg.trim().split('=');
+    arguments: (args ?? []).map((arg) => {
+        const [argIdentifier, defaultValue] = arg.trim().split('=');
         return {
-            identifier,
+            identifier: argIdentifier,
             defaultValue,
         };
     }),
@@ -42,9 +42,9 @@ const toTemplateMappings = ([namespaceRaw, directories]: [string, string[]]): Te
 };
 
 export const parseDebugTwigOutput = (output: SymfonyTwigDebugJsonOutput): TwigEnvironment => ({
-    Filters: Object.entries(output.filters).map(toFunctionLike),
-    Functions: Object.entries(output.functions).map(toFunctionLike),
-    Globals: Object.entries(output.globals).map(toTwigVariable),
-    LoaderPaths: Object.entries(output.loader_paths).flatMap(toTemplateMappings),
+    Filters: Object.entries(output.filters).map((entry) => toFunctionLike(entry)),
+    Functions: Object.entries(output.functions).map((entry) => toFunctionLike(entry)),
+    Globals: Object.entries(output.globals).map((entry) => toTwigVariable(entry)),
+    LoaderPaths: Object.entries(output.loader_paths).flatMap((entry) => toTemplateMappings(entry)),
     Tests: output.tests,
 });

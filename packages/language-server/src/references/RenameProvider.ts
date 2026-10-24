@@ -1,5 +1,4 @@
 import type { Connection, PrepareRenameParams, RenameParams } from 'vscode-languageserver/node';
-import { Range, ReferenceParams } from 'vscode-languageserver/node';
 import type { DocumentCache } from '../documents/DocumentCache';
 import { hasReferences } from '../symbols/types';
 
@@ -14,17 +13,14 @@ export class RenameProvider {
 
     async onPrepareRename(params: PrepareRenameParams) {
         const document = await this.documentCache.get(params.textDocument.uri);
-        if (!document) {
-            return;
-        }
 
         const variable = document.variableAt(params.position);
         if (!variable) {
-            return;
+            return undefined;
         }
 
         if (!hasReferences(variable)) {
-            return;
+            return undefined;
         }
 
         return {
@@ -35,17 +31,14 @@ export class RenameProvider {
 
     async onRenameRequest(params: RenameParams) {
         const document = await this.documentCache.get(params.textDocument.uri);
-        if (!document) {
-            return;
-        }
 
         const variable = document.variableAt(params.position);
         if (!variable) {
-            return;
+            return undefined;
         }
 
         if (!hasReferences(variable)) {
-            return;
+            return undefined;
         }
 
         return {

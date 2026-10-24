@@ -3,16 +3,14 @@ import type { TreeCursor } from 'web-tree-sitter';
 export class PreOrderCursorIterator {
   constructor(private readonly cursor: TreeCursor) {}
 
-  public *[Symbol.iterator](): Generator<TreeCursor> {
-    const constructor = this.constructor as typeof PreOrderCursorIterator;
-
+  *[Symbol.iterator](): Generator<TreeCursor> {
     yield this.cursor;
 
     if (this.cursor.gotoFirstChild()) {
-      yield* new constructor(this.cursor);
+      yield* new PreOrderCursorIterator(this.cursor);
 
       while (this.cursor.gotoNextSibling()) {
-        yield* new constructor(this.cursor);
+        yield* new PreOrderCursorIterator(this.cursor);
       }
 
       this.cursor.gotoParent();

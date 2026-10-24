@@ -49,14 +49,7 @@ export class CompletionProvider {
 
     async onCompletion(params: CompletionParams) {
         const document = await this.documentCache.get(params.textDocument.uri);
-        if (!document) {
-            return;
-        }
-
         const cursorNode = document.deepestAt(params.position);
-        if (!cursorNode) {
-            return;
-        }
 
         const { environment } = this.#environment;
 
@@ -65,9 +58,9 @@ export class CompletionProvider {
             ...keywords(cursorNode),
             ...localVariables(document, cursorNode),
             ...forLoop(cursorNode),
-            ...globalVariables(cursorNode, environment?.Globals || []),
-            ...functions(cursorNode, environment?.Functions || []),
-            ...filters(cursorNode, environment?.Filters || []),
+            ...globalVariables(cursorNode, environment?.Globals ?? []),
+            ...functions(cursorNode, environment?.Functions ?? []),
+            ...filters(cursorNode, environment?.Filters ?? []),
             ...symfonyRouteNames(cursorNode, this.#symfonyRouteNames),
             ...await phpClasses(cursorNode, this.#phpExecutor),
             ...await variableProperties(document, this.documentCache, cursorNode, this.#expressionTypeResolver, params.position),

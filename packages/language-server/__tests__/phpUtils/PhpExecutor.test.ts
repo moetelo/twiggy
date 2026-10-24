@@ -8,10 +8,11 @@
  * production `PhpUtilPath` resolves them against the bundled `dist/` directory
  * (populated by the esbuild copy step).
  */
-import { describe, test, expect, spyOn } from 'bun:test';
+import { describe, test, expect } from 'bun:test';
 import { ok } from 'node:assert';
 import path from 'node:path';
 import { PhpExecutor } from 'phpInterop/PhpExecutor';
+import type { ReflectedType } from 'phpInterop/ReflectedType';
 import { ensureFixtureInstalled, hasPhp, PhpUtilSourcePath, PSR4_WORKSPACE } from './__helpers__/setup';
 
 describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
@@ -42,7 +43,7 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
             otherClass: 'App\\OtherClass',
         });
 
-        const methodsByName = Object.fromEntries(
+        const methodsByName: Record<string, ReflectedType['methods'][number] | undefined> = Object.fromEntries(
             result.methods.map((m) => [m.name, m]),
         );
         ok(methodsByName.greet)
@@ -69,7 +70,9 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         const union = result.methods.find((m) => m.name === 'unionReturn');
         ok(union)
         // PHP's ReflectionUnionType does not preserve declaration order.
-        expect(union.type.split('|').sort()).toEqual(['int', 'string']);
+        const unionMembers = union.type.split('|');
+        unionMembers.sort();
+        expect(unionMembers).toEqual(['int', 'string']);
     });
 
     test('reflectType strips a leading backslash from the class name', async () => {
@@ -91,7 +94,8 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         ok(result);
         // composer's findFile yields a non-canonical path through vendor/, so
         // normalize before comparison.
-        expect(path.resolve(result.path!)).toBe(path.join(PSR4_WORKSPACE, 'src', 'Person.php'));
+        ok(result.path);
+        expect(path.resolve(result.path)).toBe(path.join(PSR4_WORKSPACE, 'src', 'Person.php'));
     });
 
     test('getClassDefinition returns { path: null } for unknown classes', async () => {
@@ -109,8 +113,8 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
     test('getClassCompletion lists classes within a namespace', async () => {
         requireInstalled();
         const result = await executor.getClassCompletion('App\\');
-        expect(result).toEqual(
-            expect.arrayContaining(['App\\Person', 'App\\OtherClass', 'App\\SomeClass']),
-        );
+        expect(result).toContain('App\\Person');
+        expect(result).toContain('App\\OtherClass');
+        expect(result).toContain('App\\SomeClass');
     });
 });

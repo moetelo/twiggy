@@ -16,7 +16,7 @@ const macroToCompletionItem = (macro: TwigMacro) => ({
     kind: CompletionItemKind.Function,
     insertTextFormat: InsertTextFormat.Snippet,
     command: triggerParameterHints,
-    insertText: !macro.args.length
+    insertText: macro.args.length === 0
         ? `${macro.name}()$0`
         : macro.name,
 });
@@ -68,7 +68,7 @@ const reflectedTypeToCompletions = (reflectedType: ReflectedType, options: { inc
             command: triggerParameterHints,
             insertTextFormat: InsertTextFormat.Snippet,
             detail: method.type,
-            insertText: !method.parameters.length
+            insertText: method.parameters.length === 0
                 ? `${method.name}()$0`
                 : `${method.name}($1)$0`,
         }))),
@@ -115,19 +115,19 @@ export async function variableProperties(
         const localMacros = importedDocument.locals.macro;
 
         if (importedDocument !== document) {
-            return localMacros.map(macroToCompletionItem);
+            return localMacros.map((macro) => macroToCompletionItem(macro));
         }
 
         const scopedMacros = importedDocument
             .getScopeAt(pointToPosition(cursorNode.startPosition))
-            ?.macro || [];
+            .macro;
 
         const allMacros = new Set([
             ...localMacros,
             ...scopedMacros,
         ]);
 
-        return [...allMacros].map(macroToCompletionItem);
+        return [...allMacros].map((macro) => macroToCompletionItem(macro));
     }
 
     return [];

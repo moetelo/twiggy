@@ -57,7 +57,7 @@ const buildOptions = {
     assetNames: 'assets/[name]-[hash].[ext]',
     logLevel: isDev ? 'error' : 'info',
     define: {
-        'process.env.NODE_ENV': !isDev ? '"production"' : 'undefined',
+        'process.env.NODE_ENV': isDev ? 'undefined' : '"production"',
         '__DEBUG__': JSON.stringify(isDev),
     },
     plugins: [
@@ -98,4 +98,4 @@ async function main() {
     await rm('../language-server/dist/extension.js');
 }
 
-main();
+await main();

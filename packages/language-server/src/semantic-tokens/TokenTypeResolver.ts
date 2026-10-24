@@ -42,7 +42,7 @@ export class TokenTypeResolver {
         }
 
         const aliasedNodeTokenType = aliasedNodes.get(node.nodeType);
-        if (aliasedNodeTokenType) {
+        if (aliasedNodeTokenType !== undefined) {
             return this.#tokenTypes.get(aliasedNodeTokenType);
         }
 

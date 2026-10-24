@@ -54,12 +54,8 @@ describe.skipIf(!hasPhp())('VanillaTwigEnvironment against twig-env fixture', ()
 
         // Default namespace becomes empty string, named one becomes '@shared'.
         const templatesDir = path.join(TWIG_ENV_WORKSPACE, 'templates');
-        expect(env.templateMappings).toEqual(
-            expect.arrayContaining([
-                { namespace: '', directory: templatesDir },
-                { namespace: '@shared', directory: templatesDir },
-            ]),
-        );
+        expect(env.templateMappings).toContainEqual({ namespace: '', directory: templatesDir });
+        expect(env.templateMappings).toContainEqual({ namespace: '@shared', directory: templatesDir });
 
         expect(twigEnv.Tests).toContain('defined');
     });

@@ -40,7 +40,7 @@ const lastDiagnosticsFor = (
     return undefined;
 };
 
-const isTemplateNotFound = (d: Diagnostic) => /^Template ".*" not found$/.test(d.message);
+const isTemplateNotFound = (d: Diagnostic) => /^Template ".*" not found$/u.test(d.message);
 
 describe('diagnostics — refresh on environment change', () => {
     beforeAll(initializeTestParser);
@@ -63,7 +63,7 @@ describe('diagnostics — refresh on environment change', () => {
         const initial = lastDiagnosticsFor(publishes, baseUri);
         assert.ok(initial, 'expected initial diagnostics publish for base.html.twig');
         assert.ok(
-            initial.some(isTemplateNotFound),
+            initial.some((d) => isTemplateNotFound(d)),
             `expected a "Template not found" diagnostic, got: ${JSON.stringify(initial)}`,
         );
 
@@ -78,7 +78,7 @@ describe('diagnostics — refresh on environment change', () => {
             'expected refresh() to publish fresh diagnostics for cached documents',
         );
         assert.deepEqual(
-            afterRefresh.filter(isTemplateNotFound),
+            afterRefresh.filter((d) => isTemplateNotFound(d)),
             [],
             `expected no "Template not found" diagnostics after refresh, got: ${JSON.stringify(afterRefresh)}`,
         );

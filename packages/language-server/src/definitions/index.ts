@@ -7,9 +7,8 @@ import type {
 import {
     Range,
 } from 'vscode-languageserver';
-import { getNodeRange, isBlockIdentifier, isPathInsideTemplateEmbedding } from '../utils/node';
+import { getNodeRange, getStringNodeValue, isBlockIdentifier, isPathInsideTemplateEmbedding } from '../utils/node';
 import type { Document, DocumentCache } from '../documents';
-import { getStringNodeValue } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';
 import { documentUriToFsPath } from '../utils/uri';
@@ -34,25 +33,17 @@ export class DefinitionProvider {
         params: DefinitionParams,
     ): Promise<Definition | undefined> {
         const document = await this.documentCache.get(params.textDocument.uri);
-
-        if (!document) {
-            return;
-        }
-
         const cursorNode = document.deepestAt(params.position);
-        if (!cursorNode) {
-            return;
-        }
 
         if (isPathInsideTemplateEmbedding(cursorNode)) {
-            const document = await this.documentCache.resolveByTwigPath(
+            const templateDocument = await this.documentCache.resolveByTwigPath(
                 getStringNodeValue(cursorNode),
             );
 
-            if (!document) return;
+            if (!templateDocument) return undefined;
 
             return {
-                uri: document.uri,
+                uri: templateDocument.uri,
                 range: Range.create(0, 0, 0, 0),
             };
         }
@@ -108,7 +99,7 @@ export class DefinitionProvider {
 
             const symbol = scopedVariables.find((x) => x.name === cursorNode.text);
 
-            if (!symbol) return;
+            if (!symbol) return undefined;
 
             return {
                 uri: document.uri,
@@ -121,10 +112,10 @@ export class DefinitionProvider {
             const importName = cursorNode.parent!.firstChild!.text;
 
             const importedDocument = await this.documentCache.resolveImport(document, importName, params.position);
-            if (!importedDocument) return;
+            if (!importedDocument) return undefined;
 
-            const macro = importedDocument.locals.macro.find(macro => macro.name === macroName);
-            if (!macro) return;
+            const macro = importedDocument.locals.macro.find((x) => x.name === macroName);
+            if (!macro) return undefined;
 
             return {
                 uri: importedDocument.uri,
@@ -134,10 +125,10 @@ export class DefinitionProvider {
 
         const typeIdentifierNode = findParentByType(cursorNode, 'qualified_name');
         if (typeIdentifierNode) {
-            if (!this.phpExecutor) return;
+            if (!this.phpExecutor) return undefined;
 
             const result = await this.phpExecutor.getClassDefinition(typeIdentifierNode.text);
-            if (!result?.path) return;
+            if (!result?.path) return undefined;
 
             return {
                 uri: result.path,

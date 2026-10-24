@@ -45,13 +45,7 @@ export class DocumentCache {
     }
 
     async setText(document: Document, text?: string) {
-        if (typeof text === 'string') {
-            document.text = text;
-        } else {
-            const fsPath = documentUriToFsPath(document.uri);
-            const text = await readFile(fsPath, 'utf8');
-            document.text = text;
-        }
+        document.text = text ?? await readFile(documentUriToFsPath(document.uri), 'utf8');
 
         document.tree = parser.parse(document.text);
         document.locals = await new LocalSymbolCollector(document.tree.rootNode, this.#typeResolver).collect();
@@ -70,8 +64,9 @@ export class DocumentCache {
             const pathToTwig = path.resolve(this.workspaceFolderPath, includePath);
             const documentUri = toDocumentUri(pathToTwig);
 
-            if (this.documents.has(documentUri)) {
-                return this.documents.get(documentUri)!;
+            const cachedDocument = this.documents.get(documentUri);
+            if (cachedDocument) {
+                return cachedDocument;
             }
 
             const resolvedTemplate = await resolveTemplate(pathToTwig);
@@ -89,15 +84,12 @@ export class DocumentCache {
 
         const { imports } = document.locals;
         if (pos !== undefined) {
-            const scopedImports = document.getScopeAt(pos)?.imports;
-            if (scopedImports) {
-                imports.push(...scopedImports);
-            }
+            imports.push(...document.getScopeAt(pos).imports);
         }
 
-        const twigImport = imports?.find(imp => imp.name === variableName);
+        const twigImport = imports.find(imp => imp.name === variableName);
 
-        if (!twigImport) return;
+        if (!twigImport) return undefined;
 
         if (!twigImport.path) return document;
 
@@ -105,11 +97,11 @@ export class DocumentCache {
     }
 
     private async add(documentUri: DocumentUri, text?: string) {
-        documentUri = toDocumentUri(documentUri);
+        const normalizedUri = toDocumentUri(documentUri);
 
-        const document = new Document(documentUri);
+        const document = new Document(normalizedUri);
         await this.setText(document, text);
-        this.documents.set(documentUri, document);
+        this.documents.set(normalizedUri, document);
         return document;
     }
 

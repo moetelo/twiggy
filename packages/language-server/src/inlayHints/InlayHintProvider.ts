@@ -38,13 +38,9 @@ export class InlayHintProvider {
 
     async onInlayHint(params: InlayHintParams): Promise<InlayHint[] | undefined> {
         const { block, macro, macroArguments } = this.settings;
-        if (!block && !macro && !macroArguments) return;
+        if (!block && !macro && !macroArguments) return undefined;
 
         const document = await this.documentCache.get(params.textDocument.uri);
-
-        if (!document) {
-            return;
-        }
 
         const inlayHints: InlayHint[] = [];
 
@@ -52,19 +48,19 @@ export class InlayHintProvider {
         for (const node of nodes) {
             if (macroArguments && node.nodeType === 'call_expression') {
                 const calledFunc = parseFunctionCall(node.currentNode);
-                if (!calledFunc || !calledFunc.object || !calledFunc.args.length) continue;
+                if (!calledFunc?.object || calledFunc.args.length === 0) continue;
 
                 const importedDocument = await this.documentCache.resolveImport(document, calledFunc.object);
                 if (!importedDocument) continue;
 
-                const macro = importedDocument.locals.macro.find(macro => macro.name === calledFunc.name);
-                if (!macro) continue;
+                const calledMacro = importedDocument.locals.macro.find(candidate => candidate.name === calledFunc.name);
+                if (!calledMacro) continue;
 
                 const hints = calledFunc.args
-                    .slice(0, macro.args.length)
+                    .slice(0, calledMacro.args.length)
                     .map((arg, i): InlayHint => ({
                         position: arg.range.start,
-                        label: `${macro.args[i].name}:`,
+                        label: `${calledMacro.args[i].name}:`,
                         kind: InlayHintKind.Parameter,
                         paddingRight: true,
                     }));

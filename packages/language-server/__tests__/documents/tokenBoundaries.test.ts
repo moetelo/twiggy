@@ -24,11 +24,11 @@ describe('parseCursor / offsetToPosition', () => {
     });
 
     test('missing marker throws', () => {
-        assert.throws(() => parseCursor(`{{ no marker here }}`), /missing/);
+        assert.throws(() => parseCursor(`{{ no marker here }}`), /missing/u);
     });
 
     test('two markers throws (use parseRange)', () => {
-        assert.throws(() => parseCursor(`$0{{ x }}$0`), /multiple/);
+        assert.throws(() => parseCursor(`$0{{ x }}$0`), /multiple/u);
     });
 
     test('offsetToPosition at very start', () => {
@@ -44,18 +44,18 @@ describe('Document.deepestAt — boundary positions', () => {
     beforeAll(initializeTestParser);
 
     test('cursor at start of document', async () => {
-        const { cursorNode } = await documentWithCursor(`$0{{ hello }}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`$0{{ hello }}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('cursor at end of document', async () => {
-        const { cursorNode } = await documentWithCursor(`{{ hello }}$0`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{{ hello }}$0`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('cursor in whitespace between tags', async () => {
-        const { cursorNode } = await documentWithCursor(`{{ a }}$0   {{ b }}`);
-        assert.ok(cursorNode);
+        const { document, position } = await documentWithCursor(`{{ a }}$0   {{ b }}`);
+        assert.doesNotThrow(() => document.deepestAt(position));
     });
 
     test('cursor past the last character does not throw', async () => {

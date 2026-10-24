@@ -84,7 +84,8 @@ module.exports = grammar({
     _incomplete_primitive_type: $ => /[a-z]+/,
     primitive_type: _ => choice(
       'array',
-      keyword('callable'), // not legal in property types
+      // not legal in property types
+      keyword('callable'),
       'iterable',
       'bool',
       'float',
@@ -364,7 +365,8 @@ module.exports = grammar({
           ['is same as', 100],
           ['**', 200, 'right'],
           ['??', 300, 'right'],
-          ['???', 300, 'right'], // https://nystudio107.com/docs/empty-coalesce
+          // https://nystudio107.com/docs/empty-coalesce
+          ['???', 300, 'right'],
         ]).map(([operator, precedence, associativity = 'left']) =>
           prec[associativity](
             precedence,
@@ -683,14 +685,22 @@ module.exports = grammar({
 });
 
 /**
- * @param {Rule} rule
+ * Creates a rule to match one or more of the rules separated by a comma, with an optional trailing comma.
+ *
+ * @param {Rule} rule The rule to repeat.
+ *
+ * @returns {SeqRule} The comma-separated rule.
  */
 function commaSep1(rule) {
   return seq(rule, repeat(seq(',', rule)), optional(','));
 }
 
 /**
- * @param {Rule} rule
+ * Creates a rule to match zero or more of the rules separated by a comma, with an optional trailing comma.
+ *
+ * @param {Rule} rule The rule to repeat.
+ *
+ * @returns {ChoiceRule} The optional comma-separated rule.
  */
 function commaSep(rule) {
   return optional(commaSep1(rule));
@@ -713,7 +723,12 @@ function source_elements($, fieldName = 'body') {
 }
 
 /**
- * @param {Rule[]} args
+ * Creates a rule to match a statement enclosed in statement delimiters.
+ *
+ * @param {GrammarSymbols<string>} $ The grammar symbols.
+ * @param {Rule[]} args The rules inside the delimiters.
+ *
+ * @returns {SeqRule} The delimited statement rule.
  */
 function statement($, ...args) {
   return seq($._statement_start, ...args, $._statement_stop);
@@ -722,9 +737,9 @@ function statement($, ...args) {
 /**
  * Creates a rule to match a single-quoted or double-quoted enclosed rule.
  *
- * @param {Rule} rule
+ * @param {Rule} rule The rule to enclose in quotes.
  *
- * @return {ChoiceRule}
+ * @returns {ChoiceRule} The quoted rule.
  */
 function string(rule) {
   return choice(
@@ -736,9 +751,9 @@ function string(rule) {
 /**
  * Creates a rule to match one or more of the rules separated by a pipe
  *
- * @param {Rule} rule
+ * @param {Rule} rule The rule to repeat.
  *
- * @return {SeqRule}
+ * @returns {SeqRule} The pipe-separated rule.
  */
 function pipeSep1(rule) {
   return seq(rule, repeat(seq('|', rule)));
@@ -747,9 +762,9 @@ function pipeSep1(rule) {
 /**
  * Creates a rule to  match one or more of the rules separated by an ampersand
  *
- * @param {Rule} rule
+ * @param {Rule} rule The rule to repeat.
  *
- * @return {SeqRule}
+ * @returns {SeqRule} The ampersand-separated rule.
  */
 function ampSep1(rule) {
   return seq(rule, repeat(seq(token('&'), rule)));
@@ -757,10 +772,10 @@ function ampSep1(rule) {
 
 
 /**
- * @param {string} word
- * @param {boolean} aliasAsWord
+ * @param {string} word The keyword text.
+ * @param {boolean} aliasAsWord Whether to alias the keyword as itself instead of wrapping it in a token.
  *
- * @return {Rule|AliasRule}
+ * @returns {Rule|AliasRule} The keyword rule.
  */
 function keyword(word, aliasAsWord = true) {
   return aliasAsWord ? alias(word, word) : token(word);

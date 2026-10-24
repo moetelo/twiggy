@@ -18,24 +18,24 @@ export class BracketSpacesInsertionProvider {
     }
 
     async onAutoInsert({ textDocument, options }: AutoInsertRequest.ParamsType): Promise<AutoInsertRequest.ResponseType> {
-        if (!this.isEnabled) return;
+        if (!this.isEnabled) return undefined;
 
         const document = this.documents.get(textDocument.uri);
 
-        if (!document) return;
+        if (!document) return undefined;
 
         const { lastChange } = options;
 
         const fullTrigger = this.changeTriggers.get(lastChange.text);
 
-        if (!fullTrigger) return;
+        if (!fullTrigger) return undefined;
 
         const textSurround = document.getText({
             start: { line: lastChange.range.start.line, character: lastChange.range.start.character - '{'.length },
             end: { line: lastChange.range.start.line, character: lastChange.range.start.character + '{}}'.length }
         });
 
-        if (textSurround !== fullTrigger) return;
+        if (textSurround !== fullTrigger) return undefined;
 
         return {
             newText: ` $0 `,

@@ -5,7 +5,7 @@ import { variableProperties } from 'completions/variableProperties';
 import { ExpressionTypeResolver } from 'typing/ExpressionTypeResolver';
 import { TypeResolver } from 'typing/TypeResolver';
 import type { ReflectedType } from 'phpInterop/ReflectedType';
-import { createDocumentCache, documentFromCode, documentFromCodeWithTypeResolver } from '../__helpers__/documentFromCode';
+import { createDocumentCache, documentFromCode } from '../__helpers__/documentFromCode';
 import { documentWithCursor, documentWithCursorAndTypes } from '../__helpers__/fixtures';
 import { MockEnvironment, MockPhpExecutor } from '../__helpers__/mocks';
 import { initializeTestParser } from '../__helpers__/parser';
@@ -17,6 +17,22 @@ const assertExpectedType = (completions: CompletionItem[], expectedType: Reflect
         const completionFound = completions.find((item) => item.label === label);
         assert.ok(completionFound, `${label} not in completions.`);
     }
+};
+
+const runCompletion = async (fixture: string) => {
+    const typeResolver = new TypeResolver(new MockPhpExecutor());
+    const { document, position, cursorNode } = await documentWithCursorAndTypes(fixture, typeResolver);
+
+    const documentCache = createDocumentCache();
+    documentCache.configure(MockEnvironment, typeResolver);
+
+    return variableProperties(
+        document,
+        documentCache,
+        cursorNode,
+        new ExpressionTypeResolver(typeResolver),
+        position,
+    );
 };
 
 describe('variableProperties (macro imports)', () => {
@@ -93,22 +109,6 @@ describe('variableProperties (macro imports)', () => {
 
 describe('variableProperties (PHP type resolution)', () => {
     beforeAll(initializeTestParser);
-
-    const runCompletion = async (fixture: string) => {
-        const typeResolver = new TypeResolver(new MockPhpExecutor());
-        const { document, position, cursorNode } = await documentWithCursorAndTypes(fixture, typeResolver);
-
-        const documentCache = createDocumentCache();
-        documentCache.configure(MockEnvironment, typeResolver);
-
-        return variableProperties(
-            document,
-            documentCache,
-            cursorNode,
-            new ExpressionTypeResolver(typeResolver),
-            position,
-        );
-    };
 
     test('completes properties of a typed variable annotation', async () => {
         const completions = await runCompletion(

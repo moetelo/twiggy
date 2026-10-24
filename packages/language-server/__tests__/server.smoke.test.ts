@@ -3,9 +3,10 @@
  * Verifies server wiring and capability registration, not provider logic.
  * Provider logic is covered by unit tests in completions/, hovers/, etc.
  */
-import { describe, test, beforeAll, expect } from 'bun:test';
+import { describe, test, beforeAll } from 'bun:test';
 import assert from 'node:assert/strict';
 import { PassThrough } from 'node:stream';
+import { setTimeout as delay } from 'node:timers/promises';
 import type {
     InitializeParams,
     CompletionParams,
@@ -16,7 +17,6 @@ import {
     createProtocolConnection,
     StreamMessageReader,
     StreamMessageWriter,
-    ProtocolNotificationType,
 } from 'vscode-languageserver/node';
 import { Server } from 'server';
 import { initializeTestParser } from './__helpers__/parser';
@@ -96,10 +96,10 @@ describe('server smoke', () => {
                 text: `{% set variable = 123 %}{{ }}`,
             },
         };
-        clientConn.sendNotification('textDocument/didOpen', didOpenParams);
+        await clientConn.sendNotification('textDocument/didOpen', didOpenParams);
 
         // Give the server one microtask loop to process didOpen (async updateText).
-        await new Promise<void>((resolve) => setTimeout(resolve, 50));
+        await delay(50);
 
         const completionParams: CompletionParams = {
             textDocument: { uri: TEST_URI },

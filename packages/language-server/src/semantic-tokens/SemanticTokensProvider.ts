@@ -1,6 +1,5 @@
 import type {
     SemanticTokensParams,
-    SemanticTokens,
     Connection,
 } from 'vscode-languageserver';
 import {
@@ -27,12 +26,7 @@ export class SemanticTokensProvider {
     }
 
     async serverRequestHandler(params: SemanticTokensParams) {
-        const semanticTokens: SemanticTokens = { data: [] };
         const document = await this.documentCache.get(params.textDocument.uri);
-
-        if (!document) {
-            return semanticTokens;
-        }
 
         const tokensBuilder = new SemanticTokensBuilder();
         const nodes = new PreOrderCursorIterator(document.tree.walk());
@@ -50,7 +44,8 @@ export class SemanticTokensProvider {
             let charNumber = start.character;
 
             for (const line of lines) {
-                tokensBuilder.push(lineNumber++, charNumber, line.length, tokenType, 0);
+                tokensBuilder.push(lineNumber, charNumber, line.length, tokenType, 0);
+                lineNumber += 1;
                 charNumber = 0;
             }
         }

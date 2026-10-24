@@ -1,24 +1,30 @@
-import { describe, beforeAll, test } from 'bun:test';
+import { describe, test } from 'bun:test';
 import assert from 'node:assert/strict';
-import type Parser from 'web-tree-sitter';
 import { LocalSymbolCollector } from 'symbols/LocalSymbolCollector';
 import type { LocalSymbolInformation } from 'symbols/types';
 import { documentFromCode } from '../__helpers__/documentFromCode';
 import { rangeOf, rangesOf } from '../__helpers__/fixtures';
 import { initializeTestParser } from '../__helpers__/parser';
 
+const collect = async (code: string) => {
+    const parser = await initializeTestParser();
+    const tree = parser.parse(code);
+    return new LocalSymbolCollector(tree.rootNode, null).collect();
+};
+
+const testOneVariable = async (varName: string, code: string, scope?: LocalSymbolInformation) => {
+    const symbols = scope ?? await collect(code);
+
+    assert.strictEqual(symbols.variable.length, 1);
+
+    const variable = symbols.variable[0];
+    assert.strictEqual(variable.name, varName);
+    assert.deepEqual(variable.nameRange, rangeOf(code, varName));
+
+    return variable;
+};
+
 describe('locals', () => {
-    let parser!: Parser;
-
-    beforeAll(async () => {
-        parser = await initializeTestParser();
-    });
-
-    const collect = async (code: string) => {
-        const tree = parser.parse(code);
-        return new LocalSymbolCollector(tree.rootNode, null).collect();
-    };
-
     test('collects `set` variables', async () => {
         const code = `{% set variable0 = 123 %}{% set anotherVariable = 'asdf' %}`;
         const locals = await collect(code);
@@ -92,20 +98,6 @@ describe('locals', () => {
 
         assert.deepEqual(locals.variable.map((variable) => variable.name), []);
     });
-
-    const testOneVariable = async (varName: string, code: string, scope?: LocalSymbolInformation) => {
-        if (!scope) {
-            scope = await collect(code);
-        }
-
-        assert.strictEqual(scope.variable.length, 1);
-
-        const variable = scope.variable[0];
-        assert.strictEqual(variable.name, varName);
-        assert.deepEqual(variable.nameRange, rangeOf(code, varName));
-
-        return variable;
-    };
 
     test('collects implicitly defined variable inside of if condition', async () => {
         const code = `{% if variable0 %}{{ variable0[0].prop }}{% endif %}{% if not variable0 %} var0 is falsy :( {% endif %}`;

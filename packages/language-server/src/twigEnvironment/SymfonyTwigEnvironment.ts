@@ -24,7 +24,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
     }
 
     get templateMappings(): TemplatePathMapping[] {
-        return this.#environment?.LoaderPaths?.length
+        return this.#environment?.LoaderPaths.length
             ? this.#environment.LoaderPaths
             : EmptyEnvironment.templateMappings;
     }
@@ -60,7 +60,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
 
     async #loadRoutes(): Promise<RouteNameToPathRecord> {
         const result = await this.#runSymfonyCommand<RouteNameToPathRecord>('debug:router');
-        return result || {};
+        return result ?? {};
     }
 
     async #runSymfonyCommand<TResult>(

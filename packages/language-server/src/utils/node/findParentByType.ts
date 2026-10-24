@@ -12,4 +12,6 @@ export function findParentByType(
     }
     node = node.parent;
   }
+
+  return undefined;
 }

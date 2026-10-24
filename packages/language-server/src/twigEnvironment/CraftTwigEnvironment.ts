@@ -20,7 +20,7 @@ export class CraftTwigEnvironment implements IFrameworkTwigEnvironment {
     }
 
     get templateMappings(): TemplatePathMapping[] {
-        return this.#environment?.LoaderPaths?.length
+        return this.#environment?.LoaderPaths.length
             ? this.#environment.LoaderPaths
             : EmptyEnvironment.templateMappings;
     }

@@ -14,13 +14,13 @@ const completions: CompletionItem[] = twigFilters.map((item) => ({
     ...item,
 }));
 
-export function filters(cursorNode: SyntaxNode, filters: TwigFunctionLike[]): CompletionItem[] {
+export function filters(cursorNode: SyntaxNode, environmentFilters: TwigFunctionLike[]): CompletionItem[] {
     if (
         cursorNode.text === '|' ||
         (cursorNode.type === 'function' &&
             cursorNode.parent!.type === 'filter_expression')
     ) {
-        const completionsPhp = filters.map(
+        const completionsPhp = environmentFilters.map(
             (func): CompletionItem => ({
                 ...commonCompletionItem,
                 label: func.identifier,
@@ -29,7 +29,7 @@ export function filters(cursorNode: SyntaxNode, filters: TwigFunctionLike[]): Co
 
         return [
             ...completions,
-            ...completionsPhp.filter((comp) => !completions.find((item) => item.label === comp.label)),
+            ...completionsPhp.filter((comp) => !completions.some((item) => item.label === comp.label)),
         ];
     }
 

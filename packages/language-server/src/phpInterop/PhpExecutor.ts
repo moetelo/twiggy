@@ -59,7 +59,7 @@ export class PhpExecutor implements IPhpExecutor {
         return await this.callJson<string[]>(this._phpUtilPath.getCompletionPhp, [
             this._workspaceDirectory,
             className,
-        ]) || [];
+        ]) ?? [];
     }
 
     async reflectType(className: string) {
