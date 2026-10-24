@@ -12,6 +12,5 @@ export namespace AutoInsertRequest {
 		},
 	};
 	export type ResponseType = string | TextEdit | null | undefined;
-	export type ErrorType = never;
 	export const type = 'twiggy/client/autoInsert';
 }

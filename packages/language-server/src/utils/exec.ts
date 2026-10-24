@@ -21,6 +21,3 @@ export const exec = async (command: string, args: string[], options: SpawnOption
 
     return { stdout, stderr, code: child.exitCode };
 };
-
-export const isProcessError = (error: unknown): error is Error & CommandResult =>
-    error instanceof Error && 'stderr' in error && 'stdout' in error;

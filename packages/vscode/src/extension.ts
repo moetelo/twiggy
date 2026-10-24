@@ -27,6 +27,11 @@ import { IsInsideHtmlRegionRequest } from 'twiggy-language-server/src/customRequ
 const outputChannel = window.createOutputChannel('Twiggy Language Server');
 const clients = new Map<string, LanguageClient>();
 
+/**
+ * Extension entry point, called by VS Code.
+ * @param context Extension context provided by VS Code.
+ * @public
+ */
 export async function activate(context: ExtensionContext) {
     for (const folder of workspace.workspaceFolders ?? []) {
         void addWorkspaceFolder(folder);
@@ -46,6 +51,10 @@ export async function activate(context: ExtensionContext) {
     );
 }
 
+/**
+ * Extension shutdown hook, called by VS Code.
+ * @public
+ */
 export async function deactivate(): Promise<void> {
     for (const client of clients.values()) {
         await client.stop();

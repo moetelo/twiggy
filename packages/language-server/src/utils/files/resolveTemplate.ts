@@ -4,6 +4,12 @@ import { isFile } from './fileStat';
 const extensions = ['twig', 'html'];
 const CRAFT_INDEX_TEMPLATE_NAME = 'index';
 
+/**
+ * Candidate file paths for a template, in lookup order. Exported for tests.
+ * @param pathToTwig Template path without extension.
+ * @yields Paths to try, in order.
+ * @internal
+ */
 export function* generateResolveSequence(pathToTwig: string): Generator<string> {
     yield pathToTwig;
 

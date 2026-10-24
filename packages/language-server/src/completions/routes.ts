@@ -6,7 +6,7 @@ import {
 } from 'vscode-languageserver/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 
-export const commonCompletionItem: Partial<CompletionItem> = {
+const commonCompletionItem: Partial<CompletionItem> = {
     kind: CompletionItemKind.EnumMember,
     commitCharacters: [`'"`],
     detail: 'symfony path',

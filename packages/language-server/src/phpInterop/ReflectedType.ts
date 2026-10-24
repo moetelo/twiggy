@@ -16,7 +16,7 @@ type Method = {
     parameters: MethodParam[];
 };
 
-export type ArrayType = {
+type ArrayType = {
     itemType: string;
     itemReflectedType: ReflectedType | null;
 };

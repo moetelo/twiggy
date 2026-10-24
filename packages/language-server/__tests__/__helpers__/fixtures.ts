@@ -73,11 +73,6 @@ export const rangesOf = (text: string, substr: string): Range[] => {
     return ranges;
 };
 
-export const createLengthRange = (start: number, length: number): Range => ({
-    start: { character: start, line: 0 },
-    end: { character: start + length, line: 0 },
-});
-
 export const documentWithCursor = async (fixture: string, uri?: string) => {
     const { text, position } = parseCursor(fixture);
     const document = await documentFromCode(text, uri);

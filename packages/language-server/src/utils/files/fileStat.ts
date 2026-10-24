@@ -1,7 +1,7 @@
 import type { Stats } from 'node:fs';
 import { stat } from 'node:fs/promises';
 
-export const fileStat = async (fsPath: string): Promise<Stats | null> => {
+const fileStat = async (fsPath: string): Promise<Stats | null> => {
     try {
         return await stat(fsPath);
     } catch {

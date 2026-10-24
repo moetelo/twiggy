@@ -1,4 +1,4 @@
-export type FunctionArgument = {
+type FunctionArgument = {
     identifier: string,
     defaultValue?: string,
 };
