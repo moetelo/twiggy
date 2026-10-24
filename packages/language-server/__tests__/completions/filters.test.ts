@@ -21,19 +21,19 @@ describe('filters', () => {
         ];
         const completions = filters(cursorNode, customFilters);
 
-        twigFilters.every((filter) => {
+        for (const filter of twigFilters) {
             assert.ok(
                 completions.some((item) => item.label === filter.label),
                 `${filter.label} not in completions.`,
             );
-        });
+        }
 
-        customFilters.every((filter) => {
+        for (const filter of customFilters) {
             assert.ok(
                 completions.some((item) => item.label === filter.identifier),
                 `${filter.identifier} not in completions.`,
             );
-        });
+        }
 
         assert.equal(completions.length, twigFilters.length + customFilters.length);
     });

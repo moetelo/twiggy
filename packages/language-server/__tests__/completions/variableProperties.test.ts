@@ -13,10 +13,10 @@ import { initializeTestParser } from '../__helpers__/parser';
 const assertExpectedType = (completions: CompletionItem[], expectedType: ReflectedType) => {
     const expectedLabels = [...expectedType.properties, ...expectedType.methods].map((prop) => prop.name);
 
-    expectedLabels.every((label) => {
+    for (const label of expectedLabels) {
         const completionFound = completions.find((item) => item.label === label);
         assert.ok(completionFound, `${label} not in completions.`);
-    });
+    }
 };
 
 describe('variableProperties (macro imports)', () => {
