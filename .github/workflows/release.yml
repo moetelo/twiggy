@@ -13,6 +13,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm trusted publishing (OIDC)
     steps:
       - uses: actions/checkout@v6
 
@@ -30,9 +33,18 @@ jobs:
       - run: bunx ovsx publish --no-dependencies
         working-directory: ./packages/vscode
 
+      # Trusted publishing needs npm >= 11.5.1; bun publish has no OIDC support.
+      # bun pm pack still does the packing so catalog: versions get resolved.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - run: npm install -g npm@^11.5.1
+
+      # https://github.com/oven-sh/bun/issues/15601#issuecomment-3058486500
       - name: npm publish language-server
         working-directory: ./packages/language-server
-        env:
-          NPM_CONFIG_TOKEN: ${{ secrets.NPM_PAT }}
         run: |
-          bun publish --access public
+          bun pm pack --destination "$RUNNER_TEMP" --quiet
+          npm publish "$RUNNER_TEMP"/twiggy-language-server-*.tgz --access public
