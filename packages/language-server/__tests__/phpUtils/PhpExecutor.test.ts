@@ -15,6 +15,14 @@ import { PhpExecutor } from 'phpInterop/PhpExecutor';
 import type { ReflectedType } from 'phpInterop/ReflectedType';
 import { ensureFixtureInstalled, hasPhp, PhpUtilSourcePath, PSR4_WORKSPACE } from './__helpers__/setup';
 
+// PHP's ReflectionUnionType/ReflectionIntersectionType do not preserve declaration order.
+const sortedMembers = (type: string | undefined, separator: '|' | '&') => {
+    ok(type !== undefined);
+    const members = type.split(separator);
+    members.sort();
+    return members;
+};
+
 describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
     const executor = new PhpExecutor('php', PSR4_WORKSPACE, PhpUtilSourcePath);
     const installed = ensureFixtureInstalled(PSR4_WORKSPACE);
@@ -26,6 +34,13 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
                 `Run \`composer install\` in ${PSR4_WORKSPACE}.`,
             );
         }
+    };
+
+    const getterPropertyType = async (name: string) => {
+        requireInstalled();
+        const result = await executor.reflectType('App\\TypedGetters');
+        ok(result);
+        return result.properties.find((p) => p.name === name)?.type;
     };
 
     test('reflectType derives properties from `getX(): T` and lists method signatures', async () => {
@@ -68,11 +83,21 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         ok(result);
 
         const union = result.methods.find((m) => m.name === 'unionReturn');
-        ok(union)
-        // PHP's ReflectionUnionType does not preserve declaration order.
-        const unionMembers = union.type.split('|');
-        unionMembers.sort();
-        expect(unionMembers).toEqual(['int', 'string']);
+        expect(sortedMembers(union?.type, '|')).toEqual(['int', 'string']);
+    });
+
+    describe('reflectType derives property types from getters', () => {
+        test('union return type `A|B`', async () => {
+            expect(sortedMembers(await getterPropertyType('id'), '|')).toEqual(['int', 'string']);
+        });
+
+        test('intersection return type `A&B`', async () => {
+            expect(sortedMembers(await getterPropertyType('items'), '&')).toEqual(['Countable', 'Traversable']);
+        });
+
+        test('no return type yields an empty string', async () => {
+            expect(await getterPropertyType('untyped')).toBe('');
+        });
     });
 
     test('reflectType strips a leading backslash from the class name', async () => {
