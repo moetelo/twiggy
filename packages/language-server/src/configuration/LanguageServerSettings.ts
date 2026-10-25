@@ -16,6 +16,13 @@ export type PhpFramework =
     | PhpFrameworkOption.Symfony
     | PhpFrameworkOption.Craft;
 
+type TemplatePathSetting = {
+    /** `@MyBundle`, `MyBundle` (the `@` is added), or `''` for the root namespace. */
+    namespace: string;
+    /** Relative to the workspace folder, or absolute. */
+    path: string;
+};
+
 type DiagnosticsSettings = {
     twigCsFixer: boolean;
 };
@@ -29,4 +36,5 @@ export type LanguageServerSettings = {
     symfonyConsolePath: string;
     vanillaTwigEnvironmentPath: string;
     diagnostics: DiagnosticsSettings;
+    templatePaths?: TemplatePathSetting[];
 };

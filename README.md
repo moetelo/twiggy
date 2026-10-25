@@ -56,6 +56,17 @@ Please refer to [this reply](https://github.com/moetelo/twiggy/issues/12#issueco
 
 Follow [instructions](https://github.com/sublimelsp/LSP-twiggy) ready-to-use client implementation maintained by the community.
 
+## Template paths
+
+Templates in namespaces the framework doesn't report (e.g. while developing a bundle), or in projects without PHP configured, can be mapped with `twiggy.templatePaths`. Paths are relative to the workspace folder or absolute; these mappings are checked before the detected ones.
+
+```json
+"twiggy.templatePaths": [
+    { "namespace": "@MyBundle", "path": "src/MyBundle/templates" },
+    { "namespace": "", "path": "custom/templates" }
+]
+```
+
 # Development
 
 1. Install [Bun](https://bun.com).

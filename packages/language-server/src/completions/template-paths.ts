@@ -78,7 +78,7 @@ export async function templatePaths(
         for (const { namespace, directory } of templateMappings) {
             const templatesDirectory = path.resolve(workspaceFolderDirectory, directory);
 
-            for (const twigPath of await getTwigFiles(directory)) {
+            for (const twigPath of await getTwigFiles(templatesDirectory)) {
                 const relativePathToTwigFromTemplatesDirectory = path.posix.relative(
                     templatesDirectory,
                     twigPath,
