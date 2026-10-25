@@ -1,70 +1,70 @@
 {
-  "$schema": "./node_modules/knip/schema-jsonc.json",
-  // Every issue type, including the opt-in ones (nsExports, nsTypes, cycles).
-  "include": [
-    "files",
-    "dependencies",
-    "devDependencies",
-    "optionalPeerDependencies",
-    "unlisted",
-    "binaries",
-    "unresolved",
-    "exports",
-    "nsExports",
-    "types",
-    "nsTypes",
-    "enumMembers",
-    "namespaceMembers",
-    "duplicates",
-    "catalog",
-    "catalogReferences",
-    "cycles"
-  ],
-  "rules": {
-    "binaries": "error",
-    "catalog": "error",
-    "catalogReferences": "error",
-    "cycles": "error",
-    "dependencies": "error",
-    "devDependencies": "error",
-    "duplicates": "error",
-    "enumMembers": "error",
-    "exports": "error",
-    "files": "error",
-    "namespaceMembers": "error",
-    "nsExports": "error",
-    "nsTypes": "error",
-    "optionalPeerDependencies": "error",
-    "types": "error",
-    "unlisted": "error",
-    "unresolved": "error"
-  },
-  "cycles": {
-    "dynamicImports": true
-  },
-  "includeEntryExports": true,
-  "treatConfigHintsAsErrors": true,
-  "treatTagHintsAsErrors": true,
-  "workspaces": {
-    ".": {},
-    "packages/language-server": {
-      // esbuild bundles this into dist/server.js; bin/server.js comes from package.json#bin.
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts!", "bin/**/*.js!", "__tests__/**/*.ts"],
-      // System tool the PHP test fixtures shell out to.
-      "ignoreBinaries": ["composer"]
+    "$schema": "./node_modules/knip/schema-jsonc.json",
+    // Every issue type, including the opt-in ones (nsExports, nsTypes, cycles).
+    "include": [
+        "files",
+        "dependencies",
+        "devDependencies",
+        "optionalPeerDependencies",
+        "unlisted",
+        "binaries",
+        "unresolved",
+        "exports",
+        "nsExports",
+        "types",
+        "nsTypes",
+        "enumMembers",
+        "namespaceMembers",
+        "duplicates",
+        "catalog",
+        "catalogReferences",
+        "cycles",
+    ],
+    "rules": {
+        "binaries": "error",
+        "catalog": "error",
+        "catalogReferences": "error",
+        "cycles": "error",
+        "dependencies": "error",
+        "devDependencies": "error",
+        "duplicates": "error",
+        "enumMembers": "error",
+        "exports": "error",
+        "files": "error",
+        "namespaceMembers": "error",
+        "nsExports": "error",
+        "nsTypes": "error",
+        "optionalPeerDependencies": "error",
+        "types": "error",
+        "unlisted": "error",
+        "unresolved": "error",
     },
-    "packages/vscode": {
-      // src/extension.ts comes from package.json#main.
-      "entry": ["build/index.mts"],
-      "project": ["src/**/*.ts!", "build/**/*.mts"]
+    "cycles": {
+        "dynamicImports": true,
     },
-    "packages/tree-sitter-twig": {
-      // Read by `tree-sitter generate`, which consumes its export.
-      "entry": ["grammar.js"],
-      "includeEntryExports": false,
-      // Referenced from binding.gyp, which knip does not parse.
-      "ignoreDependencies": ["node-addon-api"]
-    }
-  }
+    "includeEntryExports": true,
+    "treatConfigHintsAsErrors": true,
+    "treatTagHintsAsErrors": true,
+    "workspaces": {
+        ".": {},
+        "packages/language-server": {
+            // esbuild bundles this into dist/server.js; bin/server.js comes from package.json#bin.
+            "entry": ["src/index.ts!"],
+            "project": ["src/**/*.ts!", "bin/**/*.js!", "__tests__/**/*.ts"],
+            // System tool the PHP test fixtures shell out to.
+            "ignoreBinaries": ["composer"],
+        },
+        "packages/vscode": {
+            // src/extension.ts comes from package.json#main.
+            "entry": ["build/index.mts"],
+            "project": ["src/**/*.ts!", "build/**/*.mts"],
+        },
+        "packages/tree-sitter-twig": {
+            // Read by `tree-sitter generate`, which consumes its export.
+            "entry": ["grammar.js"],
+            "includeEntryExports": false,
+            // Referenced from binding.gyp, which knip does not parse.
+            "ignoreDependencies": ["node-addon-api"],
+        },
+    },
 }

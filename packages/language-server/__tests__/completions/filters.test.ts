@@ -14,23 +14,21 @@ describe('filters', () => {
             { identifier: 'custom_filter_without_args', arguments: [] },
             {
                 identifier: 'custom_filter_with_args',
-                arguments: [
-                    { identifier: 'arg1', defaultValue: 'default' },
-                ],
+                arguments: [{ identifier: 'arg1', defaultValue: 'default' }],
             },
         ];
         const completions = filters(cursorNode, customFilters);
 
         for (const filter of twigFilters) {
             assert.ok(
-                completions.some((item) => item.label === filter.label),
+                completions.some(item => item.label === filter.label),
                 `${filter.label} not in completions.`,
             );
         }
 
         for (const filter of customFilters) {
             assert.ok(
-                completions.some((item) => item.label === filter.identifier),
+                completions.some(item => item.label === filter.identifier),
                 `${filter.identifier} not in completions.`,
             );
         }

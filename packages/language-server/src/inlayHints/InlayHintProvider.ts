@@ -32,9 +32,7 @@ export class InlayHintProvider {
         connection: Connection,
         private readonly documentCache: DocumentCache,
     ) {
-        connection.languages.inlayHint.on(
-            this.onInlayHint.bind(this),
-        );
+        connection.languages.inlayHint.on(this.onInlayHint.bind(this));
     }
 
     async onInlayHint(params: InlayHintParams): Promise<InlayHint[] | undefined> {
@@ -51,10 +49,15 @@ export class InlayHintProvider {
                 const calledFunc = parseFunctionCall(node.currentNode);
                 if (!calledFunc?.object || calledFunc.args.length === 0) continue;
 
-                const importedDocument = await this.documentCache.resolveImport(document, calledFunc.object);
+                const importedDocument = await this.documentCache.resolveImport(
+                    document,
+                    calledFunc.object,
+                );
                 if (!importedDocument) continue;
 
-                const calledMacro = importedDocument.locals.macro.find(candidate => candidate.name === calledFunc.name);
+                const calledMacro = importedDocument.locals.macro.find(
+                    candidate => candidate.name === calledFunc.name,
+                );
                 if (!calledMacro) continue;
 
                 const hints = calledFunc.args
@@ -70,8 +73,8 @@ export class InlayHintProvider {
             }
 
             if (
-                (block && node.nodeType === 'block' || macro && node.nodeType === 'macro')
-                && node.startPosition.row !== node.endPosition.row
+                ((block && node.nodeType === 'block') || (macro && node.nodeType === 'macro')) &&
+                node.startPosition.row !== node.endPosition.row
             ) {
                 const hint = toInlayHint(node.currentNode);
                 if (hint) inlayHints.push(hint);

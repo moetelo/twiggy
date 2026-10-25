@@ -27,9 +27,7 @@ export function* generateResolveSequence(pathToTwig: string): Generator<string> 
  * @param pathToTwig Template path without extension, resolved against the filesystem.
  * @returns The first existing file from `generateResolveSequence`, or `null`.
  */
-export const resolveTemplate = async (
-    pathToTwig: string,
-): Promise<string | null> => {
+export const resolveTemplate = async (pathToTwig: string): Promise<string | null> => {
     for (const path of generateResolveSequence(pathToTwig)) {
         if (await isFile(path)) {
             return path;

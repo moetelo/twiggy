@@ -8,9 +8,7 @@ export const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
         return false;
     }
 
-    const isInsideStatement = templateUsingStatements.includes(
-        parent.type,
-    );
+    const isInsideStatement = templateUsingStatements.includes(parent.type);
 
     if (isInsideStatement) {
         return true;
@@ -18,9 +16,7 @@ export const isPathInsideTemplateEmbedding = (node: SyntaxNode): boolean => {
 
     const isInsideFunctionCall =
         parent.type === 'arguments' &&
-        templateUsingFunctions.some((func) =>
-            parseFunctionCall(parent.parent)?.name === func,
-        );
+        templateUsingFunctions.some(func => parseFunctionCall(parent.parent)?.name === func);
 
     return isInsideFunctionCall;
 };

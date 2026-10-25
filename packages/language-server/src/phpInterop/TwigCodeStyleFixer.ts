@@ -13,7 +13,8 @@ const severityToDiagnosticSeverity = {
 
 type ReportSeverity = keyof typeof severityToDiagnosticSeverity;
 
-const isReportSeverity = (value: string): value is ReportSeverity => value in severityToDiagnosticSeverity;
+const isReportSeverity = (value: string): value is ReportSeverity =>
+    value in severityToDiagnosticSeverity;
 
 enum TwigCodeStyleAction {
     Lint = 'lint',
@@ -31,15 +32,13 @@ export class TwigCodeStyleFixer {
     }
 
     async #call(action: TwigCodeStyleAction, uri: DocumentUri = '') {
-        if (!this._phpExecutor || !await isFile(this.#executablePath)) {
+        if (!this._phpExecutor || !(await isFile(this.#executablePath))) {
             return null;
         }
 
         const args = [action, '-r', 'github'];
         if (uri) {
-            args.push(
-                path.relative(this._workspaceDirectory, documentUriToFsPath(uri)),
-            );
+            args.push(path.relative(this._workspaceDirectory, documentUriToFsPath(uri)));
         }
 
         const lintResult = await this._phpExecutor.call(this.#executablePath, args);
@@ -52,7 +51,9 @@ export class TwigCodeStyleFixer {
         const reportLines = lintResult.stdout.split('\n');
         for (const reportLine of reportLines) {
             // ::error file=templates/template.html.twig,line=20,col=81::Expecting 0 whitespace after "|"; found 1.
-            const match = /::(error|notice|warning) file=(.*),line=(.*),col=(.*):(.*)/u.exec(reportLine);
+            const match = /::(error|notice|warning) file=(.*),line=(.*),col=(.*):(.*)/u.exec(
+                reportLine,
+            );
             if (!match) {
                 continue;
             }
@@ -72,8 +73,10 @@ export class TwigCodeStyleFixer {
                 message,
                 severity: severityToDiagnosticSeverity[severity],
                 range: Range.create(
-                    Number(line) - 1, Number(col) - 1,
-                    Number(line) - 1, Number(col),
+                    Number(line) - 1,
+                    Number(col) - 1,
+                    Number(line) - 1,
+                    Number(col),
                 ),
             });
         }

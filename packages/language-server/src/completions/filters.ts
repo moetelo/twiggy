@@ -9,27 +9,27 @@ const commonCompletionItem: Partial<CompletionItem> = {
     detail: 'filter',
 };
 
-const completions: CompletionItem[] = twigFilters.map((item) => ({
+const completions: CompletionItem[] = twigFilters.map(item => ({
     ...commonCompletionItem,
     ...item,
 }));
 
-export function filters(cursorNode: SyntaxNode, environmentFilters: TwigFunctionLike[]): CompletionItem[] {
+export function filters(
+    cursorNode: SyntaxNode,
+    environmentFilters: TwigFunctionLike[],
+): CompletionItem[] {
     if (
         cursorNode.text === '|' ||
-        (cursorNode.type === 'function' &&
-            cursorNode.parent?.type === 'filter_expression')
+        (cursorNode.type === 'function' && cursorNode.parent?.type === 'filter_expression')
     ) {
-        const completionsPhp = environmentFilters.map(
-            (func): CompletionItem => ({
-                ...commonCompletionItem,
-                label: func.identifier,
-            }),
-        );
+        const completionsPhp = environmentFilters.map((func): CompletionItem => ({
+            ...commonCompletionItem,
+            label: func.identifier,
+        }));
 
         return [
             ...completions,
-            ...completionsPhp.filter((comp) => !completions.some((item) => item.label === comp.label)),
+            ...completionsPhp.filter(comp => !completions.some(item => item.label === comp.label)),
         ];
     }
 

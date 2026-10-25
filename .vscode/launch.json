@@ -1,55 +1,48 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Extension",
-      "type": "extensionHost",
-      "request": "launch",
-      "preLaunchTask": "${defaultBuildTask}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode",
-        "--disable-extensions",
-      ],
-      "outFiles": [
-        "${workspaceFolder}/packages/vscode/dist/*",
-      ],
-    },
-    {
-      "name": "Server",
-      "type": "node",
-      "request": "attach",
-      "port": 6009,
-      "restart": true,
-      "sourceMaps": true,
-      "smartStep": true,
-      "outFiles": [
-        "${workspaceRoot}/packages/vscode/dist/*",
-      ],
-    },
-    {
-        "type": "node",
-        "request": "attach",
-        "name": "Attach to Server",
-        "address": "127.0.0.1",
-        "sourceMaps": true,
-        "smartStep": true,
-        "port": 9229,
-    },
-    {
-        "name": "Listen for XDebug",
-        "type": "php",
-        "request": "launch",
-        "port": 9003,
-    },
-  ],
-  "compounds": [
-    {
-      "name": "Extension + Server",
-      "configurations": [
-        "Server",
-        "Extension",
-      ],
-      "stopAll": true
-    }
-  ]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "preLaunchTask": "${defaultBuildTask}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode",
+                "--disable-extensions"
+            ],
+            "outFiles": ["${workspaceFolder}/packages/vscode/dist/*"]
+        },
+        {
+            "name": "Server",
+            "type": "node",
+            "request": "attach",
+            "port": 6009,
+            "restart": true,
+            "sourceMaps": true,
+            "smartStep": true,
+            "outFiles": ["${workspaceRoot}/packages/vscode/dist/*"]
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Server",
+            "address": "127.0.0.1",
+            "sourceMaps": true,
+            "smartStep": true,
+            "port": 9229
+        },
+        {
+            "name": "Listen for XDebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Extension + Server",
+            "configurations": ["Server", "Extension"],
+            "stopAll": true
+        }
+    ]
 }

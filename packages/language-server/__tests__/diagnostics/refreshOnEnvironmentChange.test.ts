@@ -17,7 +17,7 @@ const BASE_TWIG = path.join(APP_DIR, 'templates', 'base.html.twig');
 const makeSpyConnection = () => {
     const publishes: PublishDiagnosticsParams[] = [];
     const connection = createNullConnection();
-    connection.sendDiagnostics = async (params) => {
+    connection.sendDiagnostics = async params => {
         publishes.push(params);
     };
     return { connection, publishes };
@@ -25,9 +25,7 @@ const makeSpyConnection = () => {
 
 const envWithBundleMapping: IFrameworkTwigEnvironment = {
     ...EmptyEnvironment,
-    templateMappings: [
-        { namespace: '@Bundle1', directory: '../bundle1/templates' },
-    ],
+    templateMappings: [{ namespace: '@Bundle1', directory: '../bundle1/templates' }],
 };
 
 const lastDiagnosticsFor = (
@@ -63,7 +61,7 @@ describe('diagnostics — refresh on environment change', () => {
         const initial = lastDiagnosticsFor(publishes, baseUri);
         assert.ok(initial, 'expected initial diagnostics publish for base.html.twig');
         assert.ok(
-            initial.some((d) => isTemplateNotFound(d)),
+            initial.some(d => isTemplateNotFound(d)),
             `expected a "Template not found" diagnostic, got: ${JSON.stringify(initial)}`,
         );
 
@@ -78,7 +76,7 @@ describe('diagnostics — refresh on environment change', () => {
             'expected refresh() to publish fresh diagnostics for cached documents',
         );
         assert.deepEqual(
-            afterRefresh.filter((d) => isTemplateNotFound(d)),
+            afterRefresh.filter(d => isTemplateNotFound(d)),
             [],
             `expected no "Template not found" diagnostics after refresh, got: ${JSON.stringify(afterRefresh)}`,
         );

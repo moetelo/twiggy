@@ -9,17 +9,24 @@ import { ok } from 'node:assert';
 import path from 'node:path';
 import { PhpExecutor } from 'phpInterop/PhpExecutor';
 import { VanillaTwigEnvironment } from 'twigEnvironment/VanillaTwigEnvironment';
-import { ensureFixtureInstalled, hasPhp, PhpUtilSourcePath, TWIG_ENV_WORKSPACE } from './__helpers__/setup';
+import {
+    ensureFixtureInstalled,
+    hasPhp,
+    PhpUtilSourcePath,
+    TWIG_ENV_WORKSPACE,
+} from './__helpers__/setup';
 
 describe.skipIf(!hasPhp())('VanillaTwigEnvironment against twig-env fixture', () => {
-    const env = new VanillaTwigEnvironment(new PhpExecutor('php', TWIG_ENV_WORKSPACE, PhpUtilSourcePath));
+    const env = new VanillaTwigEnvironment(
+        new PhpExecutor('php', TWIG_ENV_WORKSPACE, PhpUtilSourcePath),
+    );
     const installed = ensureFixtureInstalled(TWIG_ENV_WORKSPACE);
 
     test('refresh() loads functions, filters, globals, loader paths and tests', async () => {
         if (!installed) {
             throw new Error(
                 `twig-env fixture not installed (vendor/autoload.php missing). ` +
-                `Run \`composer install\` in ${TWIG_ENV_WORKSPACE}.`,
+                    `Run \`composer install\` in ${TWIG_ENV_WORKSPACE}.`,
             );
         }
 
@@ -32,7 +39,7 @@ describe.skipIf(!hasPhp())('VanillaTwigEnvironment against twig-env fixture', ()
         const twigEnv = env.environment;
         ok(twigEnv);
 
-        const fns = Object.fromEntries(twigEnv.Functions.map((f) => [f.identifier, f]));
+        const fns = Object.fromEntries(twigEnv.Functions.map(f => [f.identifier, f]));
         expect(fns).toHaveProperty('say_hello');
         expect(fns.say_hello.arguments).toEqual([{ identifier: 'name', defaultValue: undefined }]);
         // Twig's own builtins should also be present and parameter defaults
@@ -46,7 +53,7 @@ describe.skipIf(!hasPhp())('VanillaTwigEnvironment against twig-env fixture', ()
             { identifier: 'step ', defaultValue: ' 1' },
         ]);
 
-        const filters = twigEnv.Filters.map((f) => f.identifier);
+        const filters = twigEnv.Filters.map(f => f.identifier);
         expect(filters).toContain('shout');
         expect(filters).toContain('upper');
 
@@ -55,7 +62,10 @@ describe.skipIf(!hasPhp())('VanillaTwigEnvironment against twig-env fixture', ()
         // Default namespace becomes empty string, named one becomes '@shared'.
         const templatesDir = path.join(TWIG_ENV_WORKSPACE, 'templates');
         expect(env.templateMappings).toContainEqual({ namespace: '', directory: templatesDir });
-        expect(env.templateMappings).toContainEqual({ namespace: '@shared', directory: templatesDir });
+        expect(env.templateMappings).toContainEqual({
+            namespace: '@shared',
+            directory: templatesDir,
+        });
 
         expect(twigEnv.Tests).toContain('defined');
     });

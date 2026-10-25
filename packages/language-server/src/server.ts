@@ -85,7 +85,7 @@ export class Server {
             void this.#onInitialized();
         });
 
-        connection.onDidChangeWatchedFiles((params) => {
+        connection.onDidChangeWatchedFiles(params => {
             void this.#onDidChangeWatchedFiles(params);
         });
 
@@ -104,16 +104,21 @@ export class Server {
         this.connection.listen();
     }
 
-    async #onInitialize(initializeParams: InitializeParams): Promise<InitializeResult | ResponseError<InitializeError>> {
+    async #onInitialize(
+        initializeParams: InitializeParams,
+    ): Promise<InitializeResult | ResponseError<InitializeError>> {
         const workspaceFolder = initializeParams.workspaceFolders?.at(0);
         if (!workspaceFolder) {
-            return new ResponseError(ErrorCodes.InvalidParams, 'Twiggy needs a workspace folder.', { retry: false });
+            return new ResponseError(ErrorCodes.InvalidParams, 'Twiggy needs a workspace folder.', {
+                retry: false,
+            });
         }
 
         const { connection } = this;
         this.workspaceFolder = workspaceFolder;
         this.#hasDynamicFileWatcherSupport =
-            initializeParams.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration ?? false;
+            initializeParams.capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration ??
+            false;
 
         const documentCache = new DocumentCache(workspaceFolder);
         this.documentCache = documentCache;
@@ -138,7 +143,10 @@ export class Server {
             workspaceFolder,
         );
         this.inlayHintProvider = new InlayHintProvider(connection, documentCache);
-        this.isInsideHtmlRegionCommandProvider = new IsInsideHtmlRegionCommandProvider(connection, documentCache);
+        this.isInsideHtmlRegionCommandProvider = new IsInsideHtmlRegionCommandProvider(
+            connection,
+            documentCache,
+        );
         this.formattingProvider = new FormattingProvider(connection, this.diagnosticProvider);
         this.bracketSpacesInsertionProvider = new BracketSpacesInsertionProvider(
             connection,

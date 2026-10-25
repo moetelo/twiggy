@@ -1,24 +1,18 @@
 {
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "module": "commonjs",
-    "target": "ES2020",
-    "outDir": "dist",
-    "lib": [
-      "ES2020"
-    ],
-    "sourceMap": true,
-    "rootDir": "src",
-    "noEmit": true,
-    "strict": true,
-    "paths": {
-      "@server": [
-        "../language-server/src/"
-      ],
-      "@tree-sitter-twig": [
-        "../tree-sitter-twig"
-      ]
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "module": "commonjs",
+        "target": "ES2020",
+        "outDir": "dist",
+        "lib": ["ES2020"],
+        "sourceMap": true,
+        "rootDir": "src",
+        "noEmit": true,
+        "strict": true,
+        "paths": {
+            "@server": ["../language-server/src/"],
+            "@tree-sitter-twig": ["../tree-sitter-twig"]
+        }
     },
-  },
-  "include": ["src/**/*"],
+    "include": ["src/**/*"]
 }

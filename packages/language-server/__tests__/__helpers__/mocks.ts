@@ -1,6 +1,10 @@
 import { PassThrough } from 'node:stream';
 import type { Connection } from 'vscode-languageserver';
-import { createConnection, StreamMessageReader, StreamMessageWriter } from 'vscode-languageserver/node';
+import {
+    createConnection,
+    StreamMessageReader,
+    StreamMessageWriter,
+} from 'vscode-languageserver/node';
 import type { IPhpExecutor } from 'phpInterop/IPhpExecutor';
 import type { ReflectedType } from 'phpInterop/ReflectedType';
 import type { IFrameworkTwigEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
@@ -8,7 +12,7 @@ import { EmptyEnvironment } from 'twigEnvironment/IFrameworkTwigEnvironment';
 
 export const MockEnvironment: IFrameworkTwigEnvironment = {
     ...EmptyEnvironment,
-    templateMappings: [ { namespace: '', directory: '' }],
+    templateMappings: [{ namespace: '', directory: '' }],
 };
 
 /**
@@ -17,10 +21,11 @@ export const MockEnvironment: IFrameworkTwigEnvironment = {
  * test observes instead of sending through it.
  * @returns A connection that is never listened on.
  */
-export const createNullConnection = (): Connection => createConnection(
-    new StreamMessageReader(new PassThrough()),
-    new StreamMessageWriter(new PassThrough()),
-);
+export const createNullConnection = (): Connection =>
+    createConnection(
+        new StreamMessageReader(new PassThrough()),
+        new StreamMessageWriter(new PassThrough()),
+    );
 
 export class MockPhpExecutor implements IPhpExecutor {
     static classMap: Record<string, ReflectedType> = {
@@ -63,13 +68,16 @@ export class MockPhpExecutor implements IPhpExecutor {
                 {
                     name: 'prop',
                     type: 'int',
-                }
+                },
             ],
             methods: [],
         },
     };
 
-    async call(_command: string, _args: string[]): Promise<{ stdout: string; stderr: string; } | null> {
+    async call(
+        _command: string,
+        _args: string[],
+    ): Promise<{ stdout: string; stderr: string } | null> {
         throw new Error('Method not implemented.');
     }
 
@@ -77,7 +85,7 @@ export class MockPhpExecutor implements IPhpExecutor {
         throw new Error('Method not implemented.');
     }
 
-    async getClassDefinition(_className: string): Promise<{ path: string | null; } | null> {
+    async getClassDefinition(_className: string): Promise<{ path: string | null } | null> {
         throw new Error('Method not implemented.');
     }
 

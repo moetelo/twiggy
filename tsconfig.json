@@ -1,11 +1,11 @@
 {
-  "references": [
-    {
-      "path": "packages/language-server"
-    },
-    {
-      "path": "packages/vscode"
-    }
-  ],
-  "files": []
+    "references": [
+        {
+            "path": "packages/language-server"
+        },
+        {
+            "path": "packages/vscode"
+        }
+    ],
+    "files": []
 }

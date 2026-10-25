@@ -1,5 +1,5 @@
-import type { SyntaxNode } from "web-tree-sitter";
-import { parseFunctionCall } from "./parseFunctionCall";
+import type { SyntaxNode } from 'web-tree-sitter';
+import { parseFunctionCall } from './parseFunctionCall';
 
 export const isBlockIdentifier = (node: SyntaxNode): boolean => {
     if (!node.parent) {

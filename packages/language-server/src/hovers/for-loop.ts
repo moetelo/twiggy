@@ -14,9 +14,7 @@ export function forLoop(cursorNode: SyntaxNode): Hover | undefined {
         cursorNode.previousSibling.previousSibling?.type === 'variable' &&
         cursorNode.previousSibling.previousSibling.text === 'loop'
     ) {
-        const property = forLoopProperties.find(
-            item => item.label === cursorNode.text,
-        );
+        const property = forLoopProperties.find(item => item.label === cursorNode.text);
 
         if (!property?.detail) return undefined;
 

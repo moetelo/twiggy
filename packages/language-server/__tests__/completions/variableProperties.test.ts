@@ -11,17 +11,22 @@ import { MockEnvironment, MockPhpExecutor } from '../__helpers__/mocks';
 import { initializeTestParser } from '../__helpers__/parser';
 
 const assertExpectedType = (completions: CompletionItem[], expectedType: ReflectedType) => {
-    const expectedLabels = [...expectedType.properties, ...expectedType.methods].map((prop) => prop.name);
+    const expectedLabels = [...expectedType.properties, ...expectedType.methods].map(
+        prop => prop.name,
+    );
 
     for (const label of expectedLabels) {
-        const completionFound = completions.find((item) => item.label === label);
+        const completionFound = completions.find(item => item.label === label);
         assert.ok(completionFound, `${label} not in completions.`);
     }
 };
 
 const runCompletion = async (fixture: string) => {
     const typeResolver = new TypeResolver(new MockPhpExecutor());
-    const { document, position, cursorNode } = await documentWithCursorAndTypes(fixture, typeResolver);
+    const { document, position, cursorNode } = await documentWithCursorAndTypes(
+        fixture,
+        typeResolver,
+    );
 
     const documentCache = createDocumentCache();
     documentCache.configure(MockEnvironment, typeResolver);
@@ -68,7 +73,10 @@ describe('variableProperties (macro imports)', () => {
             position,
         );
 
-        assert.ok(completions.find((item) => item.label === 'new_macro'), 'macro not in completions.');
+        assert.ok(
+            completions.find(item => item.label === 'new_macro'),
+            'macro not in completions.',
+        );
     });
 
     test('lists properties of imported macro file (inside of a macro)', async () => {
@@ -103,7 +111,10 @@ describe('variableProperties (macro imports)', () => {
             position,
         );
 
-        assert.ok(completions.find((item) => item.label === 'new_macro'), 'macro not in completions.');
+        assert.ok(
+            completions.find(item => item.label === 'new_macro'),
+            'macro not in completions.',
+        );
     });
 });
 

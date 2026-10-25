@@ -44,7 +44,9 @@ export class CompletionProvider {
         this.#environment = environment;
         this.#symfonyRouteNames = Object.keys(environment.routes);
         this.#phpExecutor = phpExecutor;
-        this.#expressionTypeResolver = typeResolver ? new ExpressionTypeResolver(typeResolver) : null;
+        this.#expressionTypeResolver = typeResolver
+            ? new ExpressionTypeResolver(typeResolver)
+            : null;
     }
 
     async onCompletion(params: CompletionParams) {
@@ -62,14 +64,20 @@ export class CompletionProvider {
             ...functions(cursorNode, environment?.Functions ?? []),
             ...filters(cursorNode, environment?.Filters ?? []),
             ...symfonyRouteNames(cursorNode, this.#symfonyRouteNames),
-            ...await phpClasses(cursorNode, this.#phpExecutor),
-            ...await variableProperties(document, this.documentCache, cursorNode, this.#expressionTypeResolver, params.position),
-            ...await templatePaths(
+            ...(await phpClasses(cursorNode, this.#phpExecutor)),
+            ...(await variableProperties(
+                document,
+                this.documentCache,
+                cursorNode,
+                this.#expressionTypeResolver,
+                params.position,
+            )),
+            ...(await templatePaths(
                 cursorNode,
                 params.position,
                 this.workspaceFolderPath,
                 this.#environment.templateMappings,
-            ),
+            )),
         ];
     }
 }

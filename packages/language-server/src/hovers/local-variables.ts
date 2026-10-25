@@ -7,9 +7,7 @@ import { isTwigImport } from '../symbols/types';
 export function localVariables(document: Document, cursorNode: SyntaxNode): Hover | undefined {
     if (cursorNode.type !== 'variable') return undefined;
 
-    const locals = document.getLocalsAt(
-        pointToPosition(cursorNode.startPosition),
-    );
+    const locals = document.getLocalsAt(pointToPosition(cursorNode.startPosition));
 
     const result = locals.find(({ name }) => name === cursorNode.text);
 

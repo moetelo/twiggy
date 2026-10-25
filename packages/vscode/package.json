@@ -1,186 +1,186 @@
 {
-  "name": "twiggy",
-  "displayName": "Twiggy",
-  "description": "Twig language server: autocomplete, go to definition, hovers, inlay hints and diagnostics for Symfony and Craft CMS templates",
-  "author": "Mikhail Gunin <gunka462@gmail.com>",
-  "license": "Mozilla Public License 2.0",
-  "version": "26.8.0",
-  "engines": {
-    "vscode": "^1.88.0"
-  },
-  "activationEvents": [
-    "onLanguage:twig",
-    "onCommand:twiggy.restartLanguageServer"
-  ],
-  "main": "./dist/extension.js",
-  "publisher": "moetelo",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/moetelo/twiggy.git",
-    "directory": "packages/vscode"
-  },
-  "keywords": [
-    "twig",
-    "symfony",
-    "craft cms",
-    "php",
-    "template",
-    "language server",
-    "lsp",
-    "autocomplete",
-    "intellisense",
-    "snippets",
-    "formatter",
-    "linter"
-  ],
-  "categories": [
-    "Programming Languages",
-    "Linters"
-  ],
-  "icon": "assets/logo.png",
-  "scripts": {
-    "vscode:prepublish": "",
-    "clean": "rm -rf ./dist ./node_modules",
-    "build": "bun ./build",
-    "dev": "bun ./build --dev",
-    "typecheck": "tsc"
-  },
-  "contributes": {
-    "commands": [
-      {
-        "command": "twiggy.restartLanguageServer",
-        "title": "Restart Language Server",
-        "category": "Twiggy"
-      }
-    ],
-    "configuration": {
-      "title": "Twiggy",
-      "properties": {
-        "twiggy.autoInsertSpaces": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Insert spaces inside of `{{ | }}` and `{% | %}`."
-        },
-        "twiggy.diagnostics.twigCsFixer": {
-          "type": "boolean",
-          "default": false,
-          "markdownDescription": "Use VincentLanglet/Twig-CS-Fixer, if installed. Note: format on save should be disabled since it's buggy."
-        },
-        "twiggy.inlayHints.macroArguments": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Inlay hints for macro arguments."
-        },
-        "twiggy.inlayHints.macro": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Inlay hints for `{% endmacro %}`."
-        },
-        "twiggy.inlayHints.block": {
-          "type": "boolean",
-          "default": true,
-          "markdownDescription": "Inlay hints for `{% endblock %}`."
-        },
-        "twiggy.phpExecutable": {
-          "type": "string",
-          "scope": "resource",
-          "default": "php",
-          "markdownDescription": "Points to the PHP executable."
-        },
-        "twiggy.framework": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "symfony",
-            "craft",
-            "twig",
-            "ignore"
-          ],
-          "markdownDescription": "Framework to use."
-        },
-        "twiggy.vanillaTwigEnvironmentPath": {
-          "type": "string",
-          "scope": "resource",
-          "default": "",
-          "markdownDescription": "Path to the Twig environment file. To be used with `\"twiggy.framework\": \"twig\"`.\nSee: https://github.com/moetelo/twiggy/issues/52"
-        },
-        "twiggy.symfonyConsolePath": {
-          "type": "string",
-          "scope": "resource",
-          "default": "bin/console",
-          "markdownDescription": "Path to the Symfony console. See: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
-        }
-      }
+    "name": "twiggy",
+    "displayName": "Twiggy",
+    "description": "Twig language server: autocomplete, go to definition, hovers, inlay hints and diagnostics for Symfony and Craft CMS templates",
+    "author": "Mikhail Gunin <gunka462@gmail.com>",
+    "license": "Mozilla Public License 2.0",
+    "version": "26.8.0",
+    "engines": {
+        "vscode": "^1.88.0"
     },
-    "languages": [
-      {
-        "id": "twig",
-        "aliases": [
-          "HTML (Twig)",
-          "twig"
-        ],
-        "extensions": [
-          ".twig",
-          ".html.twig"
-        ],
-        "configuration": "./languages/twig.configuration.json"
-      }
+    "activationEvents": [
+        "onLanguage:twig",
+        "onCommand:twiggy.restartLanguageServer"
     ],
-    "semanticTokenTypes": [
-      {
-        "id": "embedded_begin",
-        "superType": "embedded_delimiter",
-        "description": "Begin of embedded"
-      },
-      {
-        "id": "embedded_end",
-        "superType": "embedded_delimiter",
-        "description": "End of embedded"
-      },
-      {
-        "id": "null",
-        "superType": "constant",
-        "description": "null or none"
-      },
-      {
-        "id": "boolean",
-        "superType": "constant",
-        "description": "true or false"
-      }
-    ],
-    "configurationDefaults": {
-      "editor.semanticTokenColorCustomizations": {
-        "enabled": true,
-        "rules": {
-          "embedded_delimiter": {
-            "foreground": "#777777"
-          }
-        }
-      }
+    "main": "./dist/extension.js",
+    "publisher": "moetelo",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/moetelo/twiggy.git",
+        "directory": "packages/vscode"
     },
-    "grammars": [
-      {
-        "language": "twig",
-        "scopeName": "text.html.twig",
-        "path": "./syntaxes/twig.tmLanguage.json",
-        "embeddedLanguages": {
-          "source.twig": "twig",
-          "source.js": "javascript",
-          "source.json": "json",
-          "source.css": "css"
-        }
-      }
-    ]
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "@types/vscode": "^1.88.0",
-    "esbuild": "catalog:",
-    "esbuild-plugin-copy": "^2.1.1",
-    "typescript": "catalog:"
-  },
-  "dependencies": {
-    "twiggy-language-server": "workspace:*",
-    "vscode-languageclient": "^9.0.1"
-  }
+    "keywords": [
+        "twig",
+        "symfony",
+        "craft cms",
+        "php",
+        "template",
+        "language server",
+        "lsp",
+        "autocomplete",
+        "intellisense",
+        "snippets",
+        "formatter",
+        "linter"
+    ],
+    "categories": [
+        "Programming Languages",
+        "Linters"
+    ],
+    "icon": "assets/logo.png",
+    "scripts": {
+        "vscode:prepublish": "",
+        "clean": "rm -rf ./dist ./node_modules",
+        "build": "bun ./build",
+        "dev": "bun ./build --dev",
+        "typecheck": "tsc"
+    },
+    "contributes": {
+        "commands": [
+            {
+                "command": "twiggy.restartLanguageServer",
+                "title": "Restart Language Server",
+                "category": "Twiggy"
+            }
+        ],
+        "configuration": {
+            "title": "Twiggy",
+            "properties": {
+                "twiggy.autoInsertSpaces": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Insert spaces inside of `{{ | }}` and `{% | %}`."
+                },
+                "twiggy.diagnostics.twigCsFixer": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Use VincentLanglet/Twig-CS-Fixer, if installed. Note: format on save should be disabled since it's buggy."
+                },
+                "twiggy.inlayHints.macroArguments": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Inlay hints for macro arguments."
+                },
+                "twiggy.inlayHints.macro": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Inlay hints for `{% endmacro %}`."
+                },
+                "twiggy.inlayHints.block": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Inlay hints for `{% endblock %}`."
+                },
+                "twiggy.phpExecutable": {
+                    "type": "string",
+                    "scope": "resource",
+                    "default": "php",
+                    "markdownDescription": "Points to the PHP executable."
+                },
+                "twiggy.framework": {
+                    "type": "string",
+                    "scope": "resource",
+                    "enum": [
+                        "symfony",
+                        "craft",
+                        "twig",
+                        "ignore"
+                    ],
+                    "markdownDescription": "Framework to use."
+                },
+                "twiggy.vanillaTwigEnvironmentPath": {
+                    "type": "string",
+                    "scope": "resource",
+                    "default": "",
+                    "markdownDescription": "Path to the Twig environment file. To be used with `\"twiggy.framework\": \"twig\"`.\nSee: https://github.com/moetelo/twiggy/issues/52"
+                },
+                "twiggy.symfonyConsolePath": {
+                    "type": "string",
+                    "scope": "resource",
+                    "default": "bin/console",
+                    "markdownDescription": "Path to the Symfony console. See: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
+                }
+            }
+        },
+        "languages": [
+            {
+                "id": "twig",
+                "aliases": [
+                    "HTML (Twig)",
+                    "twig"
+                ],
+                "extensions": [
+                    ".twig",
+                    ".html.twig"
+                ],
+                "configuration": "./languages/twig.configuration.json"
+            }
+        ],
+        "semanticTokenTypes": [
+            {
+                "id": "embedded_begin",
+                "superType": "embedded_delimiter",
+                "description": "Begin of embedded"
+            },
+            {
+                "id": "embedded_end",
+                "superType": "embedded_delimiter",
+                "description": "End of embedded"
+            },
+            {
+                "id": "null",
+                "superType": "constant",
+                "description": "null or none"
+            },
+            {
+                "id": "boolean",
+                "superType": "constant",
+                "description": "true or false"
+            }
+        ],
+        "configurationDefaults": {
+            "editor.semanticTokenColorCustomizations": {
+                "enabled": true,
+                "rules": {
+                    "embedded_delimiter": {
+                        "foreground": "#777777"
+                    }
+                }
+            }
+        },
+        "grammars": [
+            {
+                "language": "twig",
+                "scopeName": "text.html.twig",
+                "path": "./syntaxes/twig.tmLanguage.json",
+                "embeddedLanguages": {
+                    "source.twig": "twig",
+                    "source.js": "javascript",
+                    "source.json": "json",
+                    "source.css": "css"
+                }
+            }
+        ]
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "@types/vscode": "^1.88.0",
+        "esbuild": "catalog:",
+        "esbuild-plugin-copy": "^2.1.1",
+        "typescript": "catalog:"
+    },
+    "dependencies": {
+        "twiggy-language-server": "workspace:*",
+        "vscode-languageclient": "^9.0.1"
+    }
 }

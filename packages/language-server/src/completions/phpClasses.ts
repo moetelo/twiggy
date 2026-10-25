@@ -6,8 +6,8 @@ import { primitives } from '../phpInterop/primitives';
 import { closestByPredicate } from '../utils/node';
 
 type VarVariable = {
-    fullClassName: string,
-    className: string,
+    fullClassName: string;
+    className: string;
 };
 
 const toCompletionItem = (variable: VarVariable): CompletionItem => ({
@@ -17,25 +17,22 @@ const toCompletionItem = (variable: VarVariable): CompletionItem => ({
     insertText: variable.fullClassName,
 });
 
-const primitiveCompletions = [...primitives].map(
-    primitive => toCompletionItem({ fullClassName: primitive, className: primitive }),
+const primitiveCompletions = [...primitives].map(primitive =>
+    toCompletionItem({ fullClassName: primitive, className: primitive }),
 );
 
-const typeNodes = new Set([
-    'primitive_type',
-    'qualified_name',
-    'incomplete_type',
-]);
+const typeNodes = new Set(['primitive_type', 'qualified_name', 'incomplete_type']);
 
 // `\Foo|Bar & ^ #}`
 // `^` is a cursor
-const isAtTheEndOfVarDeclaration = (node: SyntaxNode) => node.type === 'comment_end' && node.parent?.type === 'var_declaration';
+const isAtTheEndOfVarDeclaration = (node: SyntaxNode) =>
+    node.type === 'comment_end' && node.parent?.type === 'var_declaration';
 
 export async function phpClasses(
     node: SyntaxNode,
     phpExecutor: IPhpExecutor | null,
 ): Promise<CompletionItem[]> {
-    const typeNode = closestByPredicate(node, (n) => typeNodes.has(n.type))
+    const typeNode = closestByPredicate(node, n => typeNodes.has(n.type));
     if (!typeNode && !isAtTheEndOfVarDeclaration(node)) return [];
 
     if (!phpExecutor) return primitiveCompletions;
@@ -47,8 +44,5 @@ export async function phpClasses(
         return toCompletionItem({ fullClassName, className });
     });
 
-    return [
-        ...primitiveCompletions,
-        ...classes,
-    ];
+    return [...primitiveCompletions, ...classes];
 }

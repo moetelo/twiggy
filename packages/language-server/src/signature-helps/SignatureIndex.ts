@@ -3,7 +3,9 @@ import type { TwigEnvironment, TwigFunctionLike } from '../twigEnvironment';
 
 function mapToSignatureInformation(item: TwigFunctionLike): SignatureInformation {
     const paramsStr = item.arguments
-        .map(({ identifier, defaultValue }) => defaultValue ? `${identifier} = ${defaultValue}` : identifier)
+        .map(({ identifier, defaultValue }) =>
+            defaultValue ? `${identifier} = ${defaultValue}` : identifier,
+        )
         .join(', ');
 
     return {

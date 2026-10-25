@@ -6,9 +6,7 @@ export interface IFrameworkTwigEnvironment {
     get templateMappings(): TemplatePathMapping[];
 }
 
-const defaultPathMappings: TemplatePathMapping[] = [
-    { namespace: '', directory: 'templates' },
-];
+const defaultPathMappings: TemplatePathMapping[] = [{ namespace: '', directory: 'templates' }];
 
 export const EmptyEnvironment: IFrameworkTwigEnvironment = Object.freeze({
     environment: null,

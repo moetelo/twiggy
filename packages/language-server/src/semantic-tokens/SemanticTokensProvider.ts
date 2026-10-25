@@ -1,10 +1,5 @@
-import type {
-    SemanticTokensParams,
-    Connection,
-} from 'vscode-languageserver';
-import {
-    SemanticTokensBuilder,
-} from 'vscode-languageserver';
+import type { SemanticTokensParams, Connection } from 'vscode-languageserver';
+import { SemanticTokensBuilder } from 'vscode-languageserver';
 import { PreOrderCursorIterator } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { semanticTokensLegend } from './tokens-provider';
@@ -18,9 +13,7 @@ export class SemanticTokensProvider {
         private readonly connection: Connection,
         private readonly documentCache: DocumentCache,
     ) {
-        this.connection.languages.semanticTokens.on(
-            this.serverRequestHandler.bind(this),
-        );
+        this.connection.languages.semanticTokens.on(this.serverRequestHandler.bind(this));
 
         this.#tokenTypeResolver = new TokenTypeResolver(semanticTokensLegend);
     }

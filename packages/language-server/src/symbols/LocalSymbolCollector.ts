@@ -101,16 +101,13 @@ export class LocalSymbolCollector {
                     this.#visitExtends(cursor.currentNode);
                     continue;
 
-
                 case 'import':
                     this.#visitImport(cursor.currentNode);
                     continue;
 
-
                 case 'block':
                     await this.#visitBlock(cursor.currentNode);
                     continue;
-
 
                 case 'set':
                 case 'set_block':
@@ -118,26 +115,21 @@ export class LocalSymbolCollector {
                     await this.#visitVariableDeclaration(cursor.currentNode);
                     continue;
 
-
                 case 'types':
                     await this.#visitTypes(cursor.currentNode);
                     continue;
-
 
                 case 'macro':
                     await this.#visitMacro(cursor.currentNode);
                     continue;
 
-
                 case 'for':
                     await this.#visitFor(cursor.currentNode);
                     continue;
 
-
                 case 'variable':
                     await this.#visitVariable(cursor.currentNode);
                     continue;
-
 
                 // No default
             }
@@ -179,7 +171,7 @@ export class LocalSymbolCollector {
             // Implicitly defined variables are used in-place.
             // i.e. when you meet a variable for the first time,
             // it's "defined" and used in the same place.
-            references: isUsedInPlace ? [ nameRange ] : [],
+            references: isUsedInPlace ? [nameRange] : [],
             reflectedType,
         };
         this.localSymbols.variable.push(implicitVariable);
@@ -211,7 +203,6 @@ export class LocalSymbolCollector {
                     await this.#visitVariableDeclaration(variable);
                     continue;
 
-
                 // No default
             }
         }
@@ -221,7 +212,9 @@ export class LocalSymbolCollector {
         const variableDeclaration = toVariable(currentNode);
         if (!variableDeclaration) return;
 
-        const alreadyDefinedVar = this.localSymbols.variableDefinition.get(variableDeclaration.name);
+        const alreadyDefinedVar = this.localSymbols.variableDefinition.get(
+            variableDeclaration.name,
+        );
         if (alreadyDefinedVar) {
             const nameRange = getNodeRange(currentNode);
             alreadyDefinedVar.references.push(nameRange);
@@ -231,12 +224,18 @@ export class LocalSymbolCollector {
         }
 
         const valueNode = currentNode.childForFieldName('value');
-        variableDeclaration.reflectedType = await this.#reflectVariableDeclarationType(currentNode, true);
+        variableDeclaration.reflectedType = await this.#reflectVariableDeclarationType(
+            currentNode,
+            true,
+        );
 
         await this.collect(valueNode);
     }
 
-    async #reflectVariableDeclarationType(varDeclarationNode: SyntaxNode, isDeclaration?: boolean): Promise<ReflectedType | null> {
+    async #reflectVariableDeclarationType(
+        varDeclarationNode: SyntaxNode,
+        isDeclaration?: boolean,
+    ): Promise<ReflectedType | null> {
         if (!this.exprTypeResolver) return null;
 
         if (isDeclaration) {
@@ -251,15 +250,11 @@ export class LocalSymbolCollector {
 
         const valueNode = varDeclarationNode.childForFieldName('value');
         if (valueNode) {
-            return this.exprTypeResolver.resolveExpression(
-                valueNode,
-                this.localSymbols,
-            );
+            return this.exprTypeResolver.resolveExpression(valueNode, this.localSymbols);
         }
 
-        const forLoopArrayNode = varDeclarationNode.parent?.type === 'for'
-            ? varDeclarationNode.nextNamedSibling
-            : null;
+        const forLoopArrayNode =
+            varDeclarationNode.parent?.type === 'for' ? varDeclarationNode.nextNamedSibling : null;
         if (forLoopArrayNode) {
             const forLoopArrayType = await this.exprTypeResolver.resolveExpression(
                 forLoopArrayNode,
@@ -278,7 +273,11 @@ export class LocalSymbolCollector {
 
         const bodyNode = currentNode.childForFieldName('body');
 
-        const scopedSymbolCollector = new LocalSymbolCollector(bodyNode, this.typeResolver, this.localSymbols.variableDefinition);
+        const scopedSymbolCollector = new LocalSymbolCollector(
+            bodyNode,
+            this.typeResolver,
+            this.localSymbols.variableDefinition,
+        );
 
         const blockWithSymbols: TwigBlock = {
             ...block,

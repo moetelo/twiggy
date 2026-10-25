@@ -16,23 +16,15 @@ const macroToCompletionItem = (macro: TwigMacro) => ({
     kind: CompletionItemKind.Function,
     insertTextFormat: InsertTextFormat.Snippet,
     command: triggerParameterHints,
-    insertText: macro.args.length === 0
-        ? `${macro.name}()$0`
-        : macro.name,
+    insertText: macro.args.length === 0 ? `${macro.name}()$0` : macro.name,
 });
 
 const getVariableNode = (cursorNode: SyntaxNode) => {
-    if (
-        cursorNode.text === '.'
-        && cursorNode.previousSibling?.type === 'variable'
-    ) {
+    if (cursorNode.text === '.' && cursorNode.previousSibling?.type === 'variable') {
         return cursorNode.previousSibling;
     }
 
-    if (
-        cursorNode.parent?.type === 'subscript_expression'
-        && cursorNode.type === 'string'
-    ) {
+    if (cursorNode.parent?.type === 'subscript_expression' && cursorNode.type === 'string') {
         return cursorNode.parent.childForFieldName('object');
     }
 
@@ -41,9 +33,9 @@ const getVariableNode = (cursorNode: SyntaxNode) => {
 
 const getExpressionNode = (cursorNode: SyntaxNode) => {
     if (
-        cursorNode.text === '.'
-        && cursorNode.parent?.firstNamedChild
-        && ExpressionTypeResolver.supportedTypes.has(cursorNode.parent.firstNamedChild.type)
+        cursorNode.text === '.' &&
+        cursorNode.parent?.firstNamedChild &&
+        ExpressionTypeResolver.supportedTypes.has(cursorNode.parent.firstNamedChild.type)
     ) {
         return cursorNode.previousSibling;
     }
@@ -51,29 +43,31 @@ const getExpressionNode = (cursorNode: SyntaxNode) => {
     return null;
 };
 
-const reflectedTypeToCompletions = (reflectedType: ReflectedType, options: { includeMethods: boolean }) => {
-    const properties = reflectedType.properties.map((prop) => (({
+const reflectedTypeToCompletions = (
+    reflectedType: ReflectedType,
+    options: { includeMethods: boolean },
+) => {
+    const properties = reflectedType.properties.map(prop => ({
         label: prop.name,
         detail: prop.type,
-        kind: CompletionItemKind.Property
-    })));
+        kind: CompletionItemKind.Property,
+    }));
 
     if (!options.includeMethods) return properties;
 
     return [
         ...properties,
-        ...reflectedType.methods.map((method) => (({
+        ...reflectedType.methods.map(method => ({
             label: method.name,
             kind: CompletionItemKind.Method,
             command: triggerParameterHints,
             insertTextFormat: InsertTextFormat.Snippet,
             detail: method.type,
-            insertText: method.parameters.length === 0
-                ? `${method.name}()$0`
-                : `${method.name}($1)$0`,
-        }))),
+            insertText:
+                method.parameters.length === 0 ? `${method.name}()$0` : `${method.name}($1)$0`,
+        })),
     ];
-}
+};
 
 export async function variableProperties(
     document: Document,
@@ -115,19 +109,16 @@ export async function variableProperties(
         const localMacros = importedDocument.locals.macro;
 
         if (importedDocument !== document) {
-            return localMacros.map((macro) => macroToCompletionItem(macro));
+            return localMacros.map(macro => macroToCompletionItem(macro));
         }
 
-        const scopedMacros = importedDocument
-            .getScopeAt(pointToPosition(cursorNode.startPosition))
-            .macro;
+        const scopedMacros = importedDocument.getScopeAt(
+            pointToPosition(cursorNode.startPosition),
+        ).macro;
 
-        const allMacros = new Set([
-            ...localMacros,
-            ...scopedMacros,
-        ]);
+        const allMacros = new Set([...localMacros, ...scopedMacros]);
 
-        return [...allMacros].map((macro) => macroToCompletionItem(macro));
+        return [...allMacros].map(macro => macroToCompletionItem(macro));
     }
 
     return [];

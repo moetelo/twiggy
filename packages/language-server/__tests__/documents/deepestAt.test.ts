@@ -47,7 +47,6 @@ describe('Document.deepestAt', () => {
     });
 });
 
-
 describe('Document.deepestAt for incomplete nodes', () => {
     beforeAll(initializeTestParser);
 

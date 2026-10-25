@@ -5,5 +5,5 @@ export function getStringNodeValue(stringNode: SyntaxNode) {
         throw new Error(`Node is not a string. ${stringNode.type}`);
     }
 
-    return stringNode.text.slice('"'.length, -'"'.length)
+    return stringNode.text.slice('"'.length, -'"'.length);
 }

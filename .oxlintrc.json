@@ -1,181 +1,216 @@
 {
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "jsdoc", "promise", "node"],
-  "categories": {
-    "correctness": "error",
-    "suspicious": "error",
-    "pedantic": "error",
-    "perf": "error",
-    "style": "error",
-    "restriction": "error",
-    "nursery": "error"
-  },
-  "options": {
-    "typeAware": true,
-    "reportUnusedDisableDirectives": "error",
-    "denyWarnings": true
-  },
-  "env": {
-    "builtin": true,
-    "es2024": true,
-    "node": true
-  },
-  "rules": {
-    // Style, configured to match the codebase.
-    "curly": ["error", "multi-line"],
-    "no-else-return": "error",
-    "unicorn/switch-case-braces": ["error", "avoid"],
-    "one-var": ["error", "never"],
-    "func-style": ["error", "declaration", { "allowArrowFunctions": true }],
-    "prefer-destructuring": ["error", { "VariableDeclarator": { "array": false, "object": true }, "AssignmentExpression": { "array": false, "object": false } }],
-    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
-    "no-underscore-dangle": ["error", { "allowAfterThis": true, "allow": ["__DEBUG__"] }],
-    "no-use-before-define": ["error", { "functions": false, "classes": true, "variables": true }],
-    "typescript/consistent-type-imports": ["error", { "prefer": "type-imports", "fixStyle": "separate-type-imports" }],
-    "typescript/explicit-member-accessibility": ["error", { "accessibility": "no-public" }],
-    "typescript/parameter-properties": ["error", { "prefer": "parameter-property" }],
-    "typescript/method-signature-style": ["error", "method"],
-    "typescript/strict-boolean-expressions": ["error", { "allowNullableBoolean": true, "allowNullableString": true, "allowNullableNumber": true }],
-    "unicorn/filename-case": ["error", { "cases": { "camelCase": true, "pascalCase": true, "kebabCase": true } }],
-    "unicorn/import-style": ["error", { "styles": { "node:path": { "namespace": true } } }],
-    "class-methods-use-this": ["error", { "ignoreClassesWithImplements": "all" }],
-    "no-inline-comments": ["error", { "ignorePattern": "@type" }],
-    "no-implicit-coercion": ["error", { "boolean": false }],
-    "no-duplicate-imports": ["error", { "includeExports": true, "allowSeparateTypeImports": true }],
-    // `void promise;` is the only fire-and-forget form left by no-floating-promises + promise/prefer-await-to-then.
-    "no-void": ["error", { "allowAsStatement": true }],
-
-    // Style the codebase does not follow.
-    "capitalized-comments": "off",
-    "id-length": "off",
-    "no-continue": "off",
-    "no-magic-numbers": "off",
-    "no-ternary": "off",
-    "no-undefined": "off",
-    "no-warning-comments": "off",
-    "prefer-named-capture-group": "off",
-    "sort-imports": "off",
-    "sort-keys": "off",
-    "import/exports-last": "off",
-    "import/group-exports": "off",
-    "import/no-named-export": "off",
-    "import/prefer-default-export": "off",
-    "import/no-namespace": "off",
-    "import/no-relative-parent-imports": "off",
-    "typescript/consistent-type-definitions": "off",
-    "typescript/explicit-function-return-type": "off",
-    "typescript/explicit-module-boundary-types": "off",
-    "typescript/no-namespace": "off",
-    "unicorn/no-null": "off",
-    "unicorn/prefer-string-raw": "off",
-
-    // Needs deeply readonly types for every parameter, including third-party ones (SyntaxNode, Position, Connection).
-    "typescript/prefer-readonly-parameter-types": "off",
-
-    // Size metrics: the codebase has no limits.
-    "max-dependencies": "off",
-    "max-lines": "off",
-    "max-lines-per-function": "off",
-    "max-params": "off",
-    "max-statements": "off",
-
-    // Language features this Node/ES2020+ project relies on.
-    "import/no-nodejs-modules": "off",
-    "oxc/no-async-await": "off",
-    "oxc/no-optional-chaining": "off",
-    "oxc/no-rest-spread-properties": "off",
-    "unicorn/prefer-module": "off",
-
-    // Logging goes through console, which index.ts routes to the LSP connection.
-    "no-console": "off",
-
-    // Sequential awaits are inherent: tree cursor walks, extends chains, first-match lookups.
-    "no-await-in-loop": "off",
-
-    // With promise-function-async and unicorn/no-useless-promise-resolve-reject, an async interface method
-    // with a synchronous body has no legal form. promise-function-async (never throw synchronously) wins.
-    "require-await": "off",
-    "typescript/require-await": "off",
-
-    // Maps over small static tables, run once at module load; spreading is the clearer form.
-    "oxc/no-map-spread": "off",
-
-    // Matches by name: flags VS Code middleware `next(...)`. The codebase has no Node-style callbacks.
-    "node/callback-return": "off",
-
-    // Conflicts with typescript/consistent-return, which needs an explicit `return undefined`.
-    "unicorn/no-useless-undefined": "off"
-  },
-  "overrides": [
-    {
-      // In TypeScript the signature carries the types; JSDoc `{type}` would only duplicate them.
-      "files": ["**/*.ts", "**/*.mts"],
-      "rules": {
-        "jsdoc/require-param-type": "off",
-        "jsdoc/require-property-type": "off",
-        "jsdoc/require-returns-type": "off",
-        "jsdoc/require-throws-type": "off",
-        "jsdoc/require-yields-type": "off"
-      }
+    "$schema": "./node_modules/oxlint/configuration_schema.json",
+    "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "jsdoc", "promise", "node"],
+    "categories": {
+        "correctness": "error",
+        "suspicious": "error",
+        "pedantic": "error",
+        "perf": "error",
+        "style": "error",
+        "restriction": "error",
+        "nursery": "error"
     },
-    {
-      // tree-sitter DSL: globals come from tree-sitter-cli/dsl; regexes are compiled by tree-sitter, not JS.
-      "files": ["packages/tree-sitter-twig/grammar.js"],
-      "globals": {
-        "alias": "readonly",
-        "blank": "readonly",
-        "choice": "readonly",
-        "field": "readonly",
-        "grammar": "readonly",
-        "optional": "readonly",
-        "prec": "readonly",
-        "repeat": "readonly",
-        "repeat1": "readonly",
-        "seq": "readonly",
-        "token": "readonly"
-      },
-      "rules": {
-        "import/no-commonjs": "off",
-        "import/unambiguous": "off",
-        "no-implicit-globals": "off",
-        "no-underscore-dangle": "off",
-        "no-unused-vars": ["error", { "argsIgnorePattern": "^[$_]$" }],
-        "no-useless-escape": "off",
-        "require-unicode-regexp": "off",
-        "typescript/no-unsafe-argument": "off",
-        "typescript/no-unsafe-call": "off",
-        "typescript/no-unsafe-member-access": "off",
-        "typescript/no-unsafe-return": "off",
-        "unicorn/escape-case": "off",
-        "unicorn/max-nested-calls": "off",
-        "unicorn/no-hex-escape": "off"
-      }
+    "options": {
+        "typeAware": true,
+        "reportUnusedDisableDirectives": "error",
+        "denyWarnings": true
     },
-    {
-      // CommonJS bin shim: loads the bundle with `require` so a failed load exits non-zero.
-      "files": ["packages/language-server/bin/*.js"],
-      "rules": {
-        "import/no-commonjs": "off",
-        "import/no-unassigned-import": "off",
-        "import/unambiguous": "off",
-        "typescript/no-require-imports": "off"
-      }
+    "env": {
+        "builtin": true,
+        "es2024": true,
+        "node": true
     },
-    {
-      // Test helpers shell out to php/composer synchronously.
-      "files": ["packages/language-server/__tests__/**"],
-      "plugins": ["eslint", "typescript", "unicorn", "oxc", "import", "jsdoc", "promise", "node", "jest"],
-      "rules": {
-        "node/no-sync": "off"
-      }
+    "rules": {
+        // Style, configured to match the codebase.
+        "curly": ["error", "multi-line"],
+        "no-else-return": "error",
+        "unicorn/switch-case-braces": ["error", "avoid"],
+        "one-var": ["error", "never"],
+        "func-style": ["error", "declaration", { "allowArrowFunctions": true }],
+        "prefer-destructuring": [
+            "error",
+            {
+                "VariableDeclarator": { "array": false, "object": true },
+                "AssignmentExpression": { "array": false, "object": false }
+            }
+        ],
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+        "no-underscore-dangle": ["error", { "allowAfterThis": true, "allow": ["__DEBUG__"] }],
+        "no-use-before-define": [
+            "error",
+            { "functions": false, "classes": true, "variables": true }
+        ],
+        "typescript/consistent-type-imports": [
+            "error",
+            { "prefer": "type-imports", "fixStyle": "separate-type-imports" }
+        ],
+        "typescript/explicit-member-accessibility": ["error", { "accessibility": "no-public" }],
+        "typescript/parameter-properties": ["error", { "prefer": "parameter-property" }],
+        "typescript/method-signature-style": ["error", "method"],
+        "typescript/strict-boolean-expressions": [
+            "error",
+            {
+                "allowNullableBoolean": true,
+                "allowNullableString": true,
+                "allowNullableNumber": true
+            }
+        ],
+        "unicorn/filename-case": [
+            "error",
+            { "cases": { "camelCase": true, "pascalCase": true, "kebabCase": true } }
+        ],
+        "unicorn/import-style": ["error", { "styles": { "node:path": { "namespace": true } } }],
+        "class-methods-use-this": ["error", { "ignoreClassesWithImplements": "all" }],
+        "no-inline-comments": ["error", { "ignorePattern": "@type" }],
+        "no-implicit-coercion": ["error", { "boolean": false }],
+        "no-duplicate-imports": [
+            "error",
+            { "includeExports": true, "allowSeparateTypeImports": true }
+        ],
+        // `void promise;` is the only fire-and-forget form left by no-floating-promises + promise/prefer-await-to-then.
+        "no-void": ["error", { "allowAsStatement": true }],
+
+        // Style the codebase does not follow.
+        "capitalized-comments": "off",
+        "id-length": "off",
+        "no-continue": "off",
+        "no-magic-numbers": "off",
+        "no-ternary": "off",
+        "no-undefined": "off",
+        "no-warning-comments": "off",
+        "prefer-named-capture-group": "off",
+        "sort-imports": "off",
+        "sort-keys": "off",
+        "import/exports-last": "off",
+        "import/group-exports": "off",
+        "import/no-named-export": "off",
+        "import/prefer-default-export": "off",
+        "import/no-namespace": "off",
+        "import/no-relative-parent-imports": "off",
+        "typescript/consistent-type-definitions": "off",
+        "typescript/explicit-function-return-type": "off",
+        "typescript/explicit-module-boundary-types": "off",
+        "typescript/no-namespace": "off",
+        "unicorn/no-null": "off",
+        "unicorn/prefer-string-raw": "off",
+
+        // Needs deeply readonly types for every parameter, including third-party ones (SyntaxNode, Position, Connection).
+        "typescript/prefer-readonly-parameter-types": "off",
+
+        // Size metrics: the codebase has no limits.
+        "max-dependencies": "off",
+        "max-lines": "off",
+        "max-lines-per-function": "off",
+        "max-params": "off",
+        "max-statements": "off",
+
+        // Language features this Node/ES2020+ project relies on.
+        "import/no-nodejs-modules": "off",
+        "oxc/no-async-await": "off",
+        "oxc/no-optional-chaining": "off",
+        "oxc/no-rest-spread-properties": "off",
+        "unicorn/prefer-module": "off",
+
+        // Logging goes through console, which index.ts routes to the LSP connection.
+        "no-console": "off",
+
+        // Sequential awaits are inherent: tree cursor walks, extends chains, first-match lookups.
+        "no-await-in-loop": "off",
+
+        // With promise-function-async and unicorn/no-useless-promise-resolve-reject, an async interface method
+        // with a synchronous body has no legal form. promise-function-async (never throw synchronously) wins.
+        "require-await": "off",
+        "typescript/require-await": "off",
+
+        // Maps over small static tables, run once at module load; spreading is the clearer form.
+        "oxc/no-map-spread": "off",
+
+        // Matches by name: flags VS Code middleware `next(...)`. The codebase has no Node-style callbacks.
+        "node/callback-return": "off",
+
+        // Conflicts with typescript/consistent-return, which needs an explicit `return undefined`.
+        "unicorn/no-useless-undefined": "off"
     },
-    {
-      // ES module run directly by Bun. node/no-top-level-await contradicts unicorn/prefer-top-level-await here.
-      "files": ["packages/vscode/build/**"],
-      "rules": {
-        "node/no-sync": "off",
-        "node/no-top-level-await": "off"
-      }
-    }
-  ]
+    "overrides": [
+        {
+            // In TypeScript the signature carries the types; JSDoc `{type}` would only duplicate them.
+            "files": ["**/*.ts", "**/*.mts"],
+            "rules": {
+                "jsdoc/require-param-type": "off",
+                "jsdoc/require-property-type": "off",
+                "jsdoc/require-returns-type": "off",
+                "jsdoc/require-throws-type": "off",
+                "jsdoc/require-yields-type": "off"
+            }
+        },
+        {
+            // tree-sitter DSL: globals come from tree-sitter-cli/dsl; regexes are compiled by tree-sitter, not JS.
+            "files": ["packages/tree-sitter-twig/grammar.js"],
+            "globals": {
+                "alias": "readonly",
+                "blank": "readonly",
+                "choice": "readonly",
+                "field": "readonly",
+                "grammar": "readonly",
+                "optional": "readonly",
+                "prec": "readonly",
+                "repeat": "readonly",
+                "repeat1": "readonly",
+                "seq": "readonly",
+                "token": "readonly"
+            },
+            "rules": {
+                "import/no-commonjs": "off",
+                "import/unambiguous": "off",
+                "no-implicit-globals": "off",
+                "no-underscore-dangle": "off",
+                "no-unused-vars": ["error", { "argsIgnorePattern": "^[$_]$" }],
+                "no-useless-escape": "off",
+                "require-unicode-regexp": "off",
+                "typescript/no-unsafe-argument": "off",
+                "typescript/no-unsafe-call": "off",
+                "typescript/no-unsafe-member-access": "off",
+                "typescript/no-unsafe-return": "off",
+                "unicorn/escape-case": "off",
+                "unicorn/max-nested-calls": "off",
+                "unicorn/no-hex-escape": "off"
+            }
+        },
+        {
+            // CommonJS bin shim: loads the bundle with `require` so a failed load exits non-zero.
+            "files": ["packages/language-server/bin/*.js"],
+            "rules": {
+                "import/no-commonjs": "off",
+                "import/no-unassigned-import": "off",
+                "import/unambiguous": "off",
+                "typescript/no-require-imports": "off"
+            }
+        },
+        {
+            // Test helpers shell out to php/composer synchronously.
+            "files": ["packages/language-server/__tests__/**"],
+            "plugins": [
+                "eslint",
+                "typescript",
+                "unicorn",
+                "oxc",
+                "import",
+                "jsdoc",
+                "promise",
+                "node",
+                "jest"
+            ],
+            "rules": {
+                "node/no-sync": "off"
+            }
+        },
+        {
+            // ES module run directly by Bun. node/no-top-level-await contradicts unicorn/prefer-top-level-await here.
+            "files": ["packages/vscode/build/**"],
+            "rules": {
+                "node/no-sync": "off",
+                "node/no-top-level-await": "off"
+            }
+        }
+    ]
 }

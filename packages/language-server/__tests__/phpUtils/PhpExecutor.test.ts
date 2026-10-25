@@ -13,7 +13,12 @@ import { ok } from 'node:assert';
 import path from 'node:path';
 import { PhpExecutor } from 'phpInterop/PhpExecutor';
 import type { ReflectedType } from 'phpInterop/ReflectedType';
-import { ensureFixtureInstalled, hasPhp, PhpUtilSourcePath, PSR4_WORKSPACE } from './__helpers__/setup';
+import {
+    ensureFixtureInstalled,
+    hasPhp,
+    PhpUtilSourcePath,
+    PSR4_WORKSPACE,
+} from './__helpers__/setup';
 
 // PHP's ReflectionUnionType/ReflectionIntersectionType do not preserve declaration order.
 const sortedMembers = (type: string | undefined, separator: '|' | '&') => {
@@ -31,7 +36,7 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         if (!installed) {
             throw new Error(
                 `psr4-workspace fixture not installed (vendor/autoload.php missing). ` +
-                `Run \`composer install\` in ${PSR4_WORKSPACE}.`,
+                    `Run \`composer install\` in ${PSR4_WORKSPACE}.`,
             );
         }
     };
@@ -40,7 +45,7 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         requireInstalled();
         const result = await executor.reflectType('App\\TypedGetters');
         ok(result);
-        return result.properties.find((p) => p.name === name)?.type;
+        return result.properties.find(p => p.name === name)?.type;
     };
 
     test('reflectType derives properties from `getX(): T` and lists method signatures', async () => {
@@ -48,9 +53,7 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         const result = await executor.reflectType('App\\Person');
 
         ok(result);
-        const propsByName = Object.fromEntries(
-            result.properties.map((p) => [p.name, p.type]),
-        );
+        const propsByName = Object.fromEntries(result.properties.map(p => [p.name, p.type]));
         expect(propsByName).toMatchObject({
             name: 'string',
             age: 'int',
@@ -58,10 +61,9 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
             otherClass: 'App\\OtherClass',
         });
 
-        const methodsByName: Record<string, ReflectedType['methods'][number] | undefined> = Object.fromEntries(
-            result.methods.map((m) => [m.name, m]),
-        );
-        ok(methodsByName.greet)
+        const methodsByName: Record<string, ReflectedType['methods'][number] | undefined> =
+            Object.fromEntries(result.methods.map(m => [m.name, m]));
+        ok(methodsByName.greet);
         expect(methodsByName.greet.type).toBe('bool');
         expect(methodsByName.greet.parameters).toEqual([
             { name: 'msg', type: 'string', isOptional: false, isVariadic: false },
@@ -70,7 +72,7 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         ]);
 
         // setX(...) is exposed as a method but never synthesizes a property.
-        ok(methodsByName.setName)
+        ok(methodsByName.setName);
 
         // Magic methods and the constructor are filtered out.
         expect(methodsByName).not.toHaveProperty('__toString');
@@ -82,7 +84,7 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         const result = await executor.reflectType('App\\Person');
         ok(result);
 
-        const union = result.methods.find((m) => m.name === 'unionReturn');
+        const union = result.methods.find(m => m.name === 'unionReturn');
         expect(sortedMembers(union?.type, '|')).toEqual(['int', 'string']);
     });
 
@@ -92,7 +94,10 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         });
 
         test('intersection return type `A&B`', async () => {
-            expect(sortedMembers(await getterPropertyType('items'), '&')).toEqual(['Countable', 'Traversable']);
+            expect(sortedMembers(await getterPropertyType('items'), '&')).toEqual([
+                'Countable',
+                'Traversable',
+            ]);
         });
 
         test('no return type yields an empty string', async () => {
@@ -104,7 +109,7 @@ describe.skipIf(!hasPhp())('phpUtils against psr4-workspace fixture', () => {
         requireInstalled();
         const result = await executor.reflectType('\\App\\OtherClass');
         ok(result);
-        expect(result.properties.find((p) => p.name === 'prop')?.type).toBe('int');
+        expect(result.properties.find(p => p.name === 'prop')?.type).toBe('int');
     });
 
     test('reflectType does not bubble a fatal error for unknown classes', async () => {

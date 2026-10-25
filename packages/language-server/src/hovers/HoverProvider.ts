@@ -18,10 +18,12 @@ export class HoverProvider {
         const document = await this.documentCache.get(params.textDocument.uri);
         const cursorNode = document.deepestAt(params.position);
 
-        return globalVariables(cursorNode)
-            ?? localVariables(document, cursorNode)
-            ?? functions(cursorNode)
-            ?? filters(cursorNode)
-            ?? forLoop(cursorNode);
+        return (
+            globalVariables(cursorNode) ??
+            localVariables(document, cursorNode) ??
+            functions(cursorNode) ??
+            filters(cursorNode) ??
+            forLoop(cursorNode)
+        );
     }
 }

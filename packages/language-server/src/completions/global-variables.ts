@@ -11,7 +11,7 @@ const commonCompletionItem: Partial<CompletionItem> = {
     detail: 'global variable',
 };
 
-const completions: CompletionItem[] = twigGlobalVariables.map((item) => ({
+const completions: CompletionItem[] = twigGlobalVariables.map(item => ({
     ...commonCompletionItem,
     ...item,
 }));

@@ -1,9 +1,5 @@
-import type {
-    CompletionItem,
-} from 'vscode-languageserver/node';
-import {
-    CompletionItemKind,
-} from 'vscode-languageserver/node';
+import type { CompletionItem } from 'vscode-languageserver/node';
+import { CompletionItemKind } from 'vscode-languageserver/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 
 const commonCompletionItem: Partial<CompletionItem> = {
@@ -13,10 +9,13 @@ const commonCompletionItem: Partial<CompletionItem> = {
 };
 
 const isInStringInsideOfPathCall = (cursorNode: SyntaxNode): boolean => {
-    if (!(cursorNode.type === 'string'
-        && cursorNode.parent?.type === 'arguments'
-        && !!cursorNode.parent.firstNamedChild?.equals(cursorNode)
-    )) {
+    if (
+        !(
+            cursorNode.type === 'string' &&
+            cursorNode.parent?.type === 'arguments' &&
+            !!cursorNode.parent.firstNamedChild?.equals(cursorNode)
+        )
+    ) {
         return false;
     }
 
@@ -24,11 +23,11 @@ const isInStringInsideOfPathCall = (cursorNode: SyntaxNode): boolean => {
     if (!functionName) return false;
 
     return ['path', 'is_route'].includes(functionName);
-}
+};
 
 export function symfonyRouteNames(cursorNode: SyntaxNode, routeNames: string[]): CompletionItem[] {
     if (isInStringInsideOfPathCall(cursorNode)) {
-        const completions: CompletionItem[] = routeNames.map((routeName) => ({
+        const completions: CompletionItem[] = routeNames.map(routeName => ({
             ...commonCompletionItem,
             label: routeName,
         }));

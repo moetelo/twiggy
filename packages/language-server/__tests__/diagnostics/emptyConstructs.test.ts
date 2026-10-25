@@ -28,11 +28,9 @@ describe('diagnostics — empty constructs', () => {
     test('empty if condition', async () => testDiagnostic(`$0{% if %}$0<input>{% endif %}`));
     test('empty for element', async () => testDiagnostic(`$0{% for %}$0<input>{% endfor %}`));
 
-    test('empty if condition (multiline)', async () => testDiagnostic(
-        `$0{% if %}$0\n<input>\n{% endif %}`,
-    ));
+    test('empty if condition (multiline)', async () =>
+        testDiagnostic(`$0{% if %}$0\n<input>\n{% endif %}`));
 
-    test('empty output nested in if block', async () => testDiagnostic(
-        `{% if true %}$0{{ }}$0{% endif %}`,
-    ));
+    test('empty output nested in if block', async () =>
+        testDiagnostic(`{% if true %}$0{{ }}$0{% endif %}`));
 });

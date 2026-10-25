@@ -8,7 +8,9 @@ import { isInExpressionScope } from '../utils/node';
 import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';
 
-const toCompletionItem = (variable: TwigVariableDeclaration | FunctionArgument): CompletionItem => ({
+const toCompletionItem = (
+    variable: TwigVariableDeclaration | FunctionArgument,
+): CompletionItem => ({
     label: variable.name,
     kind: CompletionItemKind.Field,
     detail: hasReflectedType(variable) ? variable.type : variable.value,
@@ -19,16 +21,17 @@ export function localVariables(document: Document, cursorNode: SyntaxNode): Comp
         return [];
     }
 
-    const locals = document.getLocalsAt(
-        pointToPosition(cursorNode.startPosition),
-    );
+    const locals = document.getLocalsAt(pointToPosition(cursorNode.startPosition));
 
     // excludes the current variable from the completion list
     // so it doesn't show up when the cursor is on the variable name
-    const localsWithoutCurrentVariable = locals.filter(local =>
-        !(positionsEqual(local.nameRange.start, pointToPosition(cursorNode.startPosition))
-        && positionsEqual(local.nameRange.end, pointToPosition(cursorNode.endPosition)))
+    const localsWithoutCurrentVariable = locals.filter(
+        local =>
+            !(
+                positionsEqual(local.nameRange.start, pointToPosition(cursorNode.startPosition)) &&
+                positionsEqual(local.nameRange.end, pointToPosition(cursorNode.endPosition))
+            ),
     );
 
-    return localsWithoutCurrentVariable.map((variable) => toCompletionItem(variable));
+    return localsWithoutCurrentVariable.map(variable => toCompletionItem(variable));
 }

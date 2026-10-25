@@ -1,7 +1,14 @@
 import type { Connection, Diagnostic, DocumentUri, Range } from 'vscode-languageserver';
 import { DiagnosticSeverity, DiagnosticTag } from 'vscode-languageserver';
 import type { Document, DocumentCache } from 'documents';
-import { PreOrderCursorIterator, getNodeRange, getStringNodeValue, isBlockIdentifier, isEmptyEmbedded, isPathInsideTemplateEmbedding } from 'utils/node';
+import {
+    PreOrderCursorIterator,
+    getNodeRange,
+    getStringNodeValue,
+    isBlockIdentifier,
+    isEmptyEmbedded,
+    isPathInsideTemplateEmbedding,
+} from 'utils/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { pointToPosition } from 'utils/position';
 import { positionsEqual } from 'utils/position/comparePositions';
@@ -21,12 +28,7 @@ const createDiagnostic = (
     node: SyntaxNode,
     message: string,
     severity: DiagnosticSeverity = DiagnosticSeverity.Warning,
-): Diagnostic => createDiagnosticFromRange(
-    getNodeRange(node),
-    message,
-    severity,
-);
-
+): Diagnostic => createDiagnosticFromRange(getNodeRange(node), message, severity);
 
 export class DiagnosticProvider {
     #twigCodeStyleFixer: TwigCodeStyleFixer | null = null;
@@ -71,13 +73,16 @@ export class DiagnosticProvider {
             return createDiagnostic(node, `Empty ${node.type} block`);
         }
 
-
         if (isPathInsideTemplateEmbedding(node)) {
             const path = getStringNodeValue(node);
             const templateDocument = await this.documentCache.resolveByTwigPath(path);
 
             if (!templateDocument) {
-                return createDiagnostic(node, `Template "${path}" not found`, DiagnosticSeverity.Error)
+                return createDiagnostic(
+                    node,
+                    `Template "${path}" not found`,
+                    DiagnosticSeverity.Error,
+                );
             }
 
             // found template, no errors
@@ -91,12 +96,15 @@ export class DiagnosticProvider {
         return null;
     }
 
-    async #validateBlockCallArgument(node: SyntaxNode, document: Document): Promise<Diagnostic | null> {
+    async #validateBlockCallArgument(
+        node: SyntaxNode,
+        document: Document,
+    ): Promise<Diagnostic | null> {
         const { parent } = node;
         if (!parent) return null;
 
         let extendedDocument: Document | undefined = document;
-        let documentName = "this document";
+        let documentName = 'this document';
 
         const blockArgumentNode = parent.namedChildren[0];
         const templateArgumentNode = parent.namedChildren.at(1);
@@ -107,7 +115,11 @@ export class DiagnosticProvider {
 
             if (node.equals(templateArgumentNode)) {
                 if (!templateDocument) {
-                    return createDiagnostic(templateArgumentNode, `Template "${path}" not found`, DiagnosticSeverity.Error)
+                    return createDiagnostic(
+                        templateArgumentNode,
+                        `Template "${path}" not found`,
+                        DiagnosticSeverity.Error,
+                    );
                 }
                 // found template, no errors
                 // block existence will be checked in next pass
@@ -118,14 +130,18 @@ export class DiagnosticProvider {
             documentName = path;
         }
 
-        const blockName = blockArgumentNode.type === 'string'
-            ? getStringNodeValue(blockArgumentNode)
-            : blockArgumentNode.text;
+        const blockName =
+            blockArgumentNode.type === 'string'
+                ? getStringNodeValue(blockArgumentNode)
+                : blockArgumentNode.text;
 
         let found = false;
         while (extendedDocument) {
             const blockSymbol = extendedDocument.getBlock(blockName);
-            if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(blockArgumentNode).start)) {
+            if (
+                !blockSymbol ||
+                positionsEqual(blockSymbol.nameRange.start, getNodeRange(blockArgumentNode).start)
+            ) {
                 extendedDocument = extendedDocument.locals.extends
                     ? await this.documentCache.resolveByTwigPath(extendedDocument.locals.extends)
                     : undefined;
@@ -135,7 +151,11 @@ export class DiagnosticProvider {
             break;
         }
         if (!found) {
-            return createDiagnostic(blockArgumentNode, `Block "${blockName}" not found in ${documentName}`, DiagnosticSeverity.Error)
+            return createDiagnostic(
+                blockArgumentNode,
+                `Block "${blockName}" not found in ${documentName}`,
+                DiagnosticSeverity.Error,
+            );
         }
 
         return null;
@@ -165,10 +185,7 @@ export class DiagnosticProvider {
 
         await this.connection.sendDiagnostics({
             uri: document.uri,
-            diagnostics: [
-                ...diagnostics,
-                ...lints,
-            ],
+            diagnostics: [...diagnostics, ...lints],
         });
     }
 
@@ -176,23 +193,18 @@ export class DiagnosticProvider {
         const syntaxDiagnostics = await this.validateTree(document);
 
         const blockScopedVariables = document.locals.block.flatMap(b => b.symbols.variable);
-        const unusedVariables = [
-            ...document.locals.variable,
-            ...blockScopedVariables,
-        ]
-            .filter((variable) => variable.references.length === 0);
+        const unusedVariables = [...document.locals.variable, ...blockScopedVariables].filter(
+            variable => variable.references.length === 0,
+        );
 
         const unusedVariablesDiagnostics = unusedVariables.map((variable): Diagnostic => ({
             severity: DiagnosticSeverity.Hint,
             range: variable.nameRange,
             message: `Unused variable`,
-            tags: [ DiagnosticTag.Unnecessary ],
+            tags: [DiagnosticTag.Unnecessary],
         }));
 
-        return [
-            ...syntaxDiagnostics,
-            ...unusedVariablesDiagnostics,
-        ];
+        return [...syntaxDiagnostics, ...unusedVariablesDiagnostics];
     }
 
     async lint(uri: DocumentUri) {
@@ -213,10 +225,7 @@ export class DiagnosticProvider {
 
         await this.connection.sendDiagnostics({
             uri,
-            diagnostics: [
-                ...diagnostics,
-                ...lints,
-            ],
+            diagnostics: [...diagnostics, ...lints],
         });
     }
 

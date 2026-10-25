@@ -6,15 +6,12 @@ describe('resolveTemplate', () => {
     test('iterates over correct sequence of paths', () => {
         const sequence = [...generateResolveSequence('foo/bar')];
 
-        assert.deepEqual(
-            sequence,
-            [
-                'foo/bar',
-                'foo/bar.twig',
-                'foo/bar.html',
-                'foo/bar/index.twig',
-                'foo/bar/index.html',
-            ],
-        );
+        assert.deepEqual(sequence, [
+            'foo/bar',
+            'foo/bar.twig',
+            'foo/bar.html',
+            'foo/bar/index.twig',
+            'foo/bar/index.html',
+        ]);
     });
 });

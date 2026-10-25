@@ -14,8 +14,11 @@ export class IsInsideHtmlRegionCommandProvider {
         );
     }
 
-    private async isInsideHtmlRegionCommand({ textDocument, position }: IsInsideHtmlRegionRequest.ParamsType) {
+    private async isInsideHtmlRegionCommand({
+        textDocument,
+        position,
+    }: IsInsideHtmlRegionRequest.ParamsType) {
         const document = await this.documentCache.get(textDocument.uri);
-        return isInsideHtmlRegion(document, position)
-    };
+        return isInsideHtmlRegion(document, position);
+    }
 }

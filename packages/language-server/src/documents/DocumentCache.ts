@@ -45,11 +45,14 @@ export class DocumentCache {
     }
 
     async setText(document: Document, text?: string) {
-        document.text = text ?? await readFile(documentUriToFsPath(document.uri), 'utf8');
+        document.text = text ?? (await readFile(documentUriToFsPath(document.uri), 'utf8'));
 
         const parser = await initializeParser();
         document.tree = parser.parse(document.text);
-        document.locals = await new LocalSymbolCollector(document.tree.rootNode, this.#typeResolver).collect();
+        document.locals = await new LocalSymbolCollector(
+            document.tree.rootNode,
+            this.#typeResolver,
+        ).collect();
     }
 
     async resolveByTwigPath(pathFromTwig: string) {
@@ -58,9 +61,10 @@ export class DocumentCache {
                 continue;
             }
 
-            const includePath = namespace === ''
-                ? path.join(directory, pathFromTwig)
-                : pathFromTwig.replace(namespace, directory);
+            const includePath =
+                namespace === ''
+                    ? path.join(directory, pathFromTwig)
+                    : pathFromTwig.replace(namespace, directory);
 
             const pathToTwig = path.resolve(this.workspaceFolderPath, includePath);
             const documentUri = toDocumentUri(pathToTwig);

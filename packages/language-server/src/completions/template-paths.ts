@@ -2,10 +2,7 @@ import type { CompletionItem, Position, Range } from 'vscode-languageserver';
 import { CompletionItemKind } from 'vscode-languageserver';
 import path from 'node:path';
 import type { SyntaxNode } from 'web-tree-sitter';
-import {
-    templateUsingFunctions,
-    templateUsingStatements,
-} from '../constants/template-usage';
+import { templateUsingFunctions, templateUsingStatements } from '../constants/template-usage';
 import { getTwigFiles } from '../utils/getTwigFiles';
 import type { TemplatePathMapping } from '../twigEnvironment/types';
 import { getStringNodeValue } from 'utils/node';
@@ -28,9 +25,11 @@ function isTemplatePathString(node: SyntaxNode, cursorNode: SyntaxNode): boolean
 
     // {{ block("title", "common_blocks.twig") }}
     const secondArgument = node.namedChildren.at(1);
-    return functionName === 'block'
-        && secondArgument !== undefined
-        && cursorNode.equals(secondArgument);
+    return (
+        functionName === 'block' &&
+        secondArgument !== undefined &&
+        cursorNode.equals(secondArgument)
+    );
 }
 
 export async function templatePaths(
@@ -70,15 +69,23 @@ export async function templatePaths(
             end: { line: position.line, character: nodeStringEnd },
         };
 
-        const searchText = getStringNodeValue(cursorNode)
-            .slice(0, Math.max(0, position.character - nodeStringStart));
+        const searchText = getStringNodeValue(cursorNode).slice(
+            0,
+            Math.max(0, position.character - nodeStringStart),
+        );
 
         for (const { namespace, directory } of templateMappings) {
-            const templatesDirectory = path.resolve(workspaceFolderDirectory, directory)
+            const templatesDirectory = path.resolve(workspaceFolderDirectory, directory);
 
             for (const twigPath of await getTwigFiles(directory)) {
-                const relativePathToTwigFromTemplatesDirectory = path.posix.relative(templatesDirectory, twigPath);
-                const includePath = path.posix.join(namespace, relativePathToTwigFromTemplatesDirectory)
+                const relativePathToTwigFromTemplatesDirectory = path.posix.relative(
+                    templatesDirectory,
+                    twigPath,
+                );
+                const includePath = path.posix.join(
+                    namespace,
+                    relativePathToTwigFromTemplatesDirectory,
+                );
 
                 if (searchText === '' || includePath.startsWith(searchText)) {
                     completions.push({

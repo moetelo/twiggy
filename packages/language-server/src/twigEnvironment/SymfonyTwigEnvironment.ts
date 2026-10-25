@@ -36,7 +36,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
             console.warn('Symfony console path is not set');
         }
 
-        if (!await isFile(symfonyConsolePath)) {
+        if (!(await isFile(symfonyConsolePath))) {
             console.warn(`Symfony console path "${symfonyConsolePath}" does not exist`);
         }
 
@@ -63,9 +63,7 @@ export class SymfonyTwigEnvironment implements IFrameworkTwigEnvironment {
         return result ?? {};
     }
 
-    async #runSymfonyCommand<TResult>(
-        command: string,
-    ): Promise<TResult | null> {
+    async #runSymfonyCommand<TResult>(command: string): Promise<TResult | null> {
         if (!this.#symfonyConsolePath) {
             return null;
         }

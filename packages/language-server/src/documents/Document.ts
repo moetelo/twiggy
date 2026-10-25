@@ -35,29 +35,32 @@ export class Document {
     }
 
     getBlock(name: string): TwigBlock | undefined {
-        const symbol = this.locals.block.find((s) => s.name === name);
+        const symbol = this.locals.block.find(s => s.name === name);
         if (symbol) return symbol;
 
-        return this.locals.block
-            .flatMap((b) => b.symbols.block)
-            .find((s) => s.name === name);
+        return this.locals.block.flatMap(b => b.symbols.block).find(s => s.name === name);
     }
 
     getScopeAt(pos: Position): LocalSymbolInformation {
-        const scopes = [
-            ...this.locals.macro,
-            ...this.locals.block,
-        ];
+        const scopes = [...this.locals.macro, ...this.locals.block];
 
-        return scopes.find((scope) => rangeContainsPosition(scope.range, pos))?.symbols
-            ?? this.locals;
+        return (
+            scopes.find(scope => rangeContainsPosition(scope.range, pos))?.symbols ?? this.locals
+        );
     }
 
     getLocalsAt(cursorPosition: Position): LocalSymbol[] {
-        const blocks = this.locals.block.filter(x => rangeContainsPosition(x.range, cursorPosition));
-        const macroses = this.locals.macro.filter(x => rangeContainsPosition(x.range, cursorPosition));
+        const blocks = this.locals.block.filter(x =>
+            rangeContainsPosition(x.range, cursorPosition),
+        );
+        const macroses = this.locals.macro.filter(x =>
+            rangeContainsPosition(x.range, cursorPosition),
+        );
 
-        const scopedVariables = [ ...macroses, ...blocks ].flatMap(x => [ ...x.symbols.variable, ...x.symbols.imports ]);
+        const scopedVariables = [...macroses, ...blocks].flatMap(x => [
+            ...x.symbols.variable,
+            ...x.symbols.imports,
+        ]);
 
         return [
             ...scopedVariables,
@@ -76,7 +79,7 @@ export class Document {
         const variableName = cursorNode.text;
         const cursorPosition = pointToPosition(cursorNode.startPosition);
         const scopedVariables = this.getLocalsAt(cursorPosition);
-        const variable = scopedVariables.find((x) => x.name === variableName);
+        const variable = scopedVariables.find(x => x.name === variableName);
 
         return variable;
     }
@@ -84,7 +87,7 @@ export class Document {
     deepestAt(pos: Position): SyntaxNode {
         let node = this.tree.rootNode;
         while (node.childCount > 0) {
-            const foundNode = node.children.find((n) => rangeContainsPosition(getNodeRange(n), pos));
+            const foundNode = node.children.find(n => rangeContainsPosition(getNodeRange(n), pos));
 
             if (!foundNode) return node;
 

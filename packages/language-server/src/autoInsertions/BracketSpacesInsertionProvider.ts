@@ -17,7 +17,10 @@ export class BracketSpacesInsertionProvider {
         connection.onRequest(AutoInsertRequest.type, this.onAutoInsert.bind(this));
     }
 
-    async onAutoInsert({ textDocument, options }: AutoInsertRequest.ParamsType): Promise<AutoInsertRequest.ResponseType> {
+    async onAutoInsert({
+        textDocument,
+        options,
+    }: AutoInsertRequest.ParamsType): Promise<AutoInsertRequest.ResponseType> {
         if (!this.isEnabled) return undefined;
 
         const document = this.documents.get(textDocument.uri);
@@ -31,8 +34,14 @@ export class BracketSpacesInsertionProvider {
         if (!fullTrigger) return undefined;
 
         const textSurround = document.getText({
-            start: { line: lastChange.range.start.line, character: lastChange.range.start.character - '{'.length },
-            end: { line: lastChange.range.start.line, character: lastChange.range.start.character + '{}}'.length }
+            start: {
+                line: lastChange.range.start.line,
+                character: lastChange.range.start.character - '{'.length,
+            },
+            end: {
+                line: lastChange.range.start.line,
+                character: lastChange.range.start.character + '{}}'.length,
+            },
         });
 
         if (textSurround !== fullTrigger) return undefined;
@@ -40,8 +49,14 @@ export class BracketSpacesInsertionProvider {
         return {
             newText: ` $0 `,
             range: {
-                start: { line: lastChange.range.start.line, character: lastChange.range.start.character + 1 },
-                end: { line: lastChange.range.start.line, character: lastChange.range.start.character + 1 }
+                start: {
+                    line: lastChange.range.start.line,
+                    character: lastChange.range.start.character + 1,
+                },
+                end: {
+                    line: lastChange.range.start.line,
+                    character: lastChange.range.start.character + 1,
+                },
             },
         };
     }

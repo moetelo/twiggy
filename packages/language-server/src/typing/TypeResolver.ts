@@ -5,9 +5,7 @@ import type { IPhpExecutor } from '../phpInterop/IPhpExecutor';
 export class TypeResolver implements ITypeResolver {
     readonly #typeCache = new Map<string, ReflectedType | null>();
 
-    constructor(
-        private readonly phpExecutor: IPhpExecutor,
-    ) {}
+    constructor(private readonly phpExecutor: IPhpExecutor) {}
 
     async reflectType(typeName: string): Promise<ReflectedType | null> {
         if (!typeName) return null;

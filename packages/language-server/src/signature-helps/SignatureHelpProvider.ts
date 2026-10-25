@@ -1,4 +1,9 @@
-import type { Connection, SignatureHelp, SignatureHelpParams, SignatureInformation } from 'vscode-languageserver';
+import type {
+    Connection,
+    SignatureHelp,
+    SignatureHelpParams,
+    SignatureInformation,
+} from 'vscode-languageserver';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctionsSignatureInformation } from './staticSignatureInformation';
 import type { Document, DocumentCache } from '../documents';
@@ -12,18 +17,14 @@ export class SignatureHelpProvider {
         connection: Connection,
         private readonly documentCache: DocumentCache,
     ) {
-        connection.onSignatureHelp(
-            this.provideSignatureHelp.bind(this),
-        );
+        connection.onSignatureHelp(this.provideSignatureHelp.bind(this));
     }
 
     reindex({ environment }: IFrameworkTwigEnvironment) {
         this.#signatureIndex = new SignatureIndex(environment);
     }
 
-    async provideSignatureHelp(
-        params: SignatureHelpParams,
-    ): Promise<SignatureHelp | undefined> {
+    async provideSignatureHelp(params: SignatureHelpParams): Promise<SignatureHelp | undefined> {
         const document = await this.documentCache.get(params.textDocument.uri);
         const cursorNode = document.deepestAt(params.position);
 
@@ -61,7 +62,10 @@ export class SignatureHelpProvider {
         };
     }
 
-    async getSignatureInformation(document: Document, functionName: string): Promise<SignatureInformation | undefined> {
+    async getSignatureInformation(
+        document: Document,
+        functionName: string,
+    ): Promise<SignatureInformation | undefined> {
         const twigHardcodedSignature = twigFunctionsSignatureInformation.get(functionName);
         if (twigHardcodedSignature) return twigHardcodedSignature;
 
@@ -69,16 +73,18 @@ export class SignatureHelpProvider {
         if (twigEnvironmentSignature) return twigEnvironmentSignature;
 
         if (functionName.includes('.')) {
-            const [ importName, macroName ] = functionName.split('.');
+            const [importName, macroName] = functionName.split('.');
 
             const importedDocument = await this.documentCache.resolveImport(document, importName);
             if (!importedDocument) return undefined;
 
-            const macro = importedDocument.locals.macro.find(candidate => candidate.name === macroName);
+            const macro = importedDocument.locals.macro.find(
+                candidate => candidate.name === macroName,
+            );
             if (!macro) return undefined;
 
             const argsStr = macro.args
-                .map(({ name, value }) => value ? `${name} = ${value}` : name)
+                .map(({ name, value }) => (value ? `${name} = ${value}` : name))
                 .join(', ');
 
             return {

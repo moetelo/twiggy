@@ -1,10 +1,7 @@
 import type { SignatureInformation } from 'vscode-languageserver';
 import { twigFunctions } from '../staticCompletionInfo';
 
-export const twigFunctionsSignatureInformation = new Map<
-    string,
-    SignatureInformation
->(
+export const twigFunctionsSignatureInformation = new Map<string, SignatureInformation>(
     twigFunctions.map(item => {
         const { label } = item;
         const params = item.parameters?.map(parameter => parameter.label).join(', ');

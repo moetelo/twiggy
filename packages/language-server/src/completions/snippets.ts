@@ -15,7 +15,8 @@ const commonSnippetItem: Partial<CompletionItem> = {
 
 type Snippet = Required<SnippetLike>;
 
-const hasSnippet = (snippetLike: SnippetLike): snippetLike is Snippet => snippetLike.snippet !== undefined;
+const hasSnippet = (snippetLike: SnippetLike): snippetLike is Snippet =>
+    snippetLike.snippet !== undefined;
 
 const snippetToCompletionItem = (snippet: Snippet): CompletionItem => ({
     ...commonKeywordCompletionItem,
@@ -27,7 +28,7 @@ const snippetToCompletionItem = (snippet: Snippet): CompletionItem => ({
 
 const functionSnippets: CompletionItem[] = twigFunctions
     .filter(x => x.createSnippet)
-    .map((item) => ({
+    .map(item => ({
         ...item,
         ...commonFunctionCompletionItem,
         ...commonSnippetItem,
@@ -35,21 +36,17 @@ const functionSnippets: CompletionItem[] = twigFunctions
     }));
 
 const keywordSnippets: CompletionItem[] = twigKeywords
-    .filter((item) => hasSnippet(item))
-    .map((item) => snippetToCompletionItem(item));
+    .filter(item => hasSnippet(item))
+    .map(item => snippetToCompletionItem(item));
 
 const miscSnippetCompletions = miscSnippets
-    .filter((item) => hasSnippet(item))
-    .map((item) => snippetToCompletionItem(item));
+    .filter(item => hasSnippet(item))
+    .map(item => snippetToCompletionItem(item));
 
 export function snippets(cursorNode: SyntaxNode) {
     if (cursorNode.type !== 'content') {
         return [];
     }
 
-    return [
-        ...functionSnippets,
-        ...keywordSnippets,
-        ...miscSnippetCompletions,
-    ];
+    return [...functionSnippets, ...keywordSnippets, ...miscSnippetCompletions];
 }

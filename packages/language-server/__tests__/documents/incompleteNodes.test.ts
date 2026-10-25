@@ -87,7 +87,9 @@ describe('Document.deepestAt — incomplete tag headers', () => {
     });
 
     test("{% import '...' as $0 %}", async () => {
-        const { document, position } = await documentWithCursor(`{% import 'components.html.twig' as $0 %}`);
+        const { document, position } = await documentWithCursor(
+            `{% import 'components.html.twig' as $0 %}`,
+        );
         assert.doesNotThrow(() => document.deepestAt(position));
     });
 });

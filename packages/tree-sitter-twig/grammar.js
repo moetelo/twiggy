@@ -3,13 +3,13 @@
 
 module.exports = grammar({
   name: 'twig',
-  extras: ($) => [
+  extras: $ => [
     // @ts-ignore
     /[\s\p{Zs}\uFEFF\u2060\u200B]/,
   ],
-  supertypes: ($) => [$.expression, $.primary_expression],
-  inline: ($) => [$._statement],
-  precedences: ($) => [
+  supertypes: $ => [$.expression, $.primary_expression],
+  inline: $ => [$._statement],
+  precedences: $ => [
     [
       'member',
       'filter',
@@ -21,129 +21,117 @@ module.exports = grammar({
     ],
     [$.primary_expression, $.filter_expression],
   ],
-  conflicts: ($) => [
+  conflicts: $ => [
     [$.primary_expression, $.arrow_function],
     [$.primary_expression, $.call_expression],
 
-    [$._type, $.union_type, $.intersection_type, $.disjunctive_normal_form_type],
+    [
+      $._type,
+      $.union_type,
+      $.intersection_type,
+      $.disjunctive_normal_form_type,
+    ],
     [$.union_type, $.disjunctive_normal_form_type],
     [$.namespace],
     [$._namespace_name],
   ],
-  externals: ($) => [$.content],
+  externals: $ => [$.content],
   rules: {
-    template: ($) => repeat($._source_element),
+    template: $ => repeat($._source_element),
 
-    _source_element: ($) =>
+    _source_element: $ =>
       choice($._statement, $.output, $.comment, $.var_declaration, $.content),
 
-    output: $ => seq(
-      alias(choice('{{', '{{-', '{{~'), 'embedded_begin'),
-      optional($.expression),
-      alias(choice('}}', '-}}', '~}}'), 'embedded_end')
-    ),
-
-    comment: $ => seq(
-      alias('{#', 'comment_begin'),
-      optional(
-        repeat1(/.|\n|\r/),
-      ),
-      alias('#}', 'comment_end'),
-    ),
-
-    var_declaration: $ => seq(
-      alias('{#', 'comment_begin'),
+    output: $ =>
       seq(
-        alias('@var', 'keyword'),
-        field('variable', alias($.identifier, $.variable)),
-        field('type', optional($._type)),
+        alias(choice('{{', '{{-', '{{~'), 'embedded_begin'),
+        optional($.expression),
+        alias(choice('}}', '-}}', '~}}'), 'embedded_end'),
       ),
-      alias('#}', 'comment_end'),
-    ),
 
-    _type: $ => choice(
-      $._types,
-      $.union_type,
-      $.intersection_type,
-      $.disjunctive_normal_form_type,
-    ),
+    comment: $ =>
+      seq(
+        alias('{#', 'comment_begin'),
+        optional(repeat1(/.|\n|\r/)),
+        alias('#}', 'comment_end'),
+      ),
 
-    _types: $ => choice(
-      $.optional_type,
-      $.qualified_name,
-      $.primitive_type,
-      $.incomplete_type,
-      $.array_type,
-    ),
+    var_declaration: $ =>
+      seq(
+        alias('{#', 'comment_begin'),
+        seq(
+          alias('@var', 'keyword'),
+          field('variable', alias($.identifier, $.variable)),
+          field('type', optional($._type)),
+        ),
+        alias('#}', 'comment_end'),
+      ),
 
-    incomplete_type: $ => choice(
-      $._incomplete_primitive_type,
-      $._incomplete_qualified_name,
-    ),
+    _type: $ =>
+      choice(
+        $._types,
+        $.union_type,
+        $.intersection_type,
+        $.disjunctive_normal_form_type,
+      ),
+
+    _types: $ =>
+      choice(
+        $.optional_type,
+        $.qualified_name,
+        $.primitive_type,
+        $.incomplete_type,
+        $.array_type,
+      ),
+
+    incomplete_type: $ =>
+      choice($._incomplete_primitive_type, $._incomplete_qualified_name),
 
     _incomplete_primitive_type: $ => /[a-z]+/,
-    primitive_type: _ => choice(
-      'array',
-      // not legal in property types
-      keyword('callable'),
-      'iterable',
-      'bool',
-      'float',
-      'int',
-      'string',
-      'void',
-      'mixed',
-      'false',
-      'null',
-      'true',
-    ),
-
-    optional_type: $ => seq(
-      '?',
+    primitive_type: _ =>
       choice(
-        $.qualified_name,
-        $.primitive_type,
+        'array',
+        // not legal in property types
+        keyword('callable'),
+        'iterable',
+        'bool',
+        'float',
+        'int',
+        'string',
+        'void',
+        'mixed',
+        'false',
+        'null',
+        'true',
       ),
-    ),
 
-    array_type: $ => seq(
-      choice(
-        $.qualified_name,
-        $.primitive_type,
-      ),
-      '[]',
-    ),
+    optional_type: $ => seq('?', choice($.qualified_name, $.primitive_type)),
+
+    array_type: $ => seq(choice($.qualified_name, $.primitive_type), '[]'),
 
     _incomplete_qualified_name: $ => $.namespace,
-    qualified_name: $ => seq(
-      $.namespace,
-      $.php_identifier,
-    ),
+    qualified_name: $ => seq($.namespace, $.php_identifier),
 
-    namespace: $ => choice(
-      '\\',
-      seq(optional('\\'), $._namespace_name, '\\'),
-    ),
+    namespace: $ => choice('\\', seq(optional('\\'), $._namespace_name, '\\')),
 
-    _namespace_name: $ => seq($.php_identifier, repeat(seq('\\', $.php_identifier))),
+    _namespace_name: $ =>
+      seq($.php_identifier, repeat(seq('\\', $.php_identifier))),
     php_identifier: $ => /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
 
     union_type: $ => pipeSep1($._types),
 
     intersection_type: $ => ampSep1($._types),
 
-    disjunctive_normal_form_type: $ => prec.dynamic(-1, pipeSep1(choice(
-      seq('(', $.intersection_type, ')'),
-      $._types,
-    ))),
+    disjunctive_normal_form_type: $ =>
+      prec.dynamic(
+        -1,
+        pipeSep1(choice(seq('(', $.intersection_type, ')'), $._types)),
+      ),
 
+    _statement_start: $ => alias(choice('{%', '{%-', '{%~'), 'embedded_begin'),
+    _statement_stop: $ => alias(choice('%}', '-%}', '~%}'), 'embedded_end'),
 
-
-    _statement_start: ($) =>
-      alias(choice('{%', '{%-', '{%~'), 'embedded_begin'),
-    _statement_stop: ($) => alias(choice('%}', '-%}', '~%}'), 'embedded_end'),
-
-    expression: ($) =>
+    expression: $ =>
       choice(
         $.primary_expression,
         $.unary_expression,
@@ -151,7 +139,7 @@ module.exports = grammar({
         $.ternary_expression,
       ),
 
-    primary_expression: ($) =>
+    primary_expression: $ =>
       choice(
         $.subscript_expression,
         $.member_expression,
@@ -170,9 +158,9 @@ module.exports = grammar({
         $.call_expression,
       ),
 
-    parenthesized_expression: ($) => seq('(', $.expression, ')'),
+    parenthesized_expression: $ => seq('(', $.expression, ')'),
 
-    identifier: ($) =>
+    identifier: $ =>
       choice(
         /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
         'divisible by',
@@ -183,7 +171,7 @@ module.exports = grammar({
     number: () => /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/,
     boolean: () => choice('true', 'false', 'TRUE', 'FALSE'),
     string: () => /"([^#"\\]*(?:\\.[^#"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/,
-    interpolated_string: ($) =>
+    interpolated_string: $ =>
       seq(
         alias('"', 'string'),
         repeat(
@@ -198,11 +186,11 @@ module.exports = grammar({
         ),
         alias('"', 'string'),
       ),
-    spread_element: ($) =>
+    spread_element: $ =>
       seq('...', field('expr', alias($.identifier, $.variable))),
-    array: ($) =>
+    array: $ =>
       seq('[', commaSep($.expression), optional($.spread_element), ']'),
-    object: ($) =>
+    object: $ =>
       seq(
         '{',
         commaSep(choice($.pair, alias($.identifier, $.variable))),
@@ -210,20 +198,15 @@ module.exports = grammar({
         '}',
       ),
 
-    pair: ($) =>
+    pair: $ =>
       seq(field('key', $._property_name), ':', field('value', $.expression)),
 
-    _property_name: ($) =>
-      choice(
-        $.string,
-        $.number,
-        $.identifier,
-        $.computed_property_name,
-      ),
+    _property_name: $ =>
+      choice($.string, $.number, $.identifier, $.computed_property_name),
 
-    computed_property_name: ($) => seq('(', $.expression, ')'),
+    computed_property_name: $ => seq('(', $.expression, ')'),
 
-    arrow_function: ($) =>
+    arrow_function: $ =>
       seq(
         choice(
           field('parameter', alias($.identifier, $.parameter)),
@@ -237,7 +220,7 @@ module.exports = grammar({
         field('expr', $.expression),
       ),
 
-    optional_member_expression: ($) =>
+    optional_member_expression: $ =>
       prec(
         'member',
         seq(
@@ -247,7 +230,7 @@ module.exports = grammar({
         ),
       ),
 
-    member_expression: ($) =>
+    member_expression: $ =>
       prec(
         'member',
         seq(
@@ -257,14 +240,14 @@ module.exports = grammar({
         ),
       ),
 
-    slice: ($) =>
+    slice: $ =>
       seq(
         optional(field('start', choice($._property_name, $.unary_expression))),
         ':',
         optional(field('length', $.expression)),
       ),
 
-    subscript_expression: ($) =>
+    subscript_expression: $ =>
       prec.right(
         'member',
         seq(
@@ -275,7 +258,7 @@ module.exports = grammar({
         ),
       ),
 
-    call_expression: ($) =>
+    call_expression: $ =>
       choice(
         prec(
           'member',
@@ -299,21 +282,21 @@ module.exports = grammar({
         ),
       ),
 
-    arguments: ($) =>
+    arguments: $ =>
       seq(
         '(',
         commaSep(field('argument', choice($.named_argument, $.expression))),
         ')',
       ),
 
-    named_argument: ($) =>
+    named_argument: $ =>
       seq(
         field('key', alias($.identifier, $.variable)),
         choice('=', ':'),
         field('value', $.expression),
       ),
 
-    unary_expression: ($) =>
+    unary_expression: $ =>
       prec.left(
         'unary',
         choice(
@@ -330,7 +313,8 @@ module.exports = grammar({
         ),
       ),
 
-    binary_expression: ($) => choice(
+    binary_expression: $ =>
+      choice(
         .../** @type {const} */ ([
           ['or', 10],
           ['and', 15],
@@ -379,7 +363,7 @@ module.exports = grammar({
         ),
       ),
 
-    ternary_expression: ($) =>
+    ternary_expression: $ =>
       prec.right(
         'ternary',
         seq(
@@ -397,7 +381,7 @@ module.exports = grammar({
         ),
       ),
 
-    filter_expression: ($) =>
+    filter_expression: $ =>
       prec.right(
         'filter',
         seq(
@@ -408,14 +392,14 @@ module.exports = grammar({
         ),
       ),
 
-    tag: ($) =>
+    tag: $ =>
       statement(
         $,
         field('name', alias($.identifier, 'keyword')),
         repeat(prec.left($.expression)),
       ),
 
-    set: ($) =>
+    set: $ =>
       statement(
         $,
         alias('set', 'keyword'),
@@ -424,7 +408,7 @@ module.exports = grammar({
         commaSep1(field('value', $.expression)),
       ),
 
-    set_block: ($) =>
+    set_block: $ =>
       statement(
         $,
         alias('set', 'keyword'),
@@ -433,7 +417,7 @@ module.exports = grammar({
         alias('endset', 'keyword'),
       ),
 
-    apply: ($) =>
+    apply: $ =>
       statement(
         $,
         alias('apply', 'keyword'),
@@ -449,7 +433,7 @@ module.exports = grammar({
         alias('endapply', 'keyword'),
       ),
 
-    autoescape: ($) =>
+    autoescape: $ =>
       statement(
         $,
         alias('autoescape', 'keyword'),
@@ -458,7 +442,7 @@ module.exports = grammar({
         alias('endautoescape', 'keyword'),
       ),
 
-    block: ($) =>
+    block: $ =>
       statement(
         $,
         alias('block', 'keyword'),
@@ -473,7 +457,7 @@ module.exports = grammar({
         ),
       ),
 
-    cache: ($) =>
+    cache: $ =>
       statement(
         $,
         alias('cache', 'keyword'),
@@ -484,13 +468,12 @@ module.exports = grammar({
         alias('endcache', 'keyword'),
       ),
 
-    deprecated: ($) =>
+    deprecated: $ =>
       statement($, alias('deprecated', 'keyword'), field('expr', $.expression)),
 
-    do: ($) =>
-      statement($, alias('do', 'keyword'), field('expr', $.expression)),
+    do: $ => statement($, alias('do', 'keyword'), field('expr', $.expression)),
 
-    embed: ($) =>
+    embed: $ =>
       statement(
         $,
         alias('embed', 'keyword'),
@@ -502,12 +485,12 @@ module.exports = grammar({
         alias('endembed', 'keyword'),
       ),
 
-    extends: ($) =>
+    extends: $ =>
       statement($, alias('extends', 'keyword'), field('expr', $.expression)),
 
-    flush: ($) => statement($, alias('flush', 'keyword')),
+    flush: $ => statement($, alias('flush', 'keyword')),
 
-    for: ($) =>
+    for: $ =>
       statement(
         $,
         alias('for', 'keyword'),
@@ -519,7 +502,7 @@ module.exports = grammar({
         alias('endfor', 'keyword'),
       ),
 
-    from: ($) =>
+    from: $ =>
       statement(
         $,
         alias('from', 'keyword'),
@@ -533,14 +516,14 @@ module.exports = grammar({
         ),
       ),
 
-    as_operator: ($) =>
+    as_operator: $ =>
       seq(
         field('left', alias($.identifier, $.variable)),
         field('operator', alias('as', 'keyword')),
         field('right', alias($.identifier, $.variable)),
       ),
 
-    if: ($) =>
+    if: $ =>
       statement(
         $,
         alias('if', 'keyword'),
@@ -551,14 +534,14 @@ module.exports = grammar({
         alias('endif', 'keyword'),
       ),
 
-    elseif: ($) =>
+    elseif: $ =>
       seq(
         alias('elseif', 'keyword'),
         field('expr', $.expression),
         source_elements($, 'then'),
       ),
 
-    import: ($) =>
+    import: $ =>
       statement(
         $,
         alias('import', 'keyword'),
@@ -567,7 +550,7 @@ module.exports = grammar({
         field('variable', alias($.identifier, $.variable)),
       ),
 
-    include: ($) =>
+    include: $ =>
       statement(
         $,
         alias('include', 'keyword'),
@@ -577,7 +560,7 @@ module.exports = grammar({
         optional(field('only', alias('only', 'keyword'))),
       ),
 
-    macro: ($) =>
+    macro: $ =>
       statement(
         $,
         alias('macro', 'keyword'),
@@ -588,7 +571,7 @@ module.exports = grammar({
         optional($.identifier),
       ),
 
-    sandbox: ($) =>
+    sandbox: $ =>
       statement(
         $,
         alias('sandbox', 'keyword'),
@@ -596,7 +579,7 @@ module.exports = grammar({
         alias('endsandbox', 'keyword'),
       ),
 
-    types: ($) =>
+    types: $ =>
       statement(
         $,
         alias('types', 'keyword'),
@@ -606,25 +589,27 @@ module.exports = grammar({
             choice(
               field('types_required_declaration', $.types_required_declaration),
               field('types_optional_declaration', $.types_optional_declaration),
-            )
+            ),
           ),
           optional('}'),
         ),
       ),
 
-    types_required_declaration: ($) => seq(
+    types_required_declaration: $ =>
+      seq(
         field('variable', alias($.identifier, $.variable)),
         ':',
         string(field('type', $._type)),
       ),
 
-    types_optional_declaration: ($) => seq(
+    types_optional_declaration: $ =>
+      seq(
         field('variable', alias($.identifier, $.variable)),
         '?:',
         string(field('type', $._type)),
       ),
 
-    use: ($) =>
+    use: $ =>
       statement(
         $,
         alias('use', 'keyword'),
@@ -637,7 +622,7 @@ module.exports = grammar({
         ),
       ),
 
-    verbatim: ($) =>
+    verbatim: $ =>
       statement(
         $,
         alias('verbatim', 'keyword'),
@@ -645,7 +630,7 @@ module.exports = grammar({
         alias('endverbatim', 'keyword'),
       ),
 
-    with: ($) =>
+    with: $ =>
       statement(
         $,
         alias('with', 'keyword'),
@@ -655,7 +640,7 @@ module.exports = grammar({
         alias('endwith', 'keyword'),
       ),
 
-    _statement: ($) =>
+    _statement: $ =>
       choice(
         $.tag,
         $.apply,
@@ -742,10 +727,7 @@ function statement($, ...args) {
  * @returns {ChoiceRule} The quoted rule.
  */
 function string(rule) {
-  return choice(
-    seq('"', rule, '"'),
-    seq("'", rule, "'"),
-  );
+  return choice(seq('"', rule, '"'), seq("'", rule, "'"));
 }
 
 /**
@@ -769,7 +751,6 @@ function pipeSep1(rule) {
 function ampSep1(rule) {
   return seq(rule, repeat(seq(token('&'), rule)));
 }
-
 
 /**
  * @param {string} word The keyword text.

@@ -11,8 +11,9 @@ export const isEmptyEmbedded = (node: SyntaxNode) => {
     return minNamedChildCount !== undefined && node.namedChildCount < minNamedChildCount;
 };
 
-export const isInExpressionScope = (node: SyntaxNode) => isEmptyEmbedded(node)
+export const isInExpressionScope = (node: SyntaxNode) =>
+    isEmptyEmbedded(node) ||
     // Cursor might be in the `embedded_begin` node.
     // TODO: remove `embedded_begin` from the AST?
     // or rework this logic to compare the type to `embedded_begin` and `embedded_end`.
-    || node.parent && isEmptyEmbedded(node.parent);
+    (node.parent && isEmptyEmbedded(node.parent));

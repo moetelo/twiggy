@@ -12,7 +12,9 @@ export class PhpExecutor implements IPhpExecutor {
         private readonly _phpUtilPath: PhpUtilPathTable = PhpUtilPath,
     ) {
         if (!this._phpExecutable) {
-            console.warn('`twiggy.phpExecutable` is not configured. Some features will be disabled.');
+            console.warn(
+                '`twiggy.phpExecutable` is not configured. Some features will be disabled.',
+            );
         }
     }
 
@@ -21,14 +23,13 @@ export class PhpExecutor implements IPhpExecutor {
             return null;
         }
 
-        const result = await exec(this._phpExecutable, [
-            '-d',
-            'display_errors=stderr',
-            command,
-            ...args,
-        ], {
-            cwd: this._workspaceDirectory
-        });
+        const result = await exec(
+            this._phpExecutable,
+            ['-d', 'display_errors=stderr', command, ...args],
+            {
+                cwd: this._workspaceDirectory,
+            },
+        );
 
         if (result.stderr) {
             console.error(`${command} ${args.join(' ')}`);
@@ -57,10 +58,12 @@ export class PhpExecutor implements IPhpExecutor {
     }
 
     async getClassCompletion(className: string) {
-        return await this.callJson<string[]>(this._phpUtilPath.getCompletionPhp, [
-            this._workspaceDirectory,
-            className,
-        ]) ?? [];
+        return (
+            (await this.callJson<string[]>(this._phpUtilPath.getCompletionPhp, [
+                this._workspaceDirectory,
+                className,
+            ])) ?? []
+        );
     }
 
     async reflectType(className: string) {

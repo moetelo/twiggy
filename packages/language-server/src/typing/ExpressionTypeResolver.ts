@@ -28,11 +28,12 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
         'var_declaration',
     ]);
 
-    constructor(
-        private readonly typeResolver: ITypeResolver,
-    ) {}
+    constructor(private readonly typeResolver: ITypeResolver) {}
 
-    async resolveExpression(expr: SyntaxNode, locals: LocalSymbolInformation): Promise<ReflectedType | null> {
+    async resolveExpression(
+        expr: SyntaxNode,
+        locals: LocalSymbolInformation,
+    ): Promise<ReflectedType | null> {
         if (expr.type === 'call_expression') {
             const memberExpr = expr.childForFieldName('name');
             if (!memberExpr) return null;
@@ -50,10 +51,9 @@ export class ExpressionTypeResolver implements IExpressionTypeResolver {
             const propertyName = expr.childForFieldName('property')?.text;
             if (!propertyName) return null;
 
-            const propertyOrMethod = [
-                ...objectType.methods,
-                ...objectType.properties,
-            ].find(m => m.name === propertyName);
+            const propertyOrMethod = [...objectType.methods, ...objectType.properties].find(
+                m => m.name === propertyName,
+            );
 
             if (!propertyOrMethod) return null;
 

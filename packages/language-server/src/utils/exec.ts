@@ -2,17 +2,21 @@ import type { SpawnOptionsWithoutStdio } from 'node:child_process';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 
-export type CommandResult = { stdout: string, stderr: string, code: number | null };
+export type CommandResult = { stdout: string; stderr: string; code: number | null };
 
-export const exec = async (command: string, args: string[], options: SpawnOptionsWithoutStdio = {}): Promise<CommandResult> => {
+export const exec = async (
+    command: string,
+    args: string[],
+    options: SpawnOptionsWithoutStdio = {},
+): Promise<CommandResult> => {
     const child = spawn(command, args, options);
     let stdout = '';
     let stderr = '';
 
-    child.stdout.on('data', (data) => {
+    child.stdout.on('data', data => {
         stdout += data;
     });
-    child.stderr.on('data', (data) => {
+    child.stderr.on('data', data => {
         stderr += data;
     });
 

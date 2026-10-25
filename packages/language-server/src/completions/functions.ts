@@ -1,10 +1,5 @@
-import type {
-    CompletionItem,
-} from 'vscode-languageserver/node';
-import {
-    CompletionItemKind,
-    InsertTextFormat,
-} from 'vscode-languageserver/node';
+import type { CompletionItem } from 'vscode-languageserver/node';
+import { CompletionItemKind, InsertTextFormat } from 'vscode-languageserver/node';
 import type { SyntaxNode } from 'web-tree-sitter';
 import { twigFunctions } from '../staticCompletionInfo';
 import type { TwigFunctionLike } from '../twigEnvironment/types';
@@ -18,13 +13,16 @@ export const commonCompletionItem: Partial<CompletionItem> = {
     detail: 'function',
 };
 
-const completions: CompletionItem[] = twigFunctions.map((item) => ({
+const completions: CompletionItem[] = twigFunctions.map(item => ({
     ...item,
     ...commonCompletionItem,
     insertText: `${item.label}($1)$0`,
 }));
 
-export function functions(cursorNode: SyntaxNode, environmentFunctions: TwigFunctionLike[]): CompletionItem[] {
+export function functions(
+    cursorNode: SyntaxNode,
+    environmentFunctions: TwigFunctionLike[],
+): CompletionItem[] {
     if (['variable', 'function'].includes(cursorNode.type) || isInExpressionScope(cursorNode)) {
         const completionsPhp = environmentFunctions.map((func): CompletionItem => ({
             ...commonCompletionItem,

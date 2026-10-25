@@ -4,10 +4,13 @@ import type {
     DefinitionParams,
     WorkspaceFolder,
 } from 'vscode-languageserver';
+import { Range } from 'vscode-languageserver';
 import {
-    Range,
-} from 'vscode-languageserver';
-import { getNodeRange, getStringNodeValue, isBlockIdentifier, isPathInsideTemplateEmbedding } from '../utils/node';
+    getNodeRange,
+    getStringNodeValue,
+    isBlockIdentifier,
+    isPathInsideTemplateEmbedding,
+} from '../utils/node';
 import type { Document, DocumentCache } from '../documents';
 import { pointToPosition } from '../utils/position';
 import { positionsEqual } from '../utils/position/comparePositions';
@@ -29,9 +32,7 @@ export class DefinitionProvider {
         this.connection.onDefinition(this.onDefinition.bind(this));
     }
 
-    async onDefinition(
-        params: DefinitionParams,
-    ): Promise<Definition | undefined> {
+    async onDefinition(params: DefinitionParams): Promise<Definition | undefined> {
         const document = await this.documentCache.get(params.textDocument.uri);
         const cursorNode = document.deepestAt(params.position);
 
@@ -56,7 +57,7 @@ export class DefinitionProvider {
             const cursorPosition = pointToPosition(cursorNode.startPosition);
             const scopedVariables = document.getLocalsAt(cursorPosition);
 
-            const symbol = scopedVariables.find((x) => x.name === cursorNode.text);
+            const symbol = scopedVariables.find(x => x.name === cursorNode.text);
 
             if (!symbol) return undefined;
 
@@ -71,10 +72,14 @@ export class DefinitionProvider {
             const importName = cursorNode.parent?.firstChild?.text;
             if (importName === undefined) return undefined;
 
-            const importedDocument = await this.documentCache.resolveImport(document, importName, params.position);
+            const importedDocument = await this.documentCache.resolveImport(
+                document,
+                importName,
+                params.position,
+            );
             if (!importedDocument) return undefined;
 
-            const macro = importedDocument.locals.macro.find((x) => x.name === macroName);
+            const macro = importedDocument.locals.macro.find(x => x.name === macroName);
             if (!macro) return undefined;
 
             return {
@@ -99,15 +104,17 @@ export class DefinitionProvider {
         return undefined;
     }
 
-    async #resolveBlockIdentifier(document: Document, cursorNode: SyntaxNode): Promise<Definition | undefined> {
+    async #resolveBlockIdentifier(
+        document: Document,
+        cursorNode: SyntaxNode,
+    ): Promise<Definition | undefined> {
         if (!cursorNode.parent) {
             return undefined;
         }
 
         if (cursorNode.parent.type === 'block') {
-            const blockName = cursorNode.type === 'string'
-                ? getStringNodeValue(cursorNode)
-                : cursorNode.text;
+            const blockName =
+                cursorNode.type === 'string' ? getStringNodeValue(cursorNode) : cursorNode.text;
 
             return this.#resolveBlockSymbol(blockName, document, cursorNode);
         }
@@ -117,9 +124,10 @@ export class DefinitionProvider {
             const [blockNameArgNode] = namedChildren;
             const templatePathArgNode = namedChildren.at(1);
 
-            const blockName = blockNameArgNode.type === 'string'
-                ? getStringNodeValue(blockNameArgNode)
-                : blockNameArgNode.text;
+            const blockName =
+                blockNameArgNode.type === 'string'
+                    ? getStringNodeValue(blockNameArgNode)
+                    : blockNameArgNode.text;
 
             if (!templatePathArgNode) {
                 return this.#resolveBlockSymbol(blockName, document, cursorNode);
@@ -146,11 +154,18 @@ export class DefinitionProvider {
         return undefined;
     }
 
-    async #resolveBlockSymbol(blockName: string, initialDocument: Document, cursorNode: SyntaxNode) {
+    async #resolveBlockSymbol(
+        blockName: string,
+        initialDocument: Document,
+        cursorNode: SyntaxNode,
+    ) {
         let extendedDocument: Document | undefined = initialDocument;
         while (extendedDocument) {
             const blockSymbol = extendedDocument.getBlock(blockName);
-            if (!blockSymbol || positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)) {
+            if (
+                !blockSymbol ||
+                positionsEqual(blockSymbol.nameRange.start, getNodeRange(cursorNode).start)
+            ) {
                 extendedDocument = await this.getExtendedTemplate(extendedDocument);
                 continue;
             }

@@ -23,9 +23,7 @@ export function toVariable(node: SyntaxNode): TwigVariableDeclaration | undefine
     const variableNode = node.childForFieldName('variable');
     if (!variableNode) return undefined;
 
-    const type = node.type === 'set_block'
-        ? 'string'
-        : node.childForFieldName('type')?.text;
+    const type = node.type === 'set_block' ? 'string' : node.childForFieldName('type')?.text;
 
     return {
         name: variableNode.text,
@@ -44,28 +42,31 @@ export function toMacro(node: SyntaxNode): Omit<TwigMacro, 'symbols'> | undefine
 
     const argumentsNode = node.childForFieldName('arguments');
 
-    const variableArgs = argumentsNode?.descendantsOfType('variable')
-        .map((argumentNode): FunctionArgument => ({
+    const variableArgs =
+        argumentsNode?.descendantsOfType('variable').map((argumentNode): FunctionArgument => ({
             name: argumentNode.text,
             nameRange: getNodeRange(argumentNode),
             range: getNodeRange(argumentNode),
         })) ?? [];
 
-    const namedArgs = argumentsNode
-        ?.descendantsOfType('named_argument')
-        .flatMap((argumentNode): FunctionArgument[] => {
-            const argNameNode = argumentNode.childForFieldName('key');
-            if (!argNameNode) return [];
+    const namedArgs =
+        argumentsNode
+            ?.descendantsOfType('named_argument')
+            .flatMap((argumentNode): FunctionArgument[] => {
+                const argNameNode = argumentNode.childForFieldName('key');
+                if (!argNameNode) return [];
 
-            const value = argumentNode.childForFieldName('value')?.text;
+                const value = argumentNode.childForFieldName('value')?.text;
 
-            return [{
-                name: argNameNode.text,
-                nameRange: getNodeRange(argNameNode),
-                value,
-                range: getNodeRange(argumentNode),
-            }];
-        }) ?? [];
+                return [
+                    {
+                        name: argNameNode.text,
+                        nameRange: getNodeRange(argNameNode),
+                        value,
+                        range: getNodeRange(argumentNode),
+                    },
+                ];
+            }) ?? [];
 
     return {
         name: nameNode.text,

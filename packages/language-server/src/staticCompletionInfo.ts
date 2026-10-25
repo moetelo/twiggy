@@ -1,11 +1,5 @@
-import type {
-    CompletionItem,
-    SignatureInformation,
-} from 'vscode-languageserver';
-import {
-    MarkupKind,
-    CompletionItemKind,
-} from 'vscode-languageserver';
+import type { CompletionItem, SignatureInformation } from 'vscode-languageserver';
+import { MarkupKind, CompletionItemKind } from 'vscode-languageserver';
 
 export const twigGlobalVariables = [
     {
@@ -22,12 +16,19 @@ export const twigGlobalVariables = [
     },
 ];
 
-type TwigFunctionReturnType = 'string' | 'array' | 'mixed' | 'int' | 'float' | 'false' | '\\DateTimeInterface';
+type TwigFunctionReturnType =
+    | 'string'
+    | 'array'
+    | 'mixed'
+    | 'int'
+    | 'float'
+    | 'false'
+    | '\\DateTimeInterface';
 
 type TwigFunctionCompletionItem = {
     label: string;
-    createSnippet?: true,
-    return?: TwigFunctionReturnType | `${TwigFunctionReturnType}|${TwigFunctionReturnType}`,
+    createSnippet?: true;
+    return?: TwigFunctionReturnType | `${TwigFunctionReturnType}|${TwigFunctionReturnType}`;
 } & Partial<CompletionItem & SignatureInformation>;
 
 export const twigFunctions: TwigFunctionCompletionItem[] = [
@@ -105,8 +106,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
             },
             {
                 label: 'int $step = 1',
-                documentation:
-                    'The increment between elements of the sequence.',
+                documentation: 'The increment between elements of the sequence.',
             },
         ],
         return: 'array',
@@ -254,9 +254,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'source',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: ['Returns a template content without rendering it.'].join(
-                '\n',
-            ),
+            value: ['Returns a template content without rendering it.'].join('\n'),
         },
         parameters: [
             {
@@ -274,9 +272,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'attribute',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'Returns the attribute value for a given array/object.',
-            ].join('\n'),
+            value: ['Returns the attribute value for a given array/object.'].join('\n'),
         },
         parameters: [
             {
@@ -289,8 +285,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
             },
             {
                 label: 'array $arguments',
-                documentation:
-                    'An array of arguments to pass if the item is an object method',
+                documentation: 'An array of arguments to pass if the item is an object method',
             },
         ],
         return: 'mixed',
@@ -357,9 +352,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'language_names',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `language_names` function returns the names of the languages',
-            ].join('\n'),
+            value: ['The `language_names` function returns the names of the languages'].join('\n'),
         },
         parameters: [
             {
@@ -372,9 +365,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'script_names',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `script_names` function returns the names of the scripts',
-            ].join('\n'),
+            value: ['The `script_names` function returns the names of the scripts'].join('\n'),
         },
         parameters: [
             {
@@ -387,9 +378,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'country_names',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `country_names` function returns the names of the countries',
-            ].join('\n'),
+            value: ['The `country_names` function returns the names of the countries'].join('\n'),
         },
         parameters: [
             {
@@ -402,9 +391,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'locale_names',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `locale_names` function returns the names of the locales',
-            ].join('\n'),
+            value: ['The `locale_names` function returns the names of the locales'].join('\n'),
         },
         parameters: [
             {
@@ -417,9 +404,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'currency_names',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `currency_names` function returns the names of the currencies',
-            ].join('\n'),
+            value: ['The `currency_names` function returns the names of the currencies'].join('\n'),
         },
         parameters: [
             {
@@ -432,9 +417,7 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         label: 'timezone_names',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `timezone_names` function returns the names of the timezones',
-            ].join('\n'),
+            value: ['The `timezone_names` function returns the names of the timezones'].join('\n'),
         },
         parameters: [
             {
@@ -457,13 +440,11 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
         parameters: [
             {
                 label: 'string $template',
-                documentation:
-                    'A template as a string or object implementing __toString()',
+                documentation: 'A template as a string or object implementing __toString()',
             },
             {
                 label: 'string $name = null',
-                documentation:
-                    'An optional name of the template to be used in error messages',
+                documentation: 'An optional name of the template to be used in error messages',
             },
         ],
         return: 'string',
@@ -693,28 +674,22 @@ export const twigFunctions: TwigFunctionCompletionItem[] = [
 ];
 
 export type SnippetLike = {
-    label: string,
-    snippet?: string[],
+    label: string;
+    snippet?: string[];
 };
 
 export const miscSnippets: SnippetLike[] = [
     {
         label: 'set block',
-        snippet: [
-            '{% set $1 %}\n\t$0\n{% endset %}',
-        ],
+        snippet: ['{% set $1 %}\n\t$0\n{% endset %}'],
     },
     {
         label: 'if else',
-        snippet: [
-            '{% if $1 %}\n\t$2\n{% else %}\n\t$3\n{% endif %}',
-        ],
+        snippet: ['{% if $1 %}\n\t$2\n{% else %}\n\t$3\n{% endif %}'],
     },
     {
         label: 'block with body',
-        snippet: [
-            '{% block $1 %}\n\t$2\n{% endblock %}',
-        ],
+        snippet: ['{% block $1 %}\n\t$2\n{% endblock %}'],
     },
 ];
 
@@ -744,55 +719,31 @@ export const twigKeywords: KeywordCompletionItem[] = [
     { label: 'endverbatim' },
     {
         label: 'apply',
-        snippet: [
-            '{% apply $1 %}',
-            '\t$2',
-            '{% endapply %}',
-        ],
+        snippet: ['{% apply $1 %}', '\t$2', '{% endapply %}'],
     },
     {
         label: 'block',
-        snippet: [
-            '{% block $1 %}',
-            '\t$2',
-            '{% endblock %}',
-        ],
+        snippet: ['{% block $1 %}', '\t$2', '{% endblock %}'],
     },
     {
         label: 'if',
-        snippet: [
-            '{% if $1 %}',
-            '\t$2',
-            '{% endif %}',
-        ],
+        snippet: ['{% if $1 %}', '\t$2', '{% endif %}'],
     },
     {
         label: 'extends',
-        snippet: [
-            "{% extends '$1' %}",
-        ],
+        snippet: ["{% extends '$1' %}"],
     },
     {
         label: 'for',
-        snippet: [
-            '{% for $1 in $1s %}',
-            '\t$2',
-            '{% endfor %}',
-        ],
+        snippet: ['{% for $1 in $1s %}', '\t$2', '{% endfor %}'],
     },
     {
         label: 'macro',
-        snippet: [
-            '{% macro $1($2) %}',
-            '\t$3',
-            '{% endmacro %}',
-        ],
+        snippet: ['{% macro $1($2) %}', '\t$3', '{% endmacro %}'],
     },
     {
         label: 'set',
-        snippet: [
-            '{% set $1 = $2 %}',
-        ],
+        snippet: ['{% set $1 = $2 %}'],
     },
 ];
 
@@ -886,8 +837,7 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
             },
             {
                 label: 'string $thousandSep',
-                documentation:
-                    'The character(s) to use for the thousands separator',
+                documentation: 'The character(s) to use for the thousands separator',
             },
         ],
         return: 'string',
@@ -1029,9 +979,7 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
         label: 'nl2br',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'Inserts HTML line breaks before all newlines in a string.',
-            ].join('\n'),
+            value: ['Inserts HTML line breaks before all newlines in a string.'].join('\n'),
         },
         return: 'string',
     },
@@ -1173,8 +1121,7 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
             },
             {
                 label: 'mixed $index',
-                documentation:
-                    'The column to use as the index/keys for the returned array',
+                documentation: 'The column to use as the index/keys for the returned array',
             },
         ],
         return: 'array',
@@ -1270,8 +1217,7 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
             },
             {
                 label: 'bool $preserveKeys',
-                documentation:
-                    'Whether to preserve key or not (when the input is an array)',
+                documentation: 'Whether to preserve key or not (when the input is an array)',
             },
         ],
         return: 'mixed',
@@ -1453,9 +1399,7 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
         label: 'format_currency',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `format_currency` filter formats a number as a currency',
-            ].join('\n'),
+            value: ['The `format_currency` filter formats a number as a currency'].join('\n'),
         },
         parameters: [
             {
@@ -1499,9 +1443,7 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
         label: 'format_datetime',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: ['The `format_datetime` filter formats a date time'].join(
-                '\n',
-            ),
+            value: ['The `format_datetime` filter formats a date time'].join('\n'),
         },
         return: 'string',
     },
@@ -1529,18 +1471,18 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
         label: 'markdown_to_html',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `markdown_to_html` filter converts a block of Markdown to HTML',
-            ].join('\n'),
+            value: ['The `markdown_to_html` filter converts a block of Markdown to HTML'].join(
+                '\n',
+            ),
         },
     },
     {
         label: 'html_to_markdown',
         documentation: {
             kind: MarkupKind.Markdown,
-            value: [
-                'The `html_to_markdown` filter converts a block of HTML to Markdown',
-            ].join('\n'),
+            value: ['The `html_to_markdown` filter converts a block of HTML to Markdown'].join(
+                '\n',
+            ),
         },
     },
     {
@@ -1554,8 +1496,7 @@ export const twigFilters: TwigFunctionCompletionItem[] = [
         parameters: [
             {
                 label: 'separator',
-                documentation:
-                    'The separator that is used to join words (defaults to -)',
+                documentation: 'The separator that is used to join words (defaults to -)',
             },
             {
                 label: 'locale',

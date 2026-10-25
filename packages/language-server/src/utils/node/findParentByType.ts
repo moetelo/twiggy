@@ -1,17 +1,14 @@
 import type { SyntaxNode } from 'web-tree-sitter';
 
-export function findParentByType(
-  cursorNode: SyntaxNode,
-  type: string
-): SyntaxNode | undefined {
-  let node = cursorNode;
+export function findParentByType(cursorNode: SyntaxNode, type: string): SyntaxNode | undefined {
+    let node = cursorNode;
 
-  while (node.parent) {
-    if (node.type === type) {
-      return node;
+    while (node.parent) {
+        if (node.type === type) {
+            return node;
+        }
+        node = node.parent;
     }
-    node = node.parent;
-  }
 
-  return undefined;
+    return undefined;
 }

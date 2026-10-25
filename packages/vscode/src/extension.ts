@@ -1,25 +1,9 @@
 import * as path from 'node:path';
-import type {
-    ExtensionContext,
-    WorkspaceFolder,
-    CompletionList,
-} from 'vscode';
-import {
-    workspace,
-    window,
-    commands,
-    Uri,
-} from 'vscode';
+import type { ExtensionContext, WorkspaceFolder, CompletionList } from 'vscode';
+import { workspace, window, commands, Uri } from 'vscode';
 import * as autoInsert from './autoInsert';
-import type {
-    LanguageClientOptions,
-    ServerOptions,
-} from 'vscode-languageclient/node';
-import {
-    LanguageClient,
-    MarkupKind,
-    TransportKind,
-} from 'vscode-languageclient/node';
+import type { LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
+import { LanguageClient, MarkupKind, TransportKind } from 'vscode-languageclient/node';
 import { unwrapCompletionArray } from './utils/unwrapCompletionArray';
 import ProtocolCompletionItem from 'vscode-languageclient/lib/common/protocolCompletionItem';
 import { IsInsideHtmlRegionRequest } from 'twiggy-language-server/src/customRequests/IsInsideHtmlRegionRequest';
@@ -91,12 +75,13 @@ async function isInsideHtmlRegion(
         return false;
     }
 
-    return client.sendRequest<IsInsideHtmlRegionRequest.ResponseType>(IsInsideHtmlRegionRequest.type, params);
+    return client.sendRequest<IsInsideHtmlRegionRequest.ResponseType>(
+        IsInsideHtmlRegionRequest.type,
+        params,
+    );
 }
 
-async function addWorkspaceFolder(
-    workspaceFolder: WorkspaceFolder,
-): Promise<void> {
+async function addWorkspaceFolder(workspaceFolder: WorkspaceFolder): Promise<void> {
     const folderPath = workspaceFolder.uri.fsPath;
 
     if (clients.has(folderPath)) {
@@ -137,13 +122,7 @@ async function addWorkspaceFolder(
             },
         ],
         middleware: {
-            async provideCompletionItem(
-                document,
-                position,
-                context,
-                token,
-                next,
-            ) {
+            async provideCompletionItem(document, position, context, token, next) {
                 const originalUri = document.uri.toString(true);
 
                 const isInsideHtml = await isInsideHtmlRegion(folderPath, {
@@ -151,7 +130,9 @@ async function addWorkspaceFolder(
                     position,
                 });
 
-                const result = await unwrapCompletionArray(next(document, position, context, token));
+                const result = await unwrapCompletionArray(
+                    next(document, position, context, token),
+                );
 
                 if (!isInsideHtml) {
                     return result;
@@ -168,23 +149,15 @@ async function addWorkspaceFolder(
                     context.triggerCharacter,
                 );
 
-                const htmlItems = htmlCompletionList
-                    .items
-                    .map(item => {
-                        const protoItem = Object.assign(
-                            new ProtocolCompletionItem(item.label),
-                            item,
-                        );
+                const htmlItems = htmlCompletionList.items.map(item => {
+                    const protoItem = Object.assign(new ProtocolCompletionItem(item.label), item);
 
-                        protoItem.documentationFormat = MarkupKind.Markdown;
+                    protoItem.documentationFormat = MarkupKind.Markdown;
 
-                        return protoItem;
-                    });
+                    return protoItem;
+                });
 
-                return [
-                    ...htmlItems,
-                    ...result,
-                ];
+                return [...htmlItems, ...result];
             },
         },
     };
@@ -196,10 +169,7 @@ async function addWorkspaceFolder(
         clientOptions,
     );
 
-    await autoInsert.activate(
-        [client],
-        (document) => document.uri.fsPath.startsWith(folderPath),
-    );
+    await autoInsert.activate([client], document => document.uri.fsPath.startsWith(folderPath));
 
     clients.set(folderPath, client);
 
@@ -208,9 +178,7 @@ async function addWorkspaceFolder(
     outputChannel.appendLine(`Language server started for: ${folderPath}`);
 }
 
-async function removeWorkspaceFolder(
-    workspaceFolder: WorkspaceFolder,
-): Promise<void> {
+async function removeWorkspaceFolder(workspaceFolder: WorkspaceFolder): Promise<void> {
     const folderPath = workspaceFolder.uri.fsPath;
     const client = clients.get(folderPath);
 

@@ -63,7 +63,10 @@ describe('server smoke', () => {
             workspaceFolders: [{ name: 'test', uri: 'file:///tmp' }],
         };
 
-        const result = await clientConn.sendRequest<Partial<InitializeResult>>('initialize', initParams);
+        const result = await clientConn.sendRequest<Partial<InitializeResult>>(
+            'initialize',
+            initParams,
+        );
         const caps = result.capabilities;
 
         assert.ok(caps, 'capabilities missing from initialize result');
@@ -112,12 +115,15 @@ describe('server smoke', () => {
             'textDocument/completion',
             completionParams,
         );
-        const items = Array.isArray(result) ? result : result?.items ?? [];
+        const items = Array.isArray(result) ? result : (result?.items ?? []);
 
         assert.ok(items.length > 0, 'expected at least one completion item');
         assert.ok(
-            items.some((i) => i.label === 'variable'),
-            `expected 'variable' in completions, got: ${items.map((i) => i.label).slice(0, 10).join(', ')}`,
+            items.some(i => i.label === 'variable'),
+            `expected 'variable' in completions, got: ${items
+                .map(i => i.label)
+                .slice(0, 10)
+                .join(', ')}`,
         );
 
         clientConn.end();

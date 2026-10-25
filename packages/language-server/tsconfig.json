@@ -1,21 +1,19 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
-    "target": "es2020",
-    "lib": ["es2021"],
-    "module": "commonjs",
-    "noEmit": true,
-    "strict": true,
-    "outDir": "dist",
-    "esModuleInterop": true,
-    "paths": {
-      "*": ["./src/*"],
-      "@server": [
-        "./src/"
-      ],
+    "compilerOptions": {
+        "composite": true,
+        "skipLibCheck": true,
+        "target": "es2020",
+        "lib": ["es2021"],
+        "module": "commonjs",
+        "noEmit": true,
+        "strict": true,
+        "outDir": "dist",
+        "esModuleInterop": true,
+        "paths": {
+            "*": ["./src/*"],
+            "@server": ["./src/"]
+        },
+        "types": ["bun-types"]
     },
-    "types": ["bun-types"]
-  },
-  "exclude": ["node_modules"]
+    "exclude": ["node_modules"]
 }

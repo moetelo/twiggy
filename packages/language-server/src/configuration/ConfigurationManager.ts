@@ -3,9 +3,7 @@ import type {
     DidChangeConfigurationParams,
     WorkspaceFolder,
 } from 'vscode-languageserver';
-import {
-    DidChangeConfigurationNotification,
-} from 'vscode-languageserver';
+import { DidChangeConfigurationNotification } from 'vscode-languageserver';
 import type { LanguageServerSettings, PhpFramework } from './LanguageServerSettings';
 import { PhpFrameworkOption } from './LanguageServerSettings';
 import { InlayHintProvider } from '../inlayHints/InlayHintProvider';
@@ -16,9 +14,7 @@ import type { SignatureHelpProvider } from '../signature-helps/SignatureHelpProv
 import type { DefinitionProvider } from '../definitions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
-import type {
-    IFrameworkTwigEnvironment,
-} from '../twigEnvironment';
+import type { IFrameworkTwigEnvironment } from '../twigEnvironment';
 import {
     SymfonyTwigEnvironment,
     CraftTwigEnvironment,
@@ -33,8 +29,8 @@ import type { FormattingProvider } from 'formatting/FormattingProvider';
 import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
 
 /** Settings as the client sends them: fields with a server-side fallback may be missing. */
-type ClientSettings = Omit<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'>
-    & Partial<Pick<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'>>;
+type ClientSettings = Omit<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'> &
+    Partial<Pick<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'>>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null;
@@ -64,13 +60,12 @@ function resolveTwigEnvironment(framework: PhpFramework, phpExecutor: PhpExecuto
 
         default:
             return null;
-
     }
 }
 
 async function tryGuessFramework(workspaceDirectory: string): Promise<PhpFramework | undefined> {
     const composerJsonPath = `${workspaceDirectory}/composer.json`;
-    if (!await isFile(composerJsonPath)) {
+    if (!(await isFile(composerJsonPath))) {
         return undefined;
     }
 
@@ -117,14 +112,17 @@ export class ConfigurationManager {
         private readonly diagnosticProvider: DiagnosticProvider,
         private readonly formattingProvider: FormattingProvider,
     ) {
-        void connection.client.register(DidChangeConfigurationNotification.type, { section: this.configurationSection });
-        connection.onDidChangeConfiguration((params) => {
+        void connection.client.register(DidChangeConfigurationNotification.type, {
+            section: this.configurationSection,
+        });
+        connection.onDidChangeConfiguration(params => {
             void this.onDidChangeConfiguration(params);
         });
     }
 
     async onDidChangeConfiguration({ settings }: DidChangeConfigurationParams) {
-        const config: ClientSettings = readClientSettings(settings, this.configurationSection) ?? this.defaultSettings;
+        const config: ClientSettings =
+            readClientSettings(settings, this.configurationSection) ?? this.defaultSettings;
 
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
@@ -165,10 +163,10 @@ export class ConfigurationManager {
         });
 
         if (twigEnvironment.environment === null) {
-            console.warn('Failed to load Twig environment.')
+            console.warn('Failed to load Twig environment.');
         } else {
-            console.info('Successfully loaded Twig environment.')
-            console.debug(twigEnvironment.environment)
+            console.info('Successfully loaded Twig environment.');
+            console.debug(twigEnvironment.environment);
         }
 
         this.applySettings(twigEnvironment, phpExecutor, twigCodeStyleFixer);

@@ -45,9 +45,7 @@ const buildOptions = {
         server: '../language-server/src/index.ts',
     },
     bundle: true,
-    external: [
-        'vscode',
-    ],
+    external: ['vscode'],
     outdir: './dist',
     format: 'cjs',
     platform: 'node',
@@ -58,14 +56,18 @@ const buildOptions = {
     logLevel: isDev ? 'error' : 'info',
     define: {
         'process.env.NODE_ENV': isDev ? 'undefined' : '"production"',
-        '__DEBUG__': JSON.stringify(isDev),
+        __DEBUG__: JSON.stringify(isDev),
     },
     plugins: [
-        ...(isDev ? [ triggerVscodeDebug, watchLogPlugin ] : []),
+        ...(isDev ? [triggerVscodeDebug, watchLogPlugin] : []),
         copyPlugin({
             resolveFrom: 'cwd',
             assets: [
-                { watch: isDev, from: '../language-server/node_modules/web-tree-sitter/tree-sitter.wasm', to: './dist/' },
+                {
+                    watch: isDev,
+                    from: '../language-server/node_modules/web-tree-sitter/tree-sitter.wasm',
+                    to: './dist/',
+                },
                 { watch: isDev, from: grammarWasmPath, to: './dist/' },
                 { watch: isDev, from: '../language-server/phpUtils/**/*', to: './dist/phpUtils/' },
             ],
@@ -82,7 +84,7 @@ async function main() {
 
     if (!grammarWasmExists) {
         console.info('Building wasm grammar. This may take a while.');
-        execSync('bun run --cwd ../tree-sitter-twig build-wasm', { stdio: 'inherit' })
+        execSync('bun run --cwd ../tree-sitter-twig build-wasm', { stdio: 'inherit' });
     }
 
     const ctx = await esbuild.context(buildOptions);

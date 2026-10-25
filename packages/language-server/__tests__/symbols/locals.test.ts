@@ -13,7 +13,7 @@ const collect = async (code: string) => {
 };
 
 const testOneVariable = async (varName: string, code: string, scope?: LocalSymbolInformation) => {
-    const symbols = scope ?? await collect(code);
+    const symbols = scope ?? (await collect(code));
 
     assert.strictEqual(symbols.variable.length, 1);
 
@@ -96,7 +96,10 @@ describe('locals', () => {
         const code = `{% apply trim|nl2br %}text{% endapply %}`;
         const locals = await collect(code);
 
-        assert.deepEqual(locals.variable.map((variable) => variable.name), []);
+        assert.deepEqual(
+            locals.variable.map(variable => variable.name),
+            [],
+        );
     });
 
     test('collects implicitly defined variable inside of if condition', async () => {

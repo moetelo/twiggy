@@ -10,19 +10,23 @@ export interface LocalSymbol {
 
 type IWithReferences = { references: Range[] };
 type IWithReflectedType = {
-    type?: string,
-    reflectedType: ReflectedType | null,
+    type?: string;
+    reflectedType: ReflectedType | null;
 };
 
 export interface TwigVariableDeclaration extends LocalSymbol, IWithReferences, IWithReflectedType {
     value?: string;
 }
 
-export function hasReferences<T extends LocalSymbol | IWithReflectedType>(node: T): node is T & IWithReferences {
+export function hasReferences<T extends LocalSymbol | IWithReflectedType>(
+    node: T,
+): node is T & IWithReferences {
     return 'references' in node;
 }
 
-export function hasReflectedType<T extends LocalSymbol | IWithReferences>(node: T): node is T & IWithReflectedType {
+export function hasReflectedType<T extends LocalSymbol | IWithReferences>(
+    node: T,
+): node is T & IWithReflectedType {
     return 'reflectedType' in node && node.reflectedType !== null;
 }
 

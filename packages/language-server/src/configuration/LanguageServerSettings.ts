@@ -1,7 +1,7 @@
 export type InlayHintSettings = {
-    macro: boolean,
-    macroArguments: boolean,
-    block: boolean,
+    macro: boolean;
+    macroArguments: boolean;
+    block: boolean;
 };
 
 export enum PhpFrameworkOption {
@@ -11,19 +11,22 @@ export enum PhpFrameworkOption {
     Craft = 'craft',
 }
 
-export type PhpFramework = PhpFrameworkOption.Twig | PhpFrameworkOption.Symfony | PhpFrameworkOption.Craft;
+export type PhpFramework =
+    | PhpFrameworkOption.Twig
+    | PhpFrameworkOption.Symfony
+    | PhpFrameworkOption.Craft;
 
 type DiagnosticsSettings = {
-    twigCsFixer: boolean,
+    twigCsFixer: boolean;
 };
 
 export type LanguageServerSettings = {
-    autoInsertSpaces: boolean,
-    inlayHints: InlayHintSettings,
+    autoInsertSpaces: boolean;
+    inlayHints: InlayHintSettings;
 
-    framework?: PhpFrameworkOption,
-    phpExecutable: string,
-    symfonyConsolePath: string,
-    vanillaTwigEnvironmentPath: string,
-    diagnostics: DiagnosticsSettings,
+    framework?: PhpFrameworkOption;
+    phpExecutable: string;
+    symfonyConsolePath: string;
+    vanillaTwigEnvironmentPath: string;
+    diagnostics: DiagnosticsSettings;
 };

@@ -1,6 +1,5 @@
-
 export type TwigEnvironmentArgs = {
-    symfonyConsolePath: string,
-    workspaceDirectory: string,
-    vanillaTwigEnvironmentPath: string,
+    symfonyConsolePath: string;
+    workspaceDirectory: string;
+    vanillaTwigEnvironmentPath: string;
 };

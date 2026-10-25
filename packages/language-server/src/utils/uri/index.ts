@@ -1,2 +1,2 @@
 export { documentUriToFsPath } from './documentUriToFsPath';
-export { toDocumentUri } from './toDocumentUri'
+export { toDocumentUri } from './toDocumentUri';

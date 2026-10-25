@@ -5,13 +5,8 @@
       "camelcase": "Twig",
       "scope": "twig",
       "path": ".",
-      "file-types": [
-        "twig",
-        "html.twig"
-      ],
-      "highlights": [
-        "queries/highlights.scm"
-      ],
+      "file-types": ["twig", "html.twig"],
+      "highlights": ["queries/highlights.scm"],
       "injections": "queries/injections.scm",
       "injection-regex": "twig"
     }
