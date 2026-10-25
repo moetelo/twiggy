@@ -31,15 +31,13 @@ const toTwigVariable = ([identifier, value]: [string, TwigGlobalValue]): TwigVar
     value,
 });
 
-const isTemplateNamespace = (value: string): value is TemplateNamespace =>
-    value === '' || value.startsWith('@');
-
 const toTemplateMappings = ([namespaceRaw, directories]: [
     string,
     string[],
 ]): TemplatePathMapping[] => {
     // Symfony reports the main namespace as '(None)'.
-    const namespace: TemplateNamespace = isTemplateNamespace(namespaceRaw) ? namespaceRaw : '';
+    // Other keys stay as-is: Craft site template roots use plain prefixes like `my-plugin`.
+    const namespace: TemplateNamespace = namespaceRaw === '(None)' ? '' : namespaceRaw;
 
     return directories.map(directory => ({
         namespace,

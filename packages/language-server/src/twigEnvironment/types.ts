@@ -16,7 +16,12 @@ export type TwigVariable = {
     value: TwigGlobalValue;
 };
 
-export type TemplateNamespace = `@${string}` | '';
+/**
+ * Prefix a template path must start with to use this mapping:
+ * `''` for the main namespace, `@Name` for a Twig namespace,
+ * or a plain prefix like `my-plugin` for a Craft site template root.
+ */
+export type TemplateNamespace = string;
 
 export type TemplatePathMapping = {
     directory: string;
