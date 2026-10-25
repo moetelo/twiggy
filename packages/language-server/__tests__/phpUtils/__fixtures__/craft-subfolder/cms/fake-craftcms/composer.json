@@ -1,0 +1,7 @@
+{
+    "name": "craftcms/cms",
+    "description": "Minimal stand-in for Craft CMS: only the surface printCraftTwigEnvironment.php touches.",
+    "version": "5.0.0",
+    "type": "library",
+    "license": "MIT"
+}

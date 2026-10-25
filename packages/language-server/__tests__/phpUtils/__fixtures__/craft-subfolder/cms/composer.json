@@ -1,0 +1,16 @@
+{
+    "name": "twiggy/test-craft-subfolder",
+    "description": "Craft-in-a-subfolder fixture for phpUtils integration tests.",
+    "type": "project",
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "fake-craftcms"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "*",
+        "twig/twig": "^3.0"
+    }
+}

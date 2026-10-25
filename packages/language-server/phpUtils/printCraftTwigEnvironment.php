@@ -37,6 +37,21 @@ $twig = $view->getTwig();
 $templateRoots = ['' => [$templatesPath ?? 'templates']];
 $templateRoots = array_merge($templateRoots, $view->getSiteTemplateRoots());
 
+// The language server resolves loader paths against the workspace folder,
+// which is not the Craft root when Craft lives in a subfolder.
+$toAbsolutePath = function (string $path) use ($WORKSPACE_DIR): string {
+    $absolutePath = \Twiggy\Metadata\isAbsolutePath($path)
+        ? $path
+        : $WORKSPACE_DIR . DIRECTORY_SEPARATOR . $path;
+
+    // realpath() is false for missing dirs; keep the unresolved path then.
+    return realpath($absolutePath) ?: $absolutePath;
+};
+$templateRoots = array_map(
+    fn (string|array $paths) => array_map($toAbsolutePath, (array)$paths),
+    $templateRoots,
+);
+
 $twigMetadata = \Twiggy\Metadata\getTwigMetadata($twig, 'craft');
 $twigMetadata['loader_paths'] = $templateRoots;
 
