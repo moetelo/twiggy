@@ -14,12 +14,13 @@ import type { SignatureHelpProvider } from '../signature-helps/SignatureHelpProv
 import type { DefinitionProvider } from '../definitions';
 import { documentUriToFsPath } from '../utils/uri';
 import { PhpExecutor } from '../phpInterop/PhpExecutor';
-import type { IFrameworkTwigEnvironment } from '../twigEnvironment';
+import type { IFrameworkTwigEnvironment, TemplatePathMapping } from '../twigEnvironment';
 import {
     SymfonyTwigEnvironment,
     CraftTwigEnvironment,
     VanillaTwigEnvironment,
     EmptyEnvironment,
+    withTemplateMappings,
 } from '../twigEnvironment';
 import { TypeResolver } from '../typing/TypeResolver';
 import { isFile } from '../utils/files/fileStat';
@@ -28,14 +29,12 @@ import type { DiagnosticProvider } from 'diagnostics';
 import type { FormattingProvider } from 'formatting/FormattingProvider';
 import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
 import { parseFrameworkSetting } from './parseFrameworkSetting';
+import { isRecord } from '../utils/isRecord';
+import { parseTemplatePaths } from './templatePaths';
 
 /** Settings as the client sends them: fields with a server-side fallback may be missing. */
 type ClientSettings = Omit<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'> &
     Partial<Pick<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'>>;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null;
-}
 
 function isClientSettings(value: unknown): value is ClientSettings {
     return isRecord(value);
@@ -137,7 +136,10 @@ export class ConfigurationManager {
         this.inlayHintProvider.settings = config.inlayHints ?? InlayHintProvider.defaultSettings;
         this.bracketSpacesInsertionProvider.isEnabled = config.autoInsertSpaces ?? true;
 
-        this.applySettings(EmptyEnvironment, null, null);
+        // Applied with every environment, so they work without PHP or with `framework: ignore`.
+        const userTemplateMappings = parseTemplatePaths(config.templatePaths);
+
+        this.applySettings(EmptyEnvironment, userTemplateMappings, null, null);
 
         const configuredFramework = parseFrameworkSetting(config.framework);
         if (configuredFramework === PhpFrameworkOption.Ignore) {
@@ -175,20 +177,22 @@ export class ConfigurationManager {
             console.debug(twigEnvironment.environment);
         }
 
-        this.applySettings(twigEnvironment, phpExecutor, twigCodeStyleFixer);
+        this.applySettings(twigEnvironment, userTemplateMappings, phpExecutor, twigCodeStyleFixer);
     }
 
     private applySettings(
         frameworkEnvironment: IFrameworkTwigEnvironment,
+        userTemplateMappings: TemplatePathMapping[],
         phpExecutor: PhpExecutor | null,
         twigCodeStyleFixer: TwigCodeStyleFixer | null,
     ) {
+        const environment = withTemplateMappings(frameworkEnvironment, userTemplateMappings);
         const typeResolver = phpExecutor ? new TypeResolver(phpExecutor) : null;
 
         this.definitionProvider.phpExecutor = phpExecutor;
-        this.completionProvider.refresh(frameworkEnvironment, phpExecutor, typeResolver);
-        this.signatureHelpProvider.reindex(frameworkEnvironment);
-        this.documentCache.configure(frameworkEnvironment, typeResolver);
+        this.completionProvider.refresh(environment, phpExecutor, typeResolver);
+        this.signatureHelpProvider.reindex(environment);
+        this.documentCache.configure(environment, typeResolver);
 
         void this.diagnosticProvider.refresh(twigCodeStyleFixer);
         this.formattingProvider.refresh(twigCodeStyleFixer);

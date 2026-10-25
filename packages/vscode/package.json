@@ -109,6 +109,30 @@
                     "scope": "resource",
                     "default": "bin/console",
                     "markdownDescription": "Path to the Symfony console. See: https://symfony.com/doc/current/templates.html#inspecting-twig-information"
+                },
+                "twiggy.templatePaths": {
+                    "type": "array",
+                    "scope": "resource",
+                    "default": [],
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "namespace": {
+                                "type": "string",
+                                "markdownDescription": "Twig namespace, e.g. `@MyBundle`. The `@` is added if missing. Use `\"\"` for the root namespace."
+                            },
+                            "path": {
+                                "type": "string",
+                                "markdownDescription": "Templates directory, relative to the workspace folder or absolute."
+                            }
+                        },
+                        "required": [
+                            "namespace",
+                            "path"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "markdownDescription": "Extra template namespace → directory mappings, e.g. `[{ \"namespace\": \"@MyBundle\", \"path\": \"src/MyBundle/templates\" }]`. Checked before the paths detected from the framework, and used even when `twiggy.framework` is `ignore` or PHP is not configured."
                 }
             }
         },
