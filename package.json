@@ -28,6 +28,8 @@
     "test": "bun run --cwd ./packages/language-server test",
     "typecheck": "bun run --cwd ./packages/language-server typecheck && bun run --cwd ./packages/vscode typecheck",
     "lint": "oxlint",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
     "knip": "knip && knip --production --strict",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist && bun run --cwd ./packages/tree-sitter-twig clean"
   },
@@ -35,6 +37,7 @@
   "license": "Mozilla Public License 2.0",
   "devDependencies": {
     "knip": "^6.43.0",
+    "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",
     "oxlint-tsgolint": "^7.0.2005"
   }

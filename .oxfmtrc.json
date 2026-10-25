@@ -1,0 +1,14 @@
+{
+    "$schema": "./node_modules/oxfmt/configuration_schema.json",
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "sortPackageJson": false,
+    "ignorePatterns": ["**/__fixtures__/**"],
+    "overrides": [
+        {
+            // Matches the Prettier default width the grammar was written against (see its .prettierrc).
+            "files": ["packages/tree-sitter-twig/**"],
+            "options": { "printWidth": 80 }
+        }
+    ]
+}
