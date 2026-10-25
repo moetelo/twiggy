@@ -27,10 +27,20 @@ jobs:
 
       - run: bun run build
 
-      - run: bunx @vscode/vsce publish --no-dependencies
+      # Package once, publish the same .vsix everywhere and attach it to the GitHub release.
+      - run: bunx @vscode/vsce package --no-dependencies
         working-directory: ./packages/vscode
 
-      - run: bunx ovsx publish --no-dependencies
+      - uses: actions/upload-artifact@v7
+        with:
+          name: vsix
+          path: packages/vscode/*.vsix
+          if-no-files-found: error
+
+      - run: bunx @vscode/vsce publish --packagePath twiggy-*.vsix
+        working-directory: ./packages/vscode
+
+      - run: bunx ovsx publish twiggy-*.vsix
         working-directory: ./packages/vscode
 
       # Trusted publishing needs npm >= 11.5.1; bun publish has no OIDC support.
@@ -58,6 +68,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: vsix
+          path: ${{ runner.temp }}/assets
+
       - name: Create GitHub release from CHANGELOG
         env:
           GH_TOKEN: ${{ github.token }}
@@ -68,4 +83,4 @@ jobs:
             echo "::error::No CHANGELOG.md section for $version"
             exit 1
           fi
-          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$version" --notes-file "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$version" --notes-file "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP"/assets/*.vsix
