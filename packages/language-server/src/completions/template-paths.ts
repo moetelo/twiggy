@@ -48,10 +48,11 @@ export async function templatePaths(
         return [];
     }
 
-    // This case for array or ternary wrappers
+    // This case for array wrappers
     // ['template.html']
-    // ajax ? 'ajax.html' : 'not_ajax.html'
-    if (['array', 'ternary'].includes(node.type)) {
+    // TODO: ternary wrappers (`ajax ? 'ajax.html' : 'not_ajax.html'`) were meant to be handled
+    // here too, but compared against `ternary`, which is not a node type (`ternary_expression` is).
+    if (node.type === 'array') {
         node = node.parent;
     }
 

@@ -15,9 +15,7 @@ import type { ReflectedType } from '../phpInterop/ReflectedType';
 const nodesToDiveInto: ReadonlySet<string> = new Set([
     'if',
     'elseif',
-    'else',
     'output',
-    'primary_expression',
     'unary_expression',
     'binary_expression',
     'ternary_expression',
