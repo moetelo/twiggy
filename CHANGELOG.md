@@ -1,3 +1,20 @@
+## 26.10.1 (2026-10-25)
+
+- feat: add `twiggy.templatePaths` setting for custom template namespace → directory mappings (#87, closes #53)
+- fix(symfony): resolve loader paths against the Symfony project dir, fixing monorepos and Windows (#89, #64)
+
+Thanks to @Swahjak for the contributions.
+
+### regressions from 26.10.0
+
+- fix: guess `twiggy.framework` again when VS Code sends an empty string; namespaced templates showed "Template not found" (#91)
+- fix: keep plain template root prefixes (e.g. Craft plugin roots) as namespaces instead of mapping them to the main namespace (#92)
+
+### internal
+
+- chore: bump typescript to 7 (native Go compiler) (#90)
+- ci: create GitHub release from CHANGELOG on tag push and attach .vsix
+
 ## 26.10.0 (2026-10-25)
 
 - fix(symbols): variables used only inside `include`, `embed`, `apply`, `autoescape`, `sandbox`, `cache`, `do` or `deprecated` tags are no longer reported as unused (#83)
