@@ -23,44 +23,44 @@ describe('resolveLoaderPath', () => {
     });
 
     describe('win32', () => {
-        const projectDir = 'C:\\workspace\\app';
+        const projectDir = String.raw`C:\workspace\app`;
 
         test('treats `/templates` as relative to the project dir', () => {
             assert.equal(
                 resolveLoaderPath('/templates', projectDir, path.win32),
-                'C:\\workspace\\app\\templates',
+                String.raw`C:\workspace\app\templates`,
             );
         });
 
         test('treats `\\templates` as relative to the project dir', () => {
             assert.equal(
-                resolveLoaderPath('\\templates', projectDir, path.win32),
-                'C:\\workspace\\app\\templates',
+                resolveLoaderPath(String.raw`\templates`, projectDir, path.win32),
+                String.raw`C:\workspace\app\templates`,
             );
         });
 
         test('keeps a drive-letter path', () => {
             assert.equal(
-                resolveLoaderPath('D:\\bundles\\views', projectDir, path.win32),
-                'D:\\bundles\\views',
+                resolveLoaderPath(String.raw`D:\bundles\views`, projectDir, path.win32),
+                String.raw`D:\bundles\views`,
             );
         });
 
         test('keeps a UNC path', () => {
             assert.equal(
-                resolveLoaderPath('\\\\server\\share\\views', projectDir, path.win32),
-                '\\\\server\\share\\views',
+                resolveLoaderPath(String.raw`\\server\share\views`, projectDir, path.win32),
+                String.raw`\\server\share\views`,
             );
         });
 
         test('normalizes mixed separators', () => {
             assert.equal(
                 resolveLoaderPath(
-                    'vendor\\knplabs\\knp-menu\\src\\Knp\\Menu/Resources/views',
+                    String.raw`vendor\knplabs\knp-menu\src\Knp\Menu/Resources/views`,
                     projectDir,
                     path.win32,
                 ),
-                'C:\\workspace\\app\\vendor\\knplabs\\knp-menu\\src\\Knp\\Menu\\Resources\\views',
+                String.raw`C:\workspace\app\vendor\knplabs\knp-menu\src\Knp\Menu\Resources\views`,
             );
         });
     });
