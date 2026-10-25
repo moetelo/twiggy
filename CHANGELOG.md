@@ -1,3 +1,25 @@
+## 26.10.0 (2026-10-25)
+
+- fix(symbols): variables used only inside `include`, `embed`, `apply`, `autoescape`, `sandbox`, `cache`, `do` or `deprecated` tags are no longer reported as unused (#83)
+- fix(reflectType): getters with union or intersection return types no longer crash the language server (#85, #86)
+- fix(symbols): await variable declarations in types and for-loop visitors
+- fix(exec): reject on spawn errors instead of crashing the server
+- fix(templates): build twig file paths without deprecated `Dirent.path`
+- fix(bin): exit non-zero when the server fails to load
+- fix: guard nullable tree-sitter nodes instead of asserting them
+
+Thanks to @wuhhh and @sfrisso for the contributions.
+
+### internal
+
+- refactor(server): add `Server.listen`, reject init without a workspace folder, share one parser promise
+- refactor(vscode): await-safe auto insert and workspace folder handling
+- refactor: replace `any` and unsafe casts with type guards; use type-only imports; split long functions
+- chore: remove unused exports, dead code and node-type names the grammar never produces
+- chore: adopt oxlint, knip and oxfmt with strict settings; add editorconfig
+- test: assert every completion, not just the first
+- ci: publish language-server via npm trusted publishing
+
 ## 26.8.0 (2026-08-01)
 
 - fix: moved tree-sitter tests from corpus/ to test/corpus for the tree-sitter CLI to pick them up when running tree-sitter test (#80)

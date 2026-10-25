@@ -13,7 +13,7 @@
     },
     "packages/language-server": {
       "name": "twiggy-language-server",
-      "version": "26.8.0",
+      "version": "26.10.0",
       "bin": {
         "twiggy-language-server": "bin/server.js",
       },
@@ -43,7 +43,7 @@
     },
     "packages/vscode": {
       "name": "twiggy",
-      "version": "26.8.0",
+      "version": "26.10.0",
       "dependencies": {
         "twiggy-language-server": "workspace:*",
         "vscode-languageclient": "^9.0.1",
