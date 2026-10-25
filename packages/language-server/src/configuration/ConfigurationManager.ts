@@ -27,6 +27,7 @@ import { readFile } from 'node:fs/promises';
 import type { DiagnosticProvider } from 'diagnostics';
 import type { FormattingProvider } from 'formatting/FormattingProvider';
 import { TwigCodeStyleFixer } from 'phpInterop/TwigCodeStyleFixer';
+import { parseFrameworkSetting } from './parseFrameworkSetting';
 
 /** Settings as the client sends them: fields with a server-side fallback may be missing. */
 type ClientSettings = Omit<LanguageServerSettings, 'autoInsertSpaces' | 'inlayHints'> &
@@ -85,6 +86,15 @@ async function tryGuessFramework(workspaceDirectory: string): Promise<PhpFramewo
     return undefined;
 }
 
+async function guessFramework(workspaceDirectory: string): Promise<PhpFramework | undefined> {
+    const framework = await tryGuessFramework(workspaceDirectory);
+    if (framework !== undefined) {
+        console.info('Guessed `twiggy.framework`:', framework);
+    }
+
+    return framework;
+}
+
 export class ConfigurationManager {
     readonly configurationSection = 'twiggy';
 
@@ -129,20 +139,16 @@ export class ConfigurationManager {
 
         this.applySettings(EmptyEnvironment, null, null);
 
-        if (config.framework === PhpFrameworkOption.Ignore) {
+        const configuredFramework = parseFrameworkSetting(config.framework);
+        if (configuredFramework === PhpFrameworkOption.Ignore) {
             return;
         }
 
         const workspaceDirectory = documentUriToFsPath(this.workspaceFolder.uri);
-        if (config.framework === undefined) {
-            config.framework = await tryGuessFramework(workspaceDirectory);
-
-            if (config.framework === undefined) {
-                console.warn('`twiggy.framework` is required.');
-                return;
-            }
-
-            console.info('Guessed `twiggy.framework`:', config.framework);
+        const framework = configuredFramework ?? (await guessFramework(workspaceDirectory));
+        if (framework === undefined) {
+            console.warn('`twiggy.framework` is required.');
+            return;
         }
 
         const phpExecutor = new PhpExecutor(config.phpExecutable, workspaceDirectory);
@@ -150,9 +156,9 @@ export class ConfigurationManager {
             ? new TwigCodeStyleFixer(phpExecutor, workspaceDirectory)
             : null;
 
-        const twigEnvironment = resolveTwigEnvironment(config.framework, phpExecutor);
+        const twigEnvironment = resolveTwigEnvironment(framework, phpExecutor);
         if (!twigEnvironment) {
-            console.warn(`Unknown \`twiggy.framework\`: ${config.framework}`);
+            console.warn(`Unknown \`twiggy.framework\`: ${framework}`);
             return;
         }
 
