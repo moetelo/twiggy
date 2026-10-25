@@ -15,7 +15,9 @@ export function parseFrameworkSetting(value: unknown): PhpFrameworkOption | unde
     if (isFrameworkOption(value)) return value;
 
     if (value !== undefined && value !== null && value !== '') {
-        console.warn(`Unknown \`twiggy.framework\`: ${JSON.stringify(value)}. Guessing it instead.`);
+        console.warn(
+            `Unknown \`twiggy.framework\`: ${JSON.stringify(value)}. Guessing it instead.`,
+        );
     }
 
     return undefined;
