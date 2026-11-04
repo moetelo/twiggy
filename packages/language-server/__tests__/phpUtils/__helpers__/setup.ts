@@ -8,6 +8,8 @@ const PHP_UTILS_DIR = path.resolve(__dirname, '..', '..', '..', 'phpUtils');
 
 export const PSR4_WORKSPACE = path.join(FIXTURES_DIR, 'psr4-workspace');
 export const TWIG_ENV_WORKSPACE = path.join(FIXTURES_DIR, 'twig-env');
+/** Workspace root; the (fake) Craft install lives in its `cms/` subfolder. */
+export const CRAFT_SUBFOLDER_WORKSPACE = path.join(FIXTURES_DIR, 'craft-subfolder');
 
 /**
  * Production `PhpUtilPath` resolves scripts relative to the bundled `dist/`
